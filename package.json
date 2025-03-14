@@ -4,7 +4,7 @@
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
+    "android": "npx react-native run-android",
     "ios": "expo start --ios",
     "web": "expo start --web"
   },
