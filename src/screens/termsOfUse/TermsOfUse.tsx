@@ -5,7 +5,7 @@ import { StackActions } from "@react-navigation/native";
 import ExitApp from "react-native-exit-app";
 import { styles } from "./style";
 
-const TermsScreen = ({ navigation }: any) => {
+export const TermsScreen = ({ navigation }: any) => {
   const acceptTerms = async () => {
     // await AsyncStorage.setItem("hasAcceptedTerms", "true");
     //navigation.dispatch(StackActions.replace("ControlScreen"));

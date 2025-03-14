@@ -12,11 +12,18 @@
     "@expo/metro-config": "^0.19.12",
     "@react-native-async-storage/async-storage": "^2.1.2",
     "@react-native/metro-config": "^0.78.0",
+    "@react-navigation/bottom-tabs": "^7.2.1",
     "@react-navigation/native": "^7.0.15",
+    "@react-navigation/native-stack": "^7.2.1",
     "expo": "~52.0.38",
+    "expo-av": "^15.0.2",
+    "expo-speech": "^13.0.1",
+    "expo-splash-screen": "^0.29.22",
     "expo-status-bar": "~2.0.1",
     "react": "18.3.1",
     "react-native": "0.76.7",
+    "react-native-ble-manager": "^12.1.4",
+    "react-native-bluetooth-state-manager": "^1.3.5",
     "react-native-exit-app": "^2.0.0"
   },
   "devDependencies": {

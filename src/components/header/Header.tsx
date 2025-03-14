@@ -4,14 +4,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { styles } from "./style";
 
-
-interface HeaderProps {
+interface IHeaderProps {
   toggleMenu: () => void;
   props: string;
   sendShutdownCommand: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
+export const Header: React.FC<IHeaderProps> = ({
   toggleMenu,
   props,
   sendShutdownCommand,
