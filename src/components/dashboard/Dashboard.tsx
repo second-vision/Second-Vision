@@ -1,13 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
-  Dimensions,
-  StyleSheet,
   SafeAreaView,
-  TextInput,
-  Alert,
   Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";

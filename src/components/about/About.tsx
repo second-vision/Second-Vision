@@ -5,10 +5,8 @@ import {
 	Text,
 	View,
 	Image,
-	StyleSheet,
 	TouchableOpacity,
 	Modal,
-	Dimensions,
 	FlatList
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
