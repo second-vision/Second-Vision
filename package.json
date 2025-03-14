@@ -5,18 +5,23 @@
   "scripts": {
     "start": "expo start",
     "android": "npx react-native run-android",
-    "ios": "expo start --ios",
+    "ios": "expo run:ios",
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/metro-config": "^0.19.12",
+    "@react-native-async-storage/async-storage": "^2.1.2",
+    "@react-native/metro-config": "^0.78.0",
     "@react-navigation/native": "^7.0.15",
     "expo": "~52.0.38",
     "expo-status-bar": "~2.0.1",
     "react": "18.3.1",
-    "react-native": "0.76.7"
+    "react-native": "0.76.7",
+    "react-native-exit-app": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@react-native-community/cli": "^18.0.0",
     "@types/react": "~18.3.12",
     "typescript": "^5.3.3"
   },
