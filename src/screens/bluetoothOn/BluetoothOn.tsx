@@ -39,7 +39,7 @@ import { styles } from "./style";
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
-export default function BluetoothOnScreen() {
+export const BluetoothOn = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [bluetoothState, setBluetoothState] = useState("PoweredOn");
@@ -488,4 +488,4 @@ export default function BluetoothOnScreen() {
       <About visible={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
     </View>
   );
-}
+};

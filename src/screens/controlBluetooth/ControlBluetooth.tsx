@@ -5,7 +5,7 @@ import { useNavigation, StackActions } from "@react-navigation/native";
 import { BackHandler } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const ControlScreen = () => {
+export const ControlBluetooth = () => {
   const [bluetoothState, setBluetoothState] = useState("");
   const navigation = useNavigation();
 

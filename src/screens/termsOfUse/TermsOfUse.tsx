@@ -1,14 +1,14 @@
 import React from "react";
 import { ScrollView, View, Text, Pressable, Alert } from "react-native";
 import { StackActions } from "@react-navigation/native";
-//import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import ExitApp from "react-native-exit-app";
 import { styles } from "./style";
 
-export const TermsScreen = ({ navigation }: any) => {
+export const TermsOfUse = ({ navigation }: any) => {
   const acceptTerms = async () => {
-    // await AsyncStorage.setItem("hasAcceptedTerms", "true");
-    //navigation.dispatch(StackActions.replace("ControlScreen"));
+    await AsyncStorage.setItem("hasAcceptedTerms", "true");
+    navigation.dispatch(StackActions.replace("ControlScreen"));
   };
 
   const rejectTerms = () => {
