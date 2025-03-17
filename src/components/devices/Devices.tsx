@@ -8,7 +8,7 @@ export const Devices = () => {
   return (
     <View style={styles.titulo}>
       <Image
-        source={require("../../assets/images/Logo.png")}
+        source={require("../../../assets/images/Logo.png")}
         style={styles.image}
         resizeMode="contain"
         accessibilityLabel="Logo da aplicação"

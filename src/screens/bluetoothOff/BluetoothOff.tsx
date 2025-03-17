@@ -126,7 +126,7 @@ export const BluetoothOff = () => {
     <View style={styles.container}>
       <View>
         <Image
-          source={require("../../assets/images/device_icon.png")}
+          source={require("../../../assets/images/device_icon.png")}
           style={styles.image}
           resizeMode="contain"
           accessibilityLabel="Ícone de dispositivo Bluetooth"

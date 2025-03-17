@@ -38,7 +38,7 @@ type HomeScreenRouteProp = RouteProp<TabParamList, "Home">;
 
 const loadFonts = async () => {
   await Font.loadAsync({
-    FonteCustomizada: require("../../assets/fonts/Poppins-SemiBoldItalic.ttf"),
+    FonteCustomizada: require("../../../assets/fonts/Poppins-SemiBoldItalic.ttf"),
   });
 };
 

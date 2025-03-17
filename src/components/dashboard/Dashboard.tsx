@@ -40,8 +40,8 @@ export const Dashboard: React.FC<IDashboardProps> = ({
   }
 
   const systemIcon = isOn
-    ? require("../../assets/images/on_icon.png")
-    : require("../../assets/images/off_icon.png");
+    ? require("../../../assets/images/on_icon.png")
+    : require("../../../assets/images/off_icon.png");
 
   return (
     <SafeAreaView>
@@ -78,7 +78,7 @@ export const Dashboard: React.FC<IDashboardProps> = ({
 
           <View style={styles.info}>
             <Image
-              source={require("../../assets/images/timer_icon.png")}
+              source={require("../../../assets/images/timer_icon.png")}
               style={[{ width: 30, height: 35 }]}
               accessibilityLabel="Ícone do temporizador"
             />

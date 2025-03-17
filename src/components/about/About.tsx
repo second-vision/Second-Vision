@@ -71,7 +71,7 @@ export const About: React.FC<IAboutProps> = ({ visible, onClose }) => {
 				</TouchableOpacity>
 				<View style={styles.modalInfo}>
 					<Image
-						source={require("../../assets/images/LogoPreta.png")}
+						source={require("../../../assets/images/LogoPreta.png")}
 						style={styles.imageSessaoInfo}
 						resizeMode="contain"
 						accessibilityLabel="Logo"

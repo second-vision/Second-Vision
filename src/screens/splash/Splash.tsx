@@ -29,7 +29,7 @@ export const Splash = ({ onComplete }: ISplashProps) => {
     <Video
       style={StyleSheet.absoluteFill}
       resizeMode={ResizeMode.COVER}
-      source={require("../../assets/images/splash.mp4")}
+      source={require("../../../assets/images/splash.mp4")}
       isLooping={false}
       onPlaybackStatusUpdate={onPlaybackStatusUpdate}
       shouldPlay
