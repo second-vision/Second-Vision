@@ -1,10 +1,9 @@
-import { requestPermissions } from "../hooks/useBLE";
-import BluetoothOnScreen from "@/screens/BluetoothOn";
-
+import { requestPermissions } from "../shared/hooks";
+import { BluetoothOn } from "../screens";
 // Request BLE permissions on the first time it opens
 requestPermissions();
 
-export default function BluetoothOn() {
+export const BluetoothOnStack = () => {
   // Defina qual tela você deseja renderizar aqui (pode ser baseada em uma condição, por exemplo, se o Bluetooth está ligado ou não)
-  return <BluetoothOnScreen />;
-}
+  return <BluetoothOn />;
+};

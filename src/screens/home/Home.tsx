@@ -1,47 +1,22 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
-  StyleSheet,
   Alert,
-  Platform,
-  PermissionsAndroid,
   NativeModules,
   NativeEventEmitter,
   SafeAreaView,
   Text,
   ScrollView,
 } from "react-native";
-import * as Font from "expo-font";
-import { About } from "../components/About";
-import { Header } from "../components/Header";
-import { Devices } from "../components/Devices";
-import { Dashboard } from "../components/Dashboard";
-import {
-  useNavigation,
-  StackActions,
-  useRoute,
-  RouteProp,
-} from "@react-navigation/native";
-import * as Speech from "expo-speech";
-import {
-  BleManager,
-  Device,
-  BleError,
-  Characteristic,
-  Subscription,
-} from "react-native-ble-plx";
 import { Base64 } from "js-base64";
-import { RootStackParamList } from "../../app/navigation/types";
+import { Device, BleError, Characteristic } from "react-native-ble-plx";
+import * as Speech from "expo-speech";
 
-// Importar o tipo do RootStackParamList
+import { About, Dashboard, Devices, Header } from "@/src/shared/components";
 
-import { CompositeNavigationProp } from "@react-navigation/native";
-import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useDeviceContext } from "./DeviceContext";
+import { useDeviceContext } from "@/src/shared/context";
+import { styles } from "./styles";
 
-// Definir o tipo de navegação para o HomeScreen
 
-// Definir o tipo da rota para o HomeScreen
 
 // const loadFonts = async () => {
 // 	await Font.loadAsync({
@@ -398,20 +373,3 @@ export const Home = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "space-between",
-  },
-  scrollContent: {
-    paddingVertical: 20,
-  },
-  background: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    height: "100%",
-  },
-});

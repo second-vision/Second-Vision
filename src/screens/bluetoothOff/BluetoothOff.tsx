@@ -17,7 +17,7 @@ import { styles } from "./styles";
 
 const bleManager = new BleManager();
 
-export const Bluetooth = () => {
+export const BluetoothOff = () => {
   const navigation = useNavigation<NavigationProp>();
   const [bluetoothState, setBluetoothState] = useState<State | string>("");
 
