@@ -12,7 +12,7 @@ import {
 } from "react-native";
 //import BleManager from "react-native-ble-manager";
 import * as Speech from "expo-speech";
-import { NavigationProp } from "../../app/navigation/types";
+import { NavigationProp } from "../../app/types/types";
 import { styles } from "./styles";
 
 const bleManager = new BleManager();
@@ -60,7 +60,7 @@ export const BluetoothOff = () => {
     if (bluetoothState === "PoweredOn") {
       console.log("Bluetooth está ligado");
 
-      navigation.navigate("BluetoothOn");
+      navigation.navigate("BluetoothOnStack");
     }
   }, [bluetoothState, navigation]);
 

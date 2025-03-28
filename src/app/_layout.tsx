@@ -5,9 +5,9 @@ export default function RootLayout() {
   return (
     <DeviceProvider>
       <Stack>
-        <Stack.Screen name="BluetoothOff" />
-        <Stack.Screen name="BluetoothOn" />
-        <Stack.Screen name="Home" />
+        <Stack.Screen name="BluetoothOffStack" />
+        <Stack.Screen name="BluetoothOnStack" />
+        <Stack.Screen name="HomeStack" />
       </Stack>
     </DeviceProvider>
   );

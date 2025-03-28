@@ -19,7 +19,7 @@ import * as Speech from "expo-speech";
 import { BleManager, Device, State } from "react-native-ble-plx";
 
 import { About, Devices, Header } from "../../shared/components";
-import { NavigationProp } from "../../app/navigation/types";
+import { NavigationProp } from "../../app/types/types";
 import { useDeviceContext } from "../../shared/context";
 import { styles } from "./styles";
 
