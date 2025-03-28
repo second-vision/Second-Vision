@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
   BackHandler,
   NativeEventEmitter,
   NativeModules,
-  Platform,
-  PermissionsAndroid,
   TouchableHighlight,
   SafeAreaView,
   StatusBar,
@@ -15,27 +13,22 @@ import {
   FlatList,
   Vibration,
 } from "react-native";
-import { Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { About } from "../components/About";
-import { Devices } from "../components/Devices";
-import { Header } from "../components/Header";
-import { BleManager, Device, BleError, Characteristic, State } from "react-native-ble-plx";
-import { useNavigation, StackActions } from "@react-navigation/native";
-
+import { About, Devices, Header } from "../../shared/components";
+import { BleManager, Device, State } from "react-native-ble-plx";
+import { useNavigation } from "@react-navigation/native";
 
 import * as Speech from "expo-speech";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { NavigationProp } from "@/app/types";
-import { useDeviceContext } from "./DeviceContext";
+import { NavigationProp } from "../../app/navigation/types";
+import { useDeviceContext } from "../../shared/context";
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
 const bleManager = new BleManager();
 
-export default function BluetoothOnScreen() {
+export const BluetoothOn = () => {
   const { setDeviceConnection } = useDeviceContext();
 
   const navigation = useNavigation<NavigationProp>();
@@ -44,16 +37,17 @@ export default function BluetoothOnScreen() {
   const [BackColor, setBackColor] = useState("#F6F7F8");
   const [searchPerformed, setSearchPerformed] = useState(false);
 
-
   // Lógica do scan
   const [isScanning, setIsScanning] = useState(false);
   const [isScanningM, setIsScanningM] = useState(true);
   const [ControlnoPeripheral, setControlnoPeripheral] = useState(false);
 
-  const [allDevices, setAllDevices] = useState<Device[]>([]);  // Usando allDevices no lugar de peripherals
+  const [allDevices, setAllDevices] = useState<Device[]>([]); // Usando allDevices no lugar de peripherals
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [showDevicesWithoutName, setShowDevicesWithoutName] = useState(false);
-  const [connectedDevices, setConnectedDevices] = useState<Set<string>>(new Set());
+  const [connectedDevices, setConnectedDevices] = useState<Set<string>>(
+    new Set()
+  );
 
   useEffect(() => {
     speak("Habilite o Bluetooth no botão abaixo");
@@ -93,8 +87,7 @@ export default function BluetoothOnScreen() {
   useEffect(() => {
     if (bluetoothState != "PoweredOn") {
       console.log("Bluetooth não está ligado");
-      navigation.navigate('index');
-    
+      navigation.navigate("index");
     }
   }, [bluetoothState]);
 
@@ -104,20 +97,21 @@ export default function BluetoothOnScreen() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const isDuplicteDevice = (devices: Device[], nextDevice: Device) => devices.findIndex((device) => nextDevice.id === device.id) > -1;
+  const isDuplicteDevice = (devices: Device[], nextDevice: Device) =>
+    devices.findIndex((device) => nextDevice.id === device.id) > -1;
 
   const startScan = () => {
-    setIsScanning(true)
+    setIsScanning(true);
     const targetDeviceName = "Second Vision"; // Substitua com o nome desejado do dispositivo
     console.log("Scanning for peripherals...");
-  
+
     // Inicia o escaneamento
     bleManager.startDeviceScan(null, null, (error, device) => {
       if (error) {
         console.error(error);
         return;
       }
-  
+
       // Verifica se o dispositivo tem o nome desejado
       if (device && device.name === targetDeviceName) {
         setAllDevices((prevState: Device[]) => {
@@ -128,7 +122,7 @@ export default function BluetoothOnScreen() {
         });
       }
     });
-  
+
     // Interrompe o escaneamento após 10 segundos
     setTimeout(() => {
       console.log("Scan stopped after 10 seconds.");
@@ -138,8 +132,6 @@ export default function BluetoothOnScreen() {
     }, 10000); // 10000 milissegundos = 10 segundos
   };
 
-
-
   const connectToDevice = async (device: Device) => {
     try {
       const deviceConnection = await bleManager.connectToDevice(device.id);
@@ -148,14 +140,11 @@ export default function BluetoothOnScreen() {
       bleManager.stopDeviceScan();
       // startStreamingData(deviceConnection);
       // Redirecionar home
-     
 
       // Atualiza o estado de "dispositivos conectados"
       setConnectedDevices((prev) => new Set(prev).add(device.id));
       setDeviceConnection(device);
-      navigation.navigate('Home');
-
-
+      navigation.navigate("Home");
     } catch (e) {
       console.error("FAILED TO CONNECT", e);
     }
@@ -176,7 +165,9 @@ export default function BluetoothOnScreen() {
   // handle StopScan
 
   const renderItem = ({ item }: { item: Device }) => {
-    const backgroundColor = connectedDevices.has(item.id) ? "#45A7FF" : "#F6F7F8";
+    const backgroundColor = connectedDevices.has(item.id)
+      ? "#45A7FF"
+      : "#F6F7F8";
 
     return (
       <TouchableHighlight
@@ -187,9 +178,7 @@ export default function BluetoothOnScreen() {
       >
         <View style={[styles.row, { backgroundColor }]}>
           <Ionicons name="bluetooth-outline" size={30} color={"#0A398A"} />
-          <Text style={styles.peripheralName}>
-            {item.name || "Sem nome"}
-          </Text>
+          <Text style={styles.peripheralName}>{item.name || "Sem nome"}</Text>
         </View>
       </TouchableHighlight>
     );
@@ -239,18 +228,19 @@ export default function BluetoothOnScreen() {
             </Pressable>
           </View>
 
-          {searchPerformed && allDevices.length === 0 && (  // Usando allDevices aqui
-            <View style={styles.row}>
-              <Text style={styles.noPeripherals}>
-                Sem periféricos, pressione "Escanear" para encontrar ou acesse o
-                menu de informações no canto superior esquerdo da tela para
-                receber um tutorial de como utilizar o sistema.
-              </Text>
-            </View>
-          )}
+          {searchPerformed &&
+            allDevices.length === 0 && ( // Usando allDevices aqui
+              <View style={styles.row}>
+                <Text style={styles.noPeripherals}>
+                  Sem periféricos, pressione "Escanear" para encontrar ou acesse
+                  o menu de informações no canto superior esquerdo da tela para
+                  receber um tutorial de como utilizar o sistema.
+                </Text>
+              </View>
+            )}
 
           <FlatList
-            data={allDevices}  // Substituí o peripherals por allDevices
+            data={allDevices} // Substituí o peripherals por allDevices
             contentContainerStyle={{ rowGap: 12 }}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
@@ -262,7 +252,7 @@ export default function BluetoothOnScreen() {
       <About visible={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
     </View>
   );
-}
+};
 
 const boxShadow = {
   shadowColor: "#000",
