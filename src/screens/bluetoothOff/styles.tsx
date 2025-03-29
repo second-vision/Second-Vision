@@ -8,6 +8,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     fontFamily: "Poppins",
+    marginTop: 30,
   },
   image: {
     width: "100%",

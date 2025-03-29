@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import * as BluetoothStateManager from "react-native-bluetooth-state-manager";
+import BluetoothStateManager from "react-native-bluetooth-state-manager";
 import { useNavigation } from "@react-navigation/native";
 import { BleManager, State } from "react-native-ble-plx";
 import {
@@ -12,7 +12,7 @@ import {
 } from "react-native";
 //import BleManager from "react-native-ble-manager";
 import * as Speech from "expo-speech";
-import { NavigationProp } from "../../app/types/types";
+import { NavigationProp } from "@/app/types/types";
 import { styles } from "./styles";
 
 const bleManager = new BleManager();
@@ -22,10 +22,10 @@ export const BluetoothOff = () => {
   const [bluetoothState, setBluetoothState] = useState<State | string>("");
 
   useEffect(() => {
-    speak("Habilite o Bluetooth no botão abaixo");
-
     // Verificar o estado inicial do Bluetooth
     checkBluetoothState();
+
+    speak("Habilite o Bluetooth no botão abaixo");
 
     const backAction = () => {
       // Impede o comportamento padrão do botão de voltar
@@ -39,7 +39,6 @@ export const BluetoothOff = () => {
 
     // Adiciona o listener para mudanças no estado do Bluetooth
     const stateSubscription = bleManager.onStateChange((state) => {
-      console.log("Bluetooth state changed:", state);
       setBluetoothState(state); // Atualiza o estado com a mudança
     }, true); // O true significa que será chamado imediatamente com o estado atual
 
@@ -52,14 +51,11 @@ export const BluetoothOff = () => {
 
   const checkBluetoothState = async () => {
     const state: State = await bleManager.state();
-    console.log("Bluetooth state:", state);
     setBluetoothState(state); // Atualiza o estado com o valor atual
   };
 
   useEffect(() => {
     if (bluetoothState === "PoweredOn") {
-      console.log("Bluetooth está ligado");
-
       navigation.navigate("BluetoothOnStack");
     }
   }, [bluetoothState, navigation]);

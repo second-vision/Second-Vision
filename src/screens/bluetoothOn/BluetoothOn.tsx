@@ -19,7 +19,7 @@ import * as Speech from "expo-speech";
 import { BleManager, Device, State } from "react-native-ble-plx";
 
 import { About, Devices, Header } from "../../shared/components";
-import { NavigationProp } from "../../app/types/types";
+import { NavigationProp } from "@/app/types/types";
 import { useDeviceContext } from "../../shared/context";
 import { styles } from "./styles";
 
@@ -50,8 +50,6 @@ export const BluetoothOn = () => {
   );
 
   useEffect(() => {
-    speak("Habilite o Bluetooth no botão abaixo");
-
     // Verificar o estado inicial do Bluetooth
     checkBluetoothState();
 
@@ -67,7 +65,6 @@ export const BluetoothOn = () => {
 
     // Adiciona o listener para mudanças no estado do Bluetooth
     const stateSubscription = bleManager.onStateChange((state) => {
-      console.log("Bluetooth state changed:", state);
       setBluetoothState(state); // Atualiza o estado com a mudança
     }, true); // O true significa que será chamado imediatamente com o estado atual
 
@@ -80,14 +77,12 @@ export const BluetoothOn = () => {
 
   const checkBluetoothState = async () => {
     const state: State = await bleManager.state();
-    console.log("Bluetooth state:", state);
     setBluetoothState(state); // Atualiza o estado com o valor atual
   };
 
   useEffect(() => {
-    if (bluetoothState != "PoweredOn") {
-      console.log("Bluetooth não está ligado");
-      navigation.navigate("index");
+    if (bluetoothState === "PoweredOff") {
+      navigation.navigate("BluetoothOffStack");
     }
   }, [bluetoothState]);
 
@@ -103,7 +98,6 @@ export const BluetoothOn = () => {
   const startScan = () => {
     setIsScanning(true);
     const targetDeviceName = "Second Vision"; // Substitua com o nome desejado do dispositivo
-    console.log("Scanning for peripherals...");
 
     // Inicia o escaneamento
     bleManager.startDeviceScan(null, null, (error, device) => {
@@ -125,7 +119,6 @@ export const BluetoothOn = () => {
 
     // Interrompe o escaneamento após 10 segundos
     setTimeout(() => {
-      console.log("Scan stopped after 10 seconds.");
       bleManager.stopDeviceScan(); // Para o escaneamento
       setIsScanningM(false);
       setIsScanning(false);
@@ -144,7 +137,7 @@ export const BluetoothOn = () => {
       // Atualiza o estado de "dispositivos conectados"
       setConnectedDevices((prev) => new Set(prev).add(device.id));
       setDeviceConnection(device);
-      navigation.navigate("Home");
+      navigation.navigate("HomeStack");
     } catch (e) {
       console.error("FAILED TO CONNECT", e);
     }
