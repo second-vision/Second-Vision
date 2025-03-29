@@ -25,7 +25,7 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  if (route.name == "BluetoothOn") {
+  if (route.name == "BluetoothOnStack") {
     return (
       <View style={[styles.headerOptions]}>
         <Pressable

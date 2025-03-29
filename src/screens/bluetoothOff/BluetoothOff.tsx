@@ -14,6 +14,7 @@ import {
 import * as Speech from "expo-speech";
 import { NavigationProp } from "@/app/types/types";
 import { styles } from "./styles";
+import { requestPermissions } from "@/src/shared/hooks";
 
 const bleManager = new BleManager();
 
@@ -22,6 +23,10 @@ export const BluetoothOff = () => {
   const [bluetoothState, setBluetoothState] = useState<State | string>("");
 
   useEffect(() => {
+    const handleRequest = async () => {
+      await requestPermissions();
+    };
+    handleRequest();
     // Verificar o estado inicial do Bluetooth
     checkBluetoothState();
 
@@ -79,7 +84,7 @@ export const BluetoothOff = () => {
     <View style={styles.container}>
       <View>
         <Image
-          // source={require("../../assets/images/device_icon.png")}
+          source={require("../../shared/assets/images/device_icon.png")}
           style={styles.image}
           resizeMode="contain"
           accessibilityLabel="Ícone de dispositivo Bluetooth"

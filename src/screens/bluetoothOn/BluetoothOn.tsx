@@ -22,6 +22,7 @@ import { About, Devices, Header } from "../../shared/components";
 import { NavigationProp } from "@/app/types/types";
 import { useDeviceContext } from "../../shared/context";
 import { styles } from "./styles";
+import { requestPermissions } from "@/src/shared/hooks";
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -50,8 +51,13 @@ export const BluetoothOn = () => {
   );
 
   useEffect(() => {
+    const handleRequest = async () => {
+      await requestPermissions();
+    };
+    handleRequest();
     // Verificar o estado inicial do Bluetooth
     checkBluetoothState();
+    // Verificar o estado inicial do Bluetooth
 
     const backAction = () => {
       // Impede o comportamento padrão do botão de voltar

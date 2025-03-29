@@ -56,7 +56,7 @@ export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
     >
       <View style={styles.modalContainer}>
         <TouchableOpacity
-          style={[{ position: "absolute" }, { top: 20 }, { left: 20 }]}
+          style={[{ position: "absolute" }, { top: 32 }, { left: 20 }]}
           onPress={onClose}
           accessibilityLabel="Fechar"
           accessibilityHint="Fecha o modal sobre informações"
@@ -65,7 +65,7 @@ export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
         </TouchableOpacity>
         <View style={styles.modalInfo}>
           <Image
-            //source={require("../../assets/images/LogoPreta.png")}
+            source={require("../../assets/images/logo_preta.png")}
             style={styles.imageSessaoInfo}
             resizeMode="contain"
             accessibilityLabel="Logo"
