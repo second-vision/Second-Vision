@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   View,
-  StyleSheet,
   BackHandler,
-  NativeEventEmitter,
-  NativeModules,
   TouchableHighlight,
   SafeAreaView,
   StatusBar,
@@ -23,9 +20,6 @@ import { NavigationProp } from "@/app/types/types";
 import { useDeviceContext } from "../../shared/context";
 import { styles } from "./styles";
 import { requestPermissions } from "@/src/shared/hooks";
-
-const BleManagerModule = NativeModules.BleManager;
-const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
 const bleManager = new BleManager();
 
@@ -47,11 +41,6 @@ export const BluetoothOn = () => {
   const [connectedDevices, setConnectedDevices] = useState<Set<string>>(
     new Set()
   );
-
-  const checkBluetoothState = async () => {
-    const state: State = await bleManager.state();
-    setBluetoothState(state); // Atualiza o estado com o valor atual
-  };
 
   useEffect(() => {
     const handleRequest = async () => {
@@ -88,9 +77,25 @@ export const BluetoothOn = () => {
     if (bluetoothState === "PoweredOff") {
       navigation.navigate("BluetoothOffStack");
     }
-  }, [bluetoothState]);
+  }, [bluetoothState, isScanningM]);
 
-  // navigation
+  useEffect(() => {
+    if (!isScanningM) {
+      if (!ControlnoPeripheral) {
+        Vibration.vibrate(500); // Vibra por 500 milissegundos
+        speak(
+          "Nenhum periférico encontrado, em caso de dúvida acesse o tutorial no menu de informações do cabeçalho."
+        );
+      } else {
+        console.debug("[useEffect] Periférico encontrado.");
+      }
+    }
+  }, [isScanningM]);
+
+  const checkBluetoothState = async () => {
+    const state: State = await bleManager.state();
+    setBluetoothState(state); // Atualiza o estado com o valor atual
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -147,19 +152,11 @@ export const BluetoothOn = () => {
     }
   };
 
-  // const connectPeripheral = async () => {};
-
-  function sleep(ms: number) {
-    return new Promise<void>((resolve) => setTimeout(resolve, ms));
-  }
-
   const speak = async (text: string) => {
     Speech.speak(text, {
       language: "pt-BR",
     });
   };
-
-  // handle StopScan
 
   const renderItem = ({ item }: { item: Device }) => {
     const backgroundColor = connectedDevices.has(item.id)
@@ -182,19 +179,6 @@ export const BluetoothOn = () => {
   };
 
   const sendShutdownCommand = () => {};
-
-  useEffect(() => {
-    if (!isScanningM) {
-      if (!ControlnoPeripheral) {
-        Vibration.vibrate(500); // Vibra por 500 milissegundos
-        speak(
-          "Nenhum periférico encontrado, em caso de dúvida acesse o tutorial no menu de informações do cabeçalho."
-        );
-      } else {
-        console.debug("[useEffect] Periférico encontrado.");
-      }
-    }
-  }, [isScanningM]);
 
   return (
     <View style={styles.container}>

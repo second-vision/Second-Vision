@@ -1,10 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import {
   Alert,
-  NativeModules,
-  NativeEventEmitter,
   SafeAreaView,
-  Text,
   ScrollView,
 } from "react-native";
 import { Base64 } from "js-base64";
@@ -12,20 +9,9 @@ import { Device, BleError, Characteristic } from "react-native-ble-plx";
 import * as Speech from "expo-speech";
 
 import { About, Dashboard, Devices, Header } from "@/src/shared/components";
-
 import { useDeviceContext } from "@/src/shared/context";
 import { styles } from "./styles";
 
-
-
-// const loadFonts = async () => {
-// 	await Font.loadAsync({
-// 		//FonteCustomizada: require("../../assets/fonts/Poppins-SemiBoldItalic.ttf"),
-// 	});
-// };
-
-const BleManagerModule = NativeModules.BleManager;
-const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 const DATA_SERVICE_UUID = "12345678-1234-5678-1234-56789abcdef0";
 const CHARACTERISTIC_UUID_YOLO = "12345678-1234-5678-1234-56789abcdef1";
 const CHARACTERISTIC_UUID_PADDLE = "12345678-1234-5678-1234-56789abcdef2";
@@ -34,23 +20,12 @@ const CHARACTERISTIC_UUID_BATTERY = "12345678-1234-5678-1234-56789abcdef4";
 export const Home = () => {
   const { deviceConnection } = useDeviceContext();
   const [isOn, setIsOn] = useState(true);
-  const [StatusText, setStatusText] = useState("Desligado");
 
   const [batteryLevel, setBatteryLevel] = useState(0);
-  const hasAnnouncedOnce = useRef(false);
   const [estimatedDuration, setEstimatedDuration] = useState(0);
   const [currentModeIndex, setCurrentModeIndex] = useState(0);
-
-  const [yoloResults, setYoloResults] = useState("");
-  const [tesseractResults, setTesseractResults] = useState("");
-  const specificMacAddress = "D8:3A:DD:D5:49:E8";
-
   const [dataReceived, setDataReceived] = useState<string>("...waiting.");
-
-  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   const [interval, setInterval] = useState(0);
-
   const [dataReceivedYOLO, setDataReceivedYOLO] = useState<string | null>(null);
   const [dataReceivedPaddle, setDataReceivedPaddle] = useState<string | null>(
     null
@@ -58,7 +33,8 @@ export const Home = () => {
   const [dataReceivedBattery, setDataReceivedBattery] = useState<string | null>(
     null
   );
-
+  
+  const hasAnnouncedOnce = useRef(false);
   const isSpeakingRef = useRef<boolean>(false);
 
   useEffect(() => {

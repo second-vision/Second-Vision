@@ -2,7 +2,6 @@ import {
   Text,
   View,
   Image,
-  StyleSheet,
   TouchableOpacity,
   Modal,
   Dimensions,

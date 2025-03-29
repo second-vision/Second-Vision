@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View } from "react-native";
 import Video from "react-native-video";
 import { useNavigation } from "@react-navigation/native";
 import { NavigationProp } from "@/app/types/types";
+import { styles } from "./styles";
 
 export const Splash = () => {
   const navigation = useNavigation<NavigationProp>();
@@ -31,16 +32,3 @@ export const Splash = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "black",
-  },
-  video: {
-    width: "100%",
-    height: "100%",
-  },
-});
