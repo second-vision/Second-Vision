@@ -3,6 +3,7 @@ import {
   BluetoothOn,
   ControlBluetooth,
   Home,
+  Splash,
   TermsOfUse,
 } from "@/src/screens";
 import { DeviceProvider } from "@/src/shared/context";
@@ -13,6 +14,11 @@ export default function RootLayout() {
   return (
     <DeviceProvider>
       <Stack.Navigator>
+        <Stack.Screen
+          name="SplashStack"
+          component={Splash}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="TermsOfUseStack"
           component={TermsOfUse}
