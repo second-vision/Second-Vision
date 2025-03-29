@@ -35,7 +35,6 @@ export const BluetoothOn = () => {
   const navigation = useNavigation<NavigationProp>();
   const [bluetoothState, setBluetoothState] = useState("PoweredOn");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [BackColor, setBackColor] = useState("#F6F7F8");
   const [searchPerformed, setSearchPerformed] = useState(false);
 
   // Lógica do scan
@@ -45,10 +44,14 @@ export const BluetoothOn = () => {
 
   const [allDevices, setAllDevices] = useState<Device[]>([]); // Usando allDevices no lugar de peripherals
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
-  const [showDevicesWithoutName, setShowDevicesWithoutName] = useState(false);
   const [connectedDevices, setConnectedDevices] = useState<Set<string>>(
     new Set()
   );
+
+  const checkBluetoothState = async () => {
+    const state: State = await bleManager.state();
+    setBluetoothState(state); // Atualiza o estado com o valor atual
+  };
 
   useEffect(() => {
     const handleRequest = async () => {
@@ -80,11 +83,6 @@ export const BluetoothOn = () => {
       backHandler.remove();
     };
   }, []);
-
-  const checkBluetoothState = async () => {
-    const state: State = await bleManager.state();
-    setBluetoothState(state); // Atualiza o estado com o valor atual
-  };
 
   useEffect(() => {
     if (bluetoothState === "PoweredOff") {

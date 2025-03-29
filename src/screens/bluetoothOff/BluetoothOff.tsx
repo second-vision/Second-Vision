@@ -2,15 +2,7 @@ import { useEffect, useState } from "react";
 import BluetoothStateManager from "react-native-bluetooth-state-manager";
 import { useNavigation } from "@react-navigation/native";
 import { BleManager, State } from "react-native-ble-plx";
-import {
-  Text,
-  View,
-  Image,
-  Dimensions,
-  Pressable,
-  BackHandler,
-} from "react-native";
-//import BleManager from "react-native-ble-manager";
+import { Text, View, Image, Pressable, BackHandler } from "react-native";
 import * as Speech from "expo-speech";
 import { NavigationProp } from "@/app/types/types";
 import { styles } from "./styles";
@@ -21,6 +13,11 @@ const bleManager = new BleManager();
 export const BluetoothOff = () => {
   const navigation = useNavigation<NavigationProp>();
   const [bluetoothState, setBluetoothState] = useState<State | string>("");
+
+  const checkBluetoothState = async () => {
+    const state: State = await bleManager.state();
+    setBluetoothState(state); // Atualiza o estado com o valor atual
+  };
 
   useEffect(() => {
     const handleRequest = async () => {
@@ -53,11 +50,6 @@ export const BluetoothOff = () => {
       backHandler.remove();
     };
   }, []);
-
-  const checkBluetoothState = async () => {
-    const state: State = await bleManager.state();
-    setBluetoothState(state); // Atualiza o estado com o valor atual
-  };
 
   useEffect(() => {
     if (bluetoothState === "PoweredOn") {
