@@ -19,7 +19,7 @@ export const TermsOfUse = () => {
   const navigation = useNavigation<NavigationProp>();
   const acceptTerms = async () => {
     await AsyncStorage.setItem("hasAcceptedTerms", "true");
-    navigation.navigate("ControlBluetoothStack");
+    navigation.replace("ControlBluetoothStack");
   };
 
   const rejectTerms = () => {
