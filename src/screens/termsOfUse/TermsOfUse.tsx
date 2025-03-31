@@ -1,14 +1,9 @@
-import {
-  ScrollView,
-  View,
-  Text,
-  Pressable,
-  Alert,
-} from "react-native";
+import { ScrollView, View, Text, Pressable, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ExitApp from "react-native-exit-app";
-import { styles } from "./styles";
 import { useNavigation } from "expo-router";
+
+import { styles } from "./styles";
 import { NavigationProp } from "@/app/types/types";
 
 export const TermsOfUse = () => {

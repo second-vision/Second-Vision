@@ -25,18 +25,16 @@ const bleManager = new BleManager();
 
 export const BluetoothOn = () => {
   const { setDeviceConnection } = useDeviceContext();
-
   const navigation = useNavigation<NavigationProp>();
+
   const [bluetoothState, setBluetoothState] = useState("PoweredOn");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchPerformed, setSearchPerformed] = useState(false);
 
-  // Lógica do scan
   const [isScanning, setIsScanning] = useState(false);
   const [isScanningM, setIsScanningM] = useState(true);
-  const [ControlnoPeripheral, setControlnoPeripheral] = useState(false);
 
-  const [allDevices, setAllDevices] = useState<Device[]>([]); // Usando allDevices no lugar de peripherals
+  const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [connectedDevices, setConnectedDevices] = useState<Set<string>>(
     new Set()
@@ -47,12 +45,12 @@ export const BluetoothOn = () => {
       await requestPermissions();
     };
     handleRequest();
-    // Verificar o estado inicial do Bluetooth
+  
     checkBluetoothState();
-    // Verificar o estado inicial do Bluetooth
+   
 
     const backAction = () => {
-      // Impede o comportamento padrão do botão de voltar
+     
       return true;
     };
 
@@ -61,12 +59,11 @@ export const BluetoothOn = () => {
       backAction
     );
 
-    // Adiciona o listener para mudanças no estado do Bluetooth
+   
     const stateSubscription = bleManager.onStateChange((state) => {
-      setBluetoothState(state); // Atualiza o estado com a mudança
-    }, true); // O true significa que será chamado imediatamente com o estado atual
+      setBluetoothState(state); 
+    }, true); 
 
-    // Cleanup
     return () => {
       stateSubscription.remove();
       backHandler.remove();
@@ -126,14 +123,14 @@ export const BluetoothOn = () => {
       }
     });
 
-    // Interrompe o escaneamento após 10 segundos
+   
     setTimeout(() => {
-      bleManager.stopDeviceScan(); // Para o escaneamento
+      bleManager.stopDeviceScan(); 
       if (allDevices.length === 0) {
         setIsScanningM(false);
       }
       setIsScanning(false);
-    }, 10000); // 10000 milissegundos = 10 segundos
+    }, 10000); 
   };
 
   const connectToDevice = async (device: Device) => {
@@ -142,10 +139,7 @@ export const BluetoothOn = () => {
       setConnectedDevice(deviceConnection);
       await deviceConnection.discoverAllServicesAndCharacteristics();
       bleManager.stopDeviceScan();
-      // startStreamingData(deviceConnection);
-      // Redirecionar home
-
-      // Atualiza o estado de "dispositivos conectados"
+      
       setConnectedDevices((prev) => new Set(prev).add(device.id));
       setDeviceConnection(device);
       navigation.replace("HomeStack");
@@ -212,7 +206,7 @@ export const BluetoothOn = () => {
           </View>
 
           {searchPerformed &&
-            allDevices.length === 0 && ( // Usando allDevices aqui
+            allDevices.length === 0 && ( 
               <View style={styles.row}>
                 <Text style={styles.noPeripherals}>
                   Sem periféricos, pressione "Escanear" para encontrar ou acesse
@@ -223,7 +217,7 @@ export const BluetoothOn = () => {
             )}
 
           <FlatList
-            data={allDevices} // Substituí o peripherals por allDevices
+            data={allDevices} 
             contentContainerStyle={{ rowGap: 12 }}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}

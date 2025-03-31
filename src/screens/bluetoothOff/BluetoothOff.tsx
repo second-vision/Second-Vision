@@ -19,14 +19,15 @@ export const BluetoothOff = () => {
     const handleRequest = async () => {
       await requestPermissions();
     };
+
     handleRequest();
-    // Verificar o estado inicial do Bluetooth
+
     checkBluetoothState();
 
     speak("Habilite o Bluetooth no botão abaixo");
 
     const backAction = () => {
-      // Impede o comportamento padrão do botão de voltar
+     
       return true;
     };
 
@@ -35,12 +36,12 @@ export const BluetoothOff = () => {
       backAction
     );
 
-    // Adiciona o listener para mudanças no estado do Bluetooth
+   
     const stateSubscription = bleManager.onStateChange((state) => {
-      setBluetoothState(state); // Atualiza o estado com a mudança
-    }, true); // O true significa que será chamado imediatamente com o estado atual
+      setBluetoothState(state);
+    }, true); 
 
-    // Cleanup
+    
     return () => {
       stateSubscription.remove();
       backHandler.remove();
@@ -55,7 +56,7 @@ export const BluetoothOff = () => {
 
   const checkBluetoothState = async () => {
     const state: State = await bleManager.state();
-    setBluetoothState(state); // Atualiza o estado com o valor atual
+    setBluetoothState(state); 
   };
 
   const speak = async (text: string) => {
@@ -66,7 +67,6 @@ export const BluetoothOff = () => {
 
   const enableBluetooth = async () => {
     try {
-      console.debug("Bluetooth Ativado");
       await BluetoothStateManager.requestToEnable();
     } catch (error) {
       console.error("Bluetooth não foi ativado", error);

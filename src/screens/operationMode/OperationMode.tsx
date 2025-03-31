@@ -1,15 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { useState} from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
-  StyleSheet,
   SafeAreaView,
   View,
   ScrollView,
-  TextInput,
   Text,
-  Dimensions,
-  Pressable,
   TouchableOpacity,
 } from "react-native";
 import { About, BottomBar, Devices, Header } from "../../shared/components";
@@ -52,7 +47,7 @@ export const OperationMode = () => {
 
           <TouchableOpacity
             style={styles.operationCard}
-            onPress={() => handleSelectMode(0)} // 0 para Híbrido
+            onPress={() => handleSelectMode(0)} 
             accessibilityLabel="Modo Híbrido"
             accessibilityHint="Esse modo detecta tanto objetos possivelmente perigosos como textos estáticos."
           >
@@ -69,7 +64,7 @@ export const OperationMode = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.operationCard}
-            onPress={() => handleSelectMode(1)} // 1 para Texto
+            onPress={() => handleSelectMode(1)} 
             accessibilityLabel="Modo Texto"
             accessibilityHint="Esse modo detecta somente textos estáticos."
           >
@@ -85,7 +80,7 @@ export const OperationMode = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.operationCard}
-            onPress={() => handleSelectMode(2)} // 2 para Objetos
+            onPress={() => handleSelectMode(2)} 
             accessibilityLabel="Modo Objetos"
             accessibilityHint="Esse modo detecta somente os objetos possivelmente perigosos."
           >

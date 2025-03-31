@@ -54,7 +54,6 @@ const requestFineLocationPermission = async () => {
 };
 
 const handlePermissionResults = (results: string[]) => {
-  console.log("Permissão Resultados:", results); // Log para depuração
 
   if (results.every((res) => res === PermissionsAndroid.RESULTS.GRANTED)) {
     return true;

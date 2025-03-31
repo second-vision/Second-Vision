@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import { useNavigation, StackActions } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { BackHandler } from "react-native";
 import { BleManager, State } from "react-native-ble-plx";
+
 import { NavigationProp } from "@/app/types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -14,12 +15,12 @@ export const ControlBluetooth = () => {
 
   const checkBluetoothState = async () => {
     const state: State = await bleManager.state();
-    setBluetoothState(state); // Atualiza o estado com o valor atual
+    setBluetoothState(state);
   };
 
   useEffect(() => {
     const backAction = () => {
-      return true; // Impede o comportamento padrão do botão de voltar
+      return true;
     };
 
     const backHandler = BackHandler.addEventListener(
@@ -38,29 +39,21 @@ export const ControlBluetooth = () => {
     const checkTermsAcceptance = async () => {
       const accepted = await AsyncStorage.getItem("hasAcceptedTerms");
       if (accepted !== "true") {
-        // Se o usuário não aceitou os termos, redireciona para a tela de termos
         navigation.replace("TermsOfUseStack");
       } else {
-        // Se aceitou, continua com a lógica do Bluetooth
         handleBluetoothState();
       }
     };
 
     const handleBluetoothState = () => {
-      console.log(
-        "Verificando o estado do Bluetooth para navegação:",
-        bluetoothState
-      );
-
       if (bluetoothState === "Resetting") {
-        // Aguarda o estado do Bluetooth mudar
         const timer = setInterval(async () => {
           const state: State = await bleManager.state();
-          setBluetoothState(state); // Atualiza o estado com o valor atual
+          setBluetoothState(state);
           if (state === "PoweredOn" || state === "PoweredOff") {
-            clearInterval(timer); // Para de verificar quando o Bluetooth estabilizar
+            clearInterval(timer);
           }
-        }, 1000); // Verifica a cada 1 segundo
+        }, 1000);
 
         return () => clearInterval(timer);
       }
