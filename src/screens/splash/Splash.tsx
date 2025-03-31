@@ -13,7 +13,7 @@ export const Splash = () => {
     // Espera 3 segundos para ir para a Home
     const timer = setTimeout(() => {
       setIsLoaded(true);
-      navigation.navigate("ControlBluetoothStack"); // Navega diretamente para a Home
+      navigation.replace("ControlBluetoothStack"); // Navega diretamente para a Home
     }, 3000);
 
     return () => clearTimeout(timer);

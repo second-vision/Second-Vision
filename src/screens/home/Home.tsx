@@ -8,24 +8,44 @@ import { Base64 } from "js-base64";
 import { Device, BleError, Characteristic } from "react-native-ble-plx";
 import * as Speech from "expo-speech";
 
-import { About, Dashboard, Devices, Header } from "@/src/shared/components";
-import { useDeviceContext } from "@/src/shared/context";
+import { About, BottomBar, Dashboard, Devices, Header } from "@/src/shared/components";
+import { useDeviceContext, useHomePropsContext } from "@/src/shared/context";
 import { styles } from "./styles";
+import { useLocalSearchParams, useNavigation } from "expo-router";
+import { NavigationProp } from "@/app/types/types";
+import ControlBluetoothStack from "@/app/ControlBluetoothStack";
 
 const DATA_SERVICE_UUID = "12345678-1234-5678-1234-56789abcdef0";
 const CHARACTERISTIC_UUID_YOLO = "12345678-1234-5678-1234-56789abcdef1";
 const CHARACTERISTIC_UUID_PADDLE = "12345678-1234-5678-1234-56789abcdef2";
 const CHARACTERISTIC_UUID_BATTERY = "12345678-1234-5678-1234-56789abcdef4";
 
-export const Home = () => {
-  const { deviceConnection } = useDeviceContext();
-  const [isOn, setIsOn] = useState(true);
 
-  const [batteryLevel, setBatteryLevel] = useState(0);
-  const [estimatedDuration, setEstimatedDuration] = useState(0);
-  const [currentModeIndex, setCurrentModeIndex] = useState(0);
+// Importar o tipo do RootStackParamList
+import { RootStackParamList } from "../../../app/types/types";
+
+import { CompositeNavigationProp, RouteProp, useRoute } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+
+
+
+
+
+export const Home = () => {
+
+  const [isOn, setIsOn] = useState(true);
+  
+  const navigation = useNavigation<NavigationProp>();
+
+  const { deviceConnection } = useDeviceContext();
+
+  const { mode, interval } = useHomePropsContext();
+  
+  //const [currentModeIndex, setCurrentModeIndex] = useState(0);
   const [dataReceived, setDataReceived] = useState<string>("...waiting.");
-  const [interval, setInterval] = useState(0);
+ // const [interval, setInterval] = useState(0);
   const [dataReceivedYOLO, setDataReceivedYOLO] = useState<string | null>(null);
   const [dataReceivedPaddle, setDataReceivedPaddle] = useState<string | null>(
     null
@@ -33,9 +53,15 @@ export const Home = () => {
   const [dataReceivedBattery, setDataReceivedBattery] = useState<string | null>(
     null
   );
+  const [dataReceivedBatteryDuration, setDataReceivedBatteryDuration] = useState<string | null>(
+    null
+  );
   
   const hasAnnouncedOnce = useRef(false);
   const isSpeakingRef = useRef<boolean>(false);
+
+
+
 
   useEffect(() => {
     if (deviceConnection) {
@@ -59,38 +85,59 @@ export const Home = () => {
         0
       );
     }
+
+    return () => {
+      // Para a fala quando a tela é desmontada
+      Speech.stop();
+    };
+
   }, [isOn]);
 
   useEffect(() => {
-    if (currentModeIndex === 0 || currentModeIndex === 2) {
-      if (dataReceivedYOLO !== "none") {
-        if (dataReceivedYOLO !== "") {
-          speak(`Objetos a frente: ${dataReceivedYOLO}`, 1);
-        }
+
+    if (mode === 0 || mode === 2) {
+      if (dataReceivedYOLO !== "none" && dataReceivedYOLO !== "") {
+        speak(`Objetos a frente: ${dataReceivedYOLO}`, 1);
       }
     }
-  }, [dataReceivedYOLO]);
+    return () => {
+      // Para a fala quando a tela é desmontada
+      Speech.stop();
+    };
 
+  }, [dataReceivedYOLO]);
+  
   useEffect(() => {
-    if (currentModeIndex === 0 || currentModeIndex === 1) {
+  
+    if (mode === 0 || mode === 1) {
       if (dataReceivedPaddle !== "") {
         speak(`Texto identificado: ${dataReceivedPaddle}`, 1);
-      }
+      } 
     }
-  }, [dataReceivedPaddle]);
+    return () => {
+      // Para a fala quando a tela é desmontada
+      Speech.stop();
+    };
 
+  }, [dataReceivedPaddle]);
+  
   useEffect(() => {
-    if (currentModeIndex === 0) {
-      speak(
-        `Esse modo detecta tanto objetos possivelmente perigosos como textos estáticos.`,
-        0
-      );
-    } else if (currentModeIndex === 1) {
+  
+  
+    if (mode === 0) {
+      speak(`Esse modo detecta tanto objetos possivelmente perigosos como textos estáticos.`, 0);
+    } else if (mode === 1) {
       speak(`Esse modo detecta apenas textos estáticos.`, 0);
-    } else if (currentModeIndex === 2) {
+    } else if (mode === 2) {
       speak(`Esse modo detecta apenas objetos possivelmente perigosos.`, 0);
     }
-  }, [currentModeIndex]);
+
+    return () => {
+      // Para a fala quando a tela é desmontada
+      Speech.stop();
+    };
+
+  }, [mode]);
 
   useEffect(() => {
     if (dataReceivedBattery) {
@@ -100,26 +147,33 @@ export const Home = () => {
         // Se a bateria está acima de 20 e não foi notificado antes
         if (!hasAnnouncedOnce.current) {
           speak(
-            `Bateria a ${dataReceivedBattery}%. Tempo estimado de uso restante: ${estimatedDuration} horas.`,
+            `Bateria a ${dataReceivedBattery}%. Tempo estimado de uso restante: ${dataReceivedBatteryDuration} horas.`,
             0
           );
           hasAnnouncedOnce.current = true;
         }
       } else {
         speak(
-          `Bateria a ${dataReceivedBattery}%. Tempo estimado de uso restante: ${estimatedDuration} horas. A bateria está imprópria para uso.`,
+          `Bateria a ${dataReceivedBattery}%. Tempo estimado de uso restante: ${dataReceivedBatteryDuration} horas. A bateria está imprópria para uso.`,
           0
         );
       }
     }
+
+    return () => {
+      // Para a fala quando a tela é desmontada
+      Speech.stop();
+    };
+
   }, [dataReceivedBattery]);
 
   const delay = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
   const processSpeakQueue = async (text: string) => {
+   
     await Speech.speak(text, { language: "pt-BR" });
-    await delay(interval);
+    await delay(interval * 1000);
     isSpeakingRef.current = false;
   };
 
@@ -141,6 +195,10 @@ export const Home = () => {
       }
     }
   };
+
+
+
+
 
   // Desconectar
 
@@ -227,16 +285,23 @@ export const Home = () => {
     }
 
     const dataInput = Base64.decode(characteristic.value);
-    console.log("BATTERY Data Received:", dataInput);
+    const [batteryStr, durationStr] = dataInput.split(",");
+    const batteryPercentage = Math.floor(parseFloat(batteryStr));
+    console.log(batteryPercentage);
+    const duration = parseFloat(durationStr);
+    console.log(duration);
+
 
     // Aqui você pode salvar ou processar os dados de BATTERY conforme necessário
-    setDataReceivedBattery(dataInput);
+    setDataReceivedBatteryDuration(Math.abs(duration).toFixed(2));
+    setDataReceivedBattery(batteryPercentage.toString());
+    
   };
 
   // Função para enviar o comando de desligamento
   const sendShutdownCommand = async (device: Device) => {
-    speak("Você realmente deseja desligar o dispositivo?", 0);
-
+    console.log("1 - Iniciando comando de desligamento");
+  
     Alert.alert(
       "Confirmação de Desligamento",
       "Você realmente deseja desligar o dispositivo?",
@@ -244,47 +309,59 @@ export const Home = () => {
         {
           text: "Cancelar",
           onPress: () => {
-            console.log("Desligamento cancelado");
-            speak("Desligamento cancelado", 0);
+            console.log("2 - Desligamento cancelado");
           },
           style: "cancel",
         },
         {
           text: "Confirmar",
           onPress: async () => {
+            console.log("3 - Confirmado, tentando enviar comando...");
+  
             try {
-              const serviceUUID = "12345678-1234-5678-1234-56789abcdef0"; // Exemplo de service UUID
-              const characteristicUUID = "12345678-1234-5678-1234-56789abcdef3"; // Exemplo de characteristic UUID
-
-              // Espera a Promise de isConnected resolver
+              const serviceUUID = "12345678-1234-5678-1234-56789abcdef0";
+              const characteristicUUID = "12345678-1234-5678-1234-56789abcdef3";
+  
               const isConnected = await device.isConnected();
-
-              // Verifica se o dispositivo está conectado
+  
               if (isConnected) {
-                // Enviar comando de desligamento (exemplo usando 0x01)
+                console.log("4 - Dispositivo conectado, enviando comando...");
+  
                 const data = [0x01]; // Comando de desligamento em formato de byte
-
-                // Converte o array de números para uma string no formato hexadecimal
-                const hexString = data
-                  .map((byte) => String.fromCharCode(byte))
-                  .join("");
-
-                // Envia os dados como uma string
-                await device.writeCharacteristicWithResponseForService(
-                  serviceUUID,
-                  characteristicUUID,
-                  hexString
-                );
-
-                console.log("Comando de desligamento enviado com sucesso");
-                speak("Comando de desligamento enviado", 0);
+                const hexString = data.map((byte) => String.fromCharCode(byte)).join("");
+  
+                // Função para controlar o tempo limite
+                const writeWithTimeout = (device: Device) => {
+                  return new Promise(async (resolve, reject) => {
+                    try {
+                       device.writeCharacteristicWithResponseForService(
+                        serviceUUID,
+                        characteristicUUID,
+                        hexString
+                      );
+                      resolve("Comando enviado com sucesso");
+                    } catch (error) {
+                      reject(error);
+                    }
+                  });
+                };
+  
+                // Definir o tempo limite (exemplo de 5 segundos)
+                const timeout = new Promise((_, reject) => setTimeout(() => reject('Timeout'), 5000));
+  
+                // Tentar executar a escrita BLE com timeout
+                await Promise.race([writeWithTimeout(device), timeout]);
+  
+                console.log("5 - Comando enviado com sucesso");
+  
+                // Navegar após o envio ou timeout
+                navigation.replace("ControlBluetoothStack");
+  
               } else {
                 console.log("Dispositivo não está conectado");
-                speak("Dispositivo não está conectado", 0);
               }
             } catch (error) {
-              console.error("Erro ao enviar comando de desligamento", error);
-              speak("Erro ao enviar comando de desligamento", 0);
+              console.error("Erro ao enviar comando:", error);
             }
           },
         },
@@ -325,7 +402,9 @@ export const Home = () => {
     },
   ];
 
-  const currentMode = modes[currentModeIndex];
+  
+
+  const currentMode = modes[mode];
 
   return (
     <SafeAreaView style={styles.container} accessible>
@@ -339,13 +418,16 @@ export const Home = () => {
         <Devices />
         <Dashboard
           isOn={isOn}
-          intervalDash={interval}
-          batteryLevel={batteryLevel}
-          currentModeIndex={currentModeIndex}
+          intervalDash={interval * 1000}
+          batteryLevel={dataReceivedBattery ? parseInt(dataReceivedBattery) : 0}
+          currentModeIndex={mode}
           currentMode={currentMode}
         />
         <About visible={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+        
+      
       </ScrollView>
+      <BottomBar mode={mode} interval={interval}/>
     </SafeAreaView>
   );
 };

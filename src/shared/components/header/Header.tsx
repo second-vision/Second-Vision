@@ -45,7 +45,7 @@ export const Header: React.FC<HeaderProps> = ({
         <Text style={[styles.information]}></Text>
       </View>
     );
-  } else if (route.name == "Home") {
+  } else if (route.name == "HomeStack") {
     return (
       <View style={[styles.headerOptions]}>
         <Pressable

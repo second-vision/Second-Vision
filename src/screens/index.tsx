@@ -4,3 +4,5 @@ export * from "./home/Home";
 export * from "./controlBluetooth/ControlBluetooth";
 export * from "./termsOfUse/TermsOfUse";
 export * from "./splash/Splash";
+export * from "./intervalTime/IntervalTime";
+export * from "./operationMode/OperationMode";

@@ -5,6 +5,7 @@ export const styles = StyleSheet.create({
     width: "60%",
     height: undefined,
     aspectRatio: 1.3,
+   
   },
   titulo: {
     justifyContent: "center",

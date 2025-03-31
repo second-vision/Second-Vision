@@ -39,7 +39,7 @@ export const ControlBluetooth = () => {
       const accepted = await AsyncStorage.getItem("hasAcceptedTerms");
       if (accepted !== "true") {
         // Se o usuário não aceitou os termos, redireciona para a tela de termos
-        navigation.navigate("TermsOfUseStack");
+        navigation.replace("TermsOfUseStack");
       } else {
         // Se aceitou, continua com a lógica do Bluetooth
         handleBluetoothState();
@@ -66,9 +66,9 @@ export const ControlBluetooth = () => {
       }
 
       if (bluetoothState === "PoweredOn") {
-        navigation.navigate("BluetoothOnStack");
+        navigation.replace("BluetoothOnStack");
       } else if (bluetoothState === "PoweredOff") {
-        navigation.navigate("BluetoothOffStack");
+        navigation.replace("BluetoothOffStack");
       }
     };
 

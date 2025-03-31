@@ -5,7 +5,6 @@ import { BleManager, State } from "react-native-ble-plx";
 import { Text, View, Image, Pressable, BackHandler } from "react-native";
 import * as Speech from "expo-speech";
 
-
 import { NavigationProp } from "@/app/types/types";
 import { styles } from "./styles";
 import { requestPermissions } from "@/src/shared/hooks";
@@ -16,7 +15,6 @@ export const BluetoothOff = () => {
   const navigation = useNavigation<NavigationProp>();
   const [bluetoothState, setBluetoothState] = useState<State | string>("");
 
- 
   useEffect(() => {
     const handleRequest = async () => {
       await requestPermissions();
@@ -51,15 +49,14 @@ export const BluetoothOff = () => {
 
   useEffect(() => {
     if (bluetoothState === "PoweredOn") {
-      navigation.navigate("BluetoothOnStack");
+      navigation.replace("BluetoothOnStack");
     }
   }, [bluetoothState, navigation]);
 
-   const checkBluetoothState = async () => {
-     const state: State = await bleManager.state();
-     setBluetoothState(state); // Atualiza o estado com o valor atual
-   };
-
+  const checkBluetoothState = async () => {
+    const state: State = await bleManager.state();
+    setBluetoothState(state); // Atualiza o estado com o valor atual
+  };
 
   const speak = async (text: string) => {
     Speech.speak(text, {

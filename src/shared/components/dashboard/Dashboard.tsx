@@ -29,9 +29,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
     batteryIcon = "battery-dead-outline";
   }
 
-  // const systemIcon = isOn
-  // 	? require("../../assets/images/on_icon.png")
-  // 	: require("../../assets/images/off_icon.png");
+  const systemIcon = isOn
+  	? require("../../assets/images/on_icon.png")
+  	: require("../../assets/images/off_icon.png");
 
   return (
     <SafeAreaView>
@@ -56,7 +56,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
           <View style={styles.info}>
             <Image
-              //source={systemIcon}
+              source={systemIcon}
               style={[{ width: 36, height: 35 }]}
               accessibilityLabel={isOn ? "Sistema ligado" : "Sistema desligado"}
             />
@@ -68,7 +68,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
           <View style={styles.info}>
             <Image
-              //source={require("../../assets/images/timer_icon.png")}
+              source={require("../../assets/images/timer_icon.png")}
               style={[{ width: 30, height: 35 }]}
               accessibilityLabel="Ícone do temporizador"
             />

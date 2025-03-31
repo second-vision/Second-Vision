@@ -75,22 +75,20 @@ export const BluetoothOn = () => {
 
   useEffect(() => {
     if (bluetoothState === "PoweredOff") {
-      navigation.navigate("BluetoothOffStack");
+      navigation.replace("BluetoothOffStack");
     }
   }, [bluetoothState, isScanningM]);
 
   useEffect(() => {
     if (!isScanningM) {
-      if (!ControlnoPeripheral) {
-        Vibration.vibrate(500); // Vibra por 500 milissegundos
+      if (allDevices.length === 0) {
+        Vibration.vibrate(500);
         speak(
           "Nenhum periférico encontrado, em caso de dúvida acesse o tutorial no menu de informações do cabeçalho."
         );
-      } else {
-        console.debug("[useEffect] Periférico encontrado.");
       }
     }
-  }, [isScanningM]);
+  }, [isScanningM, allDevices]);
 
   const checkBluetoothState = async () => {
     const state: State = await bleManager.state();
@@ -106,6 +104,7 @@ export const BluetoothOn = () => {
 
   const startScan = () => {
     setIsScanning(true);
+    setIsScanningM(true);
     const targetDeviceName = "Second Vision"; // Substitua com o nome desejado do dispositivo
 
     // Inicia o escaneamento
@@ -121,6 +120,7 @@ export const BluetoothOn = () => {
           if (!isDuplicteDevice(prevState, device)) {
             return [...prevState, device];
           }
+
           return prevState;
         });
       }
@@ -129,7 +129,9 @@ export const BluetoothOn = () => {
     // Interrompe o escaneamento após 10 segundos
     setTimeout(() => {
       bleManager.stopDeviceScan(); // Para o escaneamento
-      setIsScanningM(false);
+      if (allDevices.length === 0) {
+        setIsScanningM(false);
+      }
       setIsScanning(false);
     }, 10000); // 10000 milissegundos = 10 segundos
   };
@@ -146,7 +148,7 @@ export const BluetoothOn = () => {
       // Atualiza o estado de "dispositivos conectados"
       setConnectedDevices((prev) => new Set(prev).add(device.id));
       setDeviceConnection(device);
-      navigation.navigate("HomeStack");
+      navigation.replace("HomeStack");
     } catch (e) {
       console.error("FAILED TO CONNECT", e);
     }

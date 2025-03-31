@@ -8,6 +8,8 @@ export type RootStackParamList = {
   BluetoothOffStack: undefined;
   BluetoothOnStack: undefined;
   HomeStack: undefined;
+  IntervalTimeStack: undefined;
+  OperationModeStack: undefined;
 };
 
 export type NavigationProp = StackNavigationProp<RootStackParamList>;

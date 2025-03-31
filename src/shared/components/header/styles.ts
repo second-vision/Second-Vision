@@ -14,6 +14,7 @@ export const styles = StyleSheet.create({
   information: {
     width: "25%",
     alignSelf: "flex-start",
+    
   },
   information2: {
     alignSelf: "flex-start",
@@ -24,10 +25,11 @@ export const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   textFont: {
-    width: "49%",
+    width: "50%",
     textAlign: "center",
     fontWeight: "bold",
     fontSize: width * 0.05,
     color: "#001268",
+   
   },
 });
