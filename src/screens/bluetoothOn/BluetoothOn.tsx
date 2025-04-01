@@ -83,6 +83,10 @@ export const BluetoothOn = () => {
         speak(
           "Nenhum periférico encontrado, em caso de dúvida acesse o tutorial no menu de informações do cabeçalho."
         );
+      }else{
+        speak(
+          "Second Vision encontrado clique para conectar."
+        );
       }
     }
   }, [isScanningM, allDevices]);
