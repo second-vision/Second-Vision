@@ -61,9 +61,6 @@ export const Home = () => {
       );
     }
 
-    return () => {
-      Speech.stop();
-    };
   }, [isOn]);
 
   useEffect(() => {
@@ -72,9 +69,7 @@ export const Home = () => {
         speak(`Objetos a frente: ${dataReceivedYOLO}`, 1);
       }
     }
-    return () => {
-      Speech.stop();
-    };
+   
   }, [dataReceivedYOLO]);
 
   useEffect(() => {
@@ -83,9 +78,7 @@ export const Home = () => {
         speak(`Texto identificado: ${dataReceivedPaddle}`, 1);
       }
     }
-    return () => {
-      Speech.stop();
-    };
+
   }, [dataReceivedPaddle]);
 
   useEffect(() => {
@@ -100,9 +93,7 @@ export const Home = () => {
       speak(`Esse modo detecta apenas objetos possivelmente perigosos.`, 0);
     }
 
-    return () => {
-      Speech.stop();
-    };
+ 
   }, [mode]);
 
   useEffect(() => {
@@ -125,9 +116,7 @@ export const Home = () => {
       }
     }
 
-    return () => {
-      Speech.stop();
-    };
+   
   }, [dataReceivedBattery]);
 
   const delay = (ms: number) =>
@@ -286,7 +275,7 @@ export const Home = () => {
                 await Promise.race([writeWithTimeout(device), timeout]);
 
                 
-
+                Speech.stop();
                 navigation.replace("ControlBluetoothStack");
               } 
             } catch (error) {
