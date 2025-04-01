@@ -57,7 +57,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <View style={styles.info}>
             <Image
               source={systemIcon}
-              style={[{ width: 36, height: 35 }]}
+              style={[{ width: 36, height: 36 }]}
               accessibilityLabel={isOn ? "Sistema ligado" : "Sistema desligado"}
             />
             <Text style={styles.nivel} accessibilityRole="text">
