@@ -9,9 +9,10 @@ import { NavigationProp } from "@/app/types/types";
 interface IBottomBarProps {
   interval: number | null;
   mode: number | null;
+  hostspot: number | null;
 }
 
-export const BottomBar: React.FC<IBottomBarProps> = ({ interval, mode }) => {
+export const BottomBar: React.FC<IBottomBarProps> = ({ interval, mode, hostspot }) => {
   const navigation = useNavigation<NavigationProp>();
 
   return (

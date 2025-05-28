@@ -25,13 +25,13 @@ export const styles = StyleSheet.create({
 	operationMode: {
 		marginHorizontal: 20,
 		display: "flex",
-		gap: 20,
+		gap: 15,
 	},
 	operationModeTitle: {
 		color: "#001268",
 		fontWeight: "800",
 		fontSize: width * 0.04,
-		paddingVertical: 15,
+		paddingVertical: 10,
 	},
 	operationModeText: {
 		color: "#001268",

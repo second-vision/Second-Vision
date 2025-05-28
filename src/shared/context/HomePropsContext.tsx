@@ -3,8 +3,10 @@ import React, { createContext, useContext, useState } from "react";
 interface IHomePropsContextType {
   interval: number;
   mode: number;
+  hostspot: number;
   setIntervalValue: (value: number) => void;
   setModeValue: (value: number) => void;
+  setHotspotValue: (value: number) => void;
 }
 
 const HomePropsContext = createContext<IHomePropsContextType | undefined>(undefined);
@@ -12,9 +14,10 @@ const HomePropsContext = createContext<IHomePropsContextType | undefined>(undefi
 export const ModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [interval, setIntervalValue] = useState<number>(0);
   const [mode, setModeValue] = useState<number>(0);
+  const [hostspot, setHotspotValue] = useState<number>(0);
 
   return (
-    <HomePropsContext.Provider value={{ interval, mode, setIntervalValue, setModeValue }}>
+    <HomePropsContext.Provider value={{ interval, mode, setIntervalValue, setModeValue, hostspot, setHotspotValue }}>
       {children}
     </HomePropsContext.Provider>
   );

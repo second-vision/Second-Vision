@@ -1,6 +1,7 @@
 import { View, Text, SafeAreaView, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./styles";
+import React, { useState } from "react";
 
 interface DashboardProps {
   isOn: boolean;
@@ -8,6 +9,10 @@ interface DashboardProps {
   batteryLevel: number;
   currentModeIndex: number;
   currentMode: {
+    name: string;
+    description: string;
+  };
+  currentHostspot: {
     name: string;
     description: string;
   };
@@ -19,8 +24,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
   batteryLevel,
   currentModeIndex,
   currentMode,
+  currentHostspot,
 }) => {
-  let batteryIcon;
+  let batteryIcon: any;
   if (batteryLevel === 100) {
     batteryIcon = "battery-full-outline";
   } else if (batteryLevel >= 50) {
@@ -29,9 +35,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
     batteryIcon = "battery-dead-outline";
   }
 
+  const [inputValue, setInputValue] = useState("");
+
   const systemIcon = isOn
-  	? require("../../assets/images/on_icon.png")
-  	: require("../../assets/images/off_icon.png");
+    ? require("../../assets/images/on_icon.png")
+    : require("../../assets/images/off_icon.png");
 
   return (
     <SafeAreaView>
@@ -94,6 +102,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </Text>
             <Text style={styles.cardText} accessibilityRole="text">
               {currentMode.description}
+            </Text>
+          </View>
+        </View>
+        <View style={styles.operationMode}>
+          <Text style={styles.dashboardTitle} accessibilityRole="header">
+            Modo de Conexão
+          </Text>
+          <View style={styles.operationCard}>
+            <Text style={styles.cardTitle} accessibilityRole="text">
+              {currentHostspot.name}
+            </Text>
+            <Text style={styles.cardText} accessibilityRole="text">
+              {currentHostspot.description}
             </Text>
           </View>
         </View>

@@ -1,4 +1,4 @@
-import { useState} from "react";
+import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
   SafeAreaView,
@@ -16,12 +16,18 @@ import { NavigationProp } from "@/app/types/types";
 export const OperationMode = () => {
   const navigation = useNavigation<NavigationProp>();
 
-  const { interval, mode, setModeValue } = useHomePropsContext();
+  const { interval, mode, setModeValue, hostspot, setHotspotValue } =
+    useHomePropsContext();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleSelectMode = (mode: any) => {
     setModeValue(mode);
+    navigation.navigate("HomeStack");
+  };
+
+  const handleSelectHotspot = async (hotspot: any) => {
+    setHotspotValue(hotspot);
     navigation.navigate("HomeStack");
   };
 
@@ -47,7 +53,7 @@ export const OperationMode = () => {
 
           <TouchableOpacity
             style={styles.operationCard}
-            onPress={() => handleSelectMode(0)} 
+            onPress={() => handleSelectMode(0)}
             accessibilityLabel="Modo Híbrido"
             accessibilityHint="Esse modo detecta tanto objetos possivelmente perigosos como textos estáticos."
           >
@@ -64,7 +70,7 @@ export const OperationMode = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.operationCard}
-            onPress={() => handleSelectMode(1)} 
+            onPress={() => handleSelectMode(1)}
             accessibilityLabel="Modo Texto"
             accessibilityHint="Esse modo detecta somente textos estáticos."
           >
@@ -80,7 +86,7 @@ export const OperationMode = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.operationCard}
-            onPress={() => handleSelectMode(2)} 
+            onPress={() => handleSelectMode(2)}
             accessibilityLabel="Modo Objetos"
             accessibilityHint="Esse modo detecta somente os objetos possivelmente perigosos."
           >
@@ -96,10 +102,50 @@ export const OperationMode = () => {
           </TouchableOpacity>
         </View>
 
+        <View style={styles.operationMode}>
+          <Text style={styles.operationModeTitle}>Modos de Conexão:</Text>
+
+          <TouchableOpacity
+            style={styles.operationCard}
+            onPress={() => handleSelectHotspot(0)}
+            accessibilityLabel="Modo Offline"
+            accessibilityHint="Esse modo funciona sem conexão com a internet."
+          >
+            <Text style={styles.cardTitle}>Offline</Text>
+            <Text style={styles.cardText}>
+              Esse modo funciona sem conexão com a internet.
+            </Text>
+            <View style={styles.radio}>
+              <View
+                style={
+                  hostspot === 0 ? styles.radioSelected : styles.radioInternal
+                }
+              ></View>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.operationCard}
+            onPress={() => handleSelectHotspot(1)}
+            accessibilityLabel="Modo Online"
+            accessibilityHint="Esse modo apenas funciona com conexão à internet."
+          >
+            <Text style={styles.cardTitle}>Online</Text>
+            <Text style={styles.cardText}>
+              Esse modo apenas funciona com conexão à internet.
+            </Text>
+            <View style={styles.radio}>
+              <View
+                style={
+                  hostspot === 1 ? styles.radioSelected : styles.radioInternal
+                }
+              ></View>
+            </View>
+          </TouchableOpacity>
+        </View>
+
         <About visible={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
-        
       </ScrollView>
-      <BottomBar mode={mode} interval={interval} />
+      <BottomBar mode={mode} hostspot={hostspot} interval={interval} />
     </SafeAreaView>
   );
 };
