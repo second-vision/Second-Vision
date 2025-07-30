@@ -1,4 +1,5 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
+const { width } = Dimensions.get("window");
 
 export const styles = StyleSheet.create({
   container: {
@@ -33,5 +34,37 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 10,
+  },
+  alignCloseButton:{
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingBottom: 10
+  },
+  closeButton:{
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#e0e0e0', 
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  sendButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderColor: "#0a398a",
+    backgroundColor: "#0A398A",
+    borderWidth: 2,
+
+    borderRadius: 10,
+    // flex: 1,
+    // top: 30,
+  },
+  sendButtonText: {
+    fontSize: width * 0.03,
+    letterSpacing: 0.25,
+    color: "#fff",
   },
 });

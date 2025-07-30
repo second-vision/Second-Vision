@@ -20,7 +20,7 @@ const MAX_INTERVAL_SECONDS = 30;
 export const IntervalTime = () => {
   const navigation = useNavigation<NavigationProp>();
 
-  const { interval, mode, setIntervalValue } = useHomePropsContext();
+  const { interval, mode, setIntervalValue, hostspot } = useHomePropsContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [inputValueInt, setInputValueInt] = useState("0");
 
@@ -92,7 +92,7 @@ export const IntervalTime = () => {
 
         <About visible={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       </ScrollView>
-      <BottomBar mode={mode} interval={interval} />
+      <BottomBar mode={mode} hostspot={hostspot} interval={interval} />
     </SafeAreaView>
   );
 };

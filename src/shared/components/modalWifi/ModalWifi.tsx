@@ -1,10 +1,12 @@
-import { View, Text, SafeAreaView, Button, Modal } from "react-native";
+import { View, Text, SafeAreaView, Button, Modal, TouchableOpacity } from "react-native";
 import { styles } from "./styles";
 import React from "react";
 import { TextInput } from "react-native-gesture-handler";
 import { Device } from "react-native-ble-plx";
+import { Ionicons } from "@expo/vector-icons";
 
 interface ModalWifiProps {
+  onClose: () => void;
   handleSelectHotspot: () => void;
   openHotspotSettings: () => void;
   handleSubmitCredentials: () => void;
@@ -22,7 +24,6 @@ interface ModalWifiProps {
 }
 
 export const ModalWifi: React.FC<ModalWifiProps> = ({
-  handleSelectHotspot,
   openHotspotSettings,
   handleSubmitCredentials,
   modalVisible,
@@ -30,29 +31,29 @@ export const ModalWifi: React.FC<ModalWifiProps> = ({
   setSsid,
   password,
   setPassword,
-  SendWifiSubmit,
-  device,
+  onClose
 }) => {
-  const handleWifiSubmit = async () => {
-    if (device) {
-      await SendWifiSubmit(ssid, password, device);
-    }
-  };
+
   return (
     <SafeAreaView>
       <View style={styles.container}>
-        <Button
-          title="Ativar Roteador Wi-Fi"
-          onPress={handleSelectHotspot}
-          accessibilityLabel="Botão para ativar o roteador Wi-Fi"
-        />
 
         <Modal visible={modalVisible} animationType="slide" transparent>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent} accessible>
+              <View  style={styles.alignCloseButton}>
+              <TouchableOpacity
+                  onPress={onClose}
+                  style={styles.closeButton}
+                  accessibilityLabel="Fechar Modal" 
+                  accessibilityRole="button"
+                >
+                  <Ionicons name="close" size={22} color="#333" />
+                </TouchableOpacity>
+                </View>
               <Text
                 style={styles.modalTitle}
-                accessibilityLabel="Mensagem de instrução"
+                accessibilityLabel="Certifique que o roteador do celular está ligado e digite o nome e a senha do roteador para prosseguir."
               >
                 Certifique que o roteador do celular está ligado e digite o nome e a senha do roteador para prosseguir.
               </Text>
@@ -76,16 +77,30 @@ export const ModalWifi: React.FC<ModalWifiProps> = ({
               />
 
               <View style={styles.buttonRow}>
-                <Button
-                  title="Abrir Configurações"
+                <TouchableOpacity
+                style={styles.sendButton}
                   onPress={openHotspotSettings}
                   accessibilityLabel="Botão para abrir as configurações do roteador"
-                />
-                <Button
-                  title="Enviar"
+                >
+                  <Text
+                style={styles.sendButtonText}
+                accessibilityLabel=" Abrir Roteador"
+              >
+               Abrir Roteador.
+              </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+style={styles.sendButton}
                   onPress={handleSubmitCredentials}
                   accessibilityLabel="Botão para enviar nome e senha do roteador"
-                />
+                >
+                  <Text
+                style={styles.sendButtonText}
+                accessibilityLabel="Enviar"
+              >
+                Enviar.
+              </Text>
+                  </TouchableOpacity>
               </View>
             </View>
           </View>

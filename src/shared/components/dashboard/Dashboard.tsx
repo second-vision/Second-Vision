@@ -22,7 +22,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
   isOn,
   intervalDash,
   batteryLevel,
-  currentModeIndex,
   currentMode,
   currentHostspot,
 }) => {
@@ -35,7 +34,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
     batteryIcon = "battery-dead-outline";
   }
 
-  const [inputValue, setInputValue] = useState("");
 
   const systemIcon = isOn
     ? require("../../assets/images/on_icon.png")
