@@ -27,7 +27,8 @@ const CHARACTERISTIC_UUID_YOLO = "12345678-1234-5678-1234-56789abcdef1";
 const CHARACTERISTIC_UUID_PADDLE = "12345678-1234-5678-1234-56789abcdef2";
 const CHARACTERISTIC_UUID_SHUTDOWN = "12345678-1234-5678-1234-56789abcdef3";
 const CHARACTERISTIC_UUID_BATTERY = "12345678-1234-5678-1234-56789abcdef4";
-const CHARACTERISTIC_UUID_WIFI = "12345678-1234-5678-1234-56789abcdef5";
+const CHARACTERISTIC_UUID_WIFI_STATUS = "12345678-1234-5678-1234-56789abcdef5"; // Para ler/monitorar
+const CHARACTERISTIC_UUID_WIFI_COMMAND = "12345678-1234-5678-1234-56789abcdef6"; // Para escrever
 
 export const Home = () => {
   //Variaveis uteis
@@ -173,17 +174,26 @@ useEffect(() => {
       return; 
     }
 
-    if (hostspot !== 1) {
-      return;
-    }
     setIsConnecting(true)
+    console.log("teste")
     const status = await checkWifiStatus(deviceConnection);
 
-    if (!status.connected) {
-      handleSelectHotspot();
-    }else{
+    if (hostspot !== 1 && status.connected) {
+      await switchToOfflineMode(deviceConnection); 
+      console.log("chegou")
       setIsConnecting(false)
+      return;
     }
+    
+    if (hostspot !== 0 && !status.connected) {
+      await handleSelectHotspot();
+      console.log("chegou1")
+      setIsConnecting(false)
+      return;
+    }
+    console.log("chegou2")
+      setIsConnecting(false)
+    return
   }
 
     runWifiCheck();
@@ -213,7 +223,7 @@ const handleWifiSubmit = async (
     console.log("Enviando comando de configuração Wi-Fi...");
     await device.writeCharacteristicWithResponseForService(
       DATA_SERVICE_UUID,
-      CHARACTERISTIC_UUID_WIFI,
+      CHARACTERISTIC_UUID_WIFI_COMMAND,
       base64Data
     );
     console.log("Comando enviado com sucesso! Aguardando o resultado da conexão...");
@@ -230,7 +240,7 @@ const handleWifiSubmit = async (
       
       const result = await device.readCharacteristicForService(
         DATA_SERVICE_UUID,
-        CHARACTERISTIC_UUID_WIFI
+        CHARACTERISTIC_UUID_WIFI_STATUS
       );
 
       const decoded = Buffer.from(result.value!, "base64").toString("utf-8");
@@ -304,6 +314,7 @@ const handleWifiSubmit = async (
       return;
     }
     setIsConnecting(true);
+    console.log("teste1")
     const connected = await handleWifiSubmit(ssid, password, deviceConnection);
 setIsConnecting(false);
     if (!connected) {
@@ -337,7 +348,7 @@ setIsConnecting(false);
     if (savedSsid && savedPassword) {
  
       setIsConnecting(true);
-
+console.log("teste2")
       const connected = await handleWifiSubmit(
         savedSsid,
         savedPassword,
@@ -384,7 +395,7 @@ const checkWifiStatus = async (
           // Lê o valor da característica
           const result = await device.readCharacteristicForService(
             DATA_SERVICE_UUID,
-            CHARACTERISTIC_UUID_WIFI
+            CHARACTERISTIC_UUID_WIFI_STATUS
           );
 
           // Decodifica a resposta
@@ -459,6 +470,12 @@ const checkWifiStatus = async (
         CHARACTERISTIC_UUID_BATTERY,
         onDataUpdateBattery
       );
+
+      device.monitorCharacteristicForService(
+      DATA_SERVICE_UUID,
+      CHARACTERISTIC_UUID_WIFI_STATUS, // A UUID correta para o Wi-Fi
+      onDataUpdateWifi // A nova função de callback que vamos criar
+      );
     } else {
     }
   };
@@ -517,8 +534,74 @@ const checkWifiStatus = async (
     setDataReceivedBattery(batteryPercentage.toString());
   };
 
-  //funcao fechar modal
-  
+  const onDataUpdateWifi = (
+  error: BleError | null,
+  characteristic: Characteristic | null
+) => {
+  if (error) {
+    // Um erro comum aqui é 'notifications are not enabled' se a flag
+    // 'notify' não estiver na característica do servidor.
+    console.error("Erro no monitor de Wi-Fi:", error);
+    // Em caso de erro, é seguro assumir que estamos offline.
+    setHotspotValue(0); 
+    //setWifiSsid(null);
+    return;
+  } else if (!characteristic?.value) {
+    console.warn("Nenhum dado recebido na notificação de Wi-Fi!");
+    return;
+  }
+
+  // Decodifica a string enviada pelo servidor
+  const dataInput = Base64.decode(characteristic.value);
+  console.log("Notificação de status de Wi-Fi recebida:", dataInput); // Ex: "Conectado a: MyNetwork" ou "Conectado a: Nenhum"
+
+  // Interpreta a string para definir se está online ou offline
+  if (dataInput.includes('Conectado a:') && !dataInput.includes('Nenhum')) {
+    // O dispositivo está conectado a uma rede!
+    setHotspotValue(1);
+    
+    // Opcional, mas útil: extrair o nome da rede para exibir na UI
+    //const ssidName = dataInput.split(': ')[1]?.trim();
+    //setWifiSsid(ssidName);
+
+  } else {
+    // O dispositivo está offline (recebeu "Nenhum" ou uma string de erro)
+    setHotspotValue(0);
+    //setWifiSsid(null);
+  }
+};
+
+
+// Função no seu app para mudar para o modo offline
+const switchToOfflineMode = async (device: Device) => {
+  try {
+    // 1. Cria o objeto de comando
+    const commandData = {
+      command: "offline",
+    };
+
+    // 2. Converte para string JSON e Base64
+    const jsonString = JSON.stringify(commandData);
+    const base64Data = Buffer.from(jsonString, "utf-8").toString("base64");
+
+    // 3. Escreve na mesma característica de Wi-Fi
+    await device.writeCharacteristicWithResponseForService(
+      DATA_SERVICE_UUID,
+      CHARACTERISTIC_UUID_WIFI_COMMAND,
+      base64Data
+    );
+
+    console.log("Comando 'offline' enviado com sucesso!");
+    // O servidor irá desconectar e, graças à Dinâmica 1,
+    // ele enviará uma notificação de status "Conectado a: Nenhum",
+    // que seu app receberá, confirmando a mudança.
+    
+  } catch (error) {
+    console.error("Erro ao tentar mudar para o modo offline:", error);
+    alert("Não foi possível solicitar o modo offline.");
+  }
+};
+
 
   //funcao de desligar
   const sendShutdownCommand = async (device: Device) => {
@@ -646,7 +729,7 @@ const checkWifiStatus = async (
           setPassword={setPassword}
           SendWifiSubmit={handleWifiSubmit}
           device={deviceConnection}
-          onClose={() => setModalVisible(false)}
+          onClose={() => {setModalVisible(false); setHotspotValue(0)}}
         />
         <About visible={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       </ScrollView>
