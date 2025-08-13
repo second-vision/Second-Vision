@@ -23,12 +23,19 @@ import { NavigationProp } from "@/app/types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const DATA_SERVICE_UUID = "12345678-1234-5678-1234-56789abcdef0";
-const CHARACTERISTIC_UUID_YOLO = "12345678-1234-5678-1234-56789abcdef1";
-const CHARACTERISTIC_UUID_PADDLE = "12345678-1234-5678-1234-56789abcdef2";
+const CHARACTERISTIC_UUID_OBJECT = "12345678-1234-5678-1234-56789abcdef1";
+const CHARACTERISTIC_UUID_OCR = "12345678-1234-5678-1234-56789abcdef2";
 const CHARACTERISTIC_UUID_SHUTDOWN = "12345678-1234-5678-1234-56789abcdef3";
 const CHARACTERISTIC_UUID_BATTERY = "12345678-1234-5678-1234-56789abcdef4";
 const CHARACTERISTIC_UUID_WIFI_STATUS = "12345678-1234-5678-1234-56789abcdef5"; // Para ler/monitorar
 const CHARACTERISTIC_UUID_WIFI_COMMAND = "12345678-1234-5678-1234-56789abcdef6"; // Para escrever
+const CHARACTERISTIC_UUID_DEVICE_INFO = "12345678-1234-5678-1234-56789abcdef7";
+
+interface DeviceInfo {
+  model: string;
+  version_code: number;
+  features: string[];
+}
 
 export const Home = () => {
   //Variaveis uteis
@@ -47,8 +54,8 @@ export const Home = () => {
   const { mode, interval, hostspot, setHotspotValue } = useHomePropsContext();
 
   //Recebimento de dados do servidor
-  const [dataReceivedYOLO, setDataReceivedYOLO] = useState<string | null>(null);
-  const [dataReceivedPaddle, setDataReceivedPaddle] = useState<string | null>(
+  const [dataReceivedOBJECT, setDataReceivedOBJECT] = useState<string | null>(null);
+  const [dataReceivedOCR, setDataReceivedOCR] = useState<string | null>(
     null
   );
   const [dataReceivedBattery, setDataReceivedBattery] = useState<string | null>(
@@ -56,6 +63,8 @@ export const Home = () => {
   );
   const [dataReceivedBatteryDuration, setDataReceivedBatteryDuration] =
     useState<string | null>(null);
+  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
+
 
   //Variaveis para funcao de fala
   const hasAnnouncedOnce = useRef(false);
@@ -72,6 +81,21 @@ useEffect(() => {
     }
 
     try {
+
+     const char = await deviceConnection.readCharacteristicForService(
+        DATA_SERVICE_UUID,
+        CHARACTERISTIC_UUID_DEVICE_INFO
+      );
+
+      // Usa o Buffer para decodificar de Base64 para a string UTF-8
+      const infoString = Buffer.from(char.value!, "base64").toString("utf-8");
+
+      // Agora faz o parse do JSON
+      const infoObject = JSON.parse(infoString);
+        
+        console.log("Informações do dispositivo recebidas:", infoObject);
+        setDeviceInfo(infoObject); // SALVA AS INFORMAÇÕES NO ESTADO
+
       // 1. Inicia o streaming de dados (como você queria).
       console.log("Conexão com dispositivo detectada. Iniciando streaming de dados...");
       startStreamingData(deviceConnection);
@@ -130,19 +154,19 @@ useEffect(() => {
   //Use effects de recebimento dos dados
   useEffect(() => {
     if (mode === 0 || mode === 2) {
-      if (dataReceivedYOLO !== "none" && dataReceivedYOLO !== "") {
-        speak(`Objetos a frente: ${dataReceivedYOLO}`, 1);
+      if (dataReceivedOBJECT !== "none" && dataReceivedOBJECT !== "") {
+        speak(`Objetos a frente: ${dataReceivedOBJECT}`, 1);
       }
     }
-  }, [dataReceivedYOLO]);
+  }, [dataReceivedOBJECT]);
 
   useEffect(() => {
     if (mode === 0 || mode === 1) {
-      if (dataReceivedPaddle !== "") {
-        speak(`Texto identificado: ${dataReceivedPaddle}`, 1);
+      if (dataReceivedOCR !== "") {
+        speak(`Texto identificado: ${dataReceivedOCR}`, 1);
       }
     }
-  }, [dataReceivedPaddle]);
+  }, [dataReceivedOCR]);
 
   useEffect(() => {
     if (dataReceivedBattery) {
@@ -455,14 +479,14 @@ const checkWifiStatus = async (
     if (device) {
       device.monitorCharacteristicForService(
         DATA_SERVICE_UUID,
-        CHARACTERISTIC_UUID_YOLO,
-        onDataUpdateYOLO
+        CHARACTERISTIC_UUID_OBJECT,
+        onDataUpdateOBJECT
       );
 
       device.monitorCharacteristicForService(
         DATA_SERVICE_UUID,
-        CHARACTERISTIC_UUID_PADDLE,
-        onDataUpdatePaddle
+        CHARACTERISTIC_UUID_OCR,
+        onDataUpdateOCR
       );
 
       device.monitorCharacteristicForService(
@@ -480,7 +504,7 @@ const checkWifiStatus = async (
     }
   };
 
-  const onDataUpdateYOLO = (
+  const onDataUpdateOBJECT = (
     error: BleError | null,
     characteristic: Characteristic | null
   ) => {
@@ -494,10 +518,10 @@ const checkWifiStatus = async (
 
     const dataInput = Base64.decode(characteristic.value);
 
-    setDataReceivedYOLO(dataInput);
+    setDataReceivedOBJECT(dataInput);
   };
 
-  const onDataUpdatePaddle = (
+  const onDataUpdateOCR = (
     error: BleError | null,
     characteristic: Characteristic | null
   ) => {
@@ -510,7 +534,7 @@ const checkWifiStatus = async (
     }
 
     const dataInput = Base64.decode(characteristic.value);
-    setDataReceivedPaddle(dataInput);
+    setDataReceivedOCR(dataInput);
   };
 
   const onDataUpdateBattery = (
@@ -680,16 +704,30 @@ const switchToOfflineMode = async (device: Device) => {
     },
   ];
 
-  const hostspotMode = [
-    {
-      name: "Offline",
-      description: "Esse modo funciona sem conexão com a internet.",
-    },
-    {
-      name: "Online",
-      description: "Esse modo apenas funciona com conexão à internet.",
-    },
-  ];
+
+
+// 2. Use o 'if/else' para ATRIBUIR o valor à variável já existente.
+ const hostspotMode = deviceInfo?.model === "RPi-5"
+    ? [ // Valor se a condição for verdadeira
+        {
+          name: "Offline",
+          description: "Esse modo funciona sem conexão com a internet.",
+        },
+        {
+          name: "Online",
+          description: "Esse modo apenas funciona com conexão à internet.",
+        },
+      ]
+    : [ // Valor se a condição for falsa
+        {
+          name: "Offline",
+          description: "Ative a internet para o sistema operar.",
+        },
+        {
+          name: "Online",
+          description: "Sistema conectado e funcionando.",
+        },
+      ];
 
   const currentMode = modes[mode];
 
@@ -733,7 +771,7 @@ const switchToOfflineMode = async (device: Device) => {
         />
         <About visible={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       </ScrollView>
-      <BottomBar mode={mode} hostspot={hostspot} interval={interval} />
+      <BottomBar mode={mode} hostspot={hostspot} interval={interval} deviceInfo={deviceInfo?.model} />
     </SafeAreaView>
   );
 };

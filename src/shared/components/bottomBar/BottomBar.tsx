@@ -10,9 +10,10 @@ interface IBottomBarProps {
   interval: number | null;
   mode: number | null;
   hostspot: number | null;
+  deviceInfo: string | undefined;
 }
 
-export const BottomBar: React.FC<IBottomBarProps> = ({ interval, mode, hostspot }) => {
+export const BottomBar: React.FC<IBottomBarProps> = ({ interval, mode, hostspot, deviceInfo }) => {
   const navigation = useNavigation<NavigationProp>();
 
   return (
