@@ -31,11 +31,6 @@ const CHARACTERISTIC_UUID_WIFI_STATUS = "12345678-1234-5678-1234-56789abcdef5"; 
 const CHARACTERISTIC_UUID_WIFI_COMMAND = "12345678-1234-5678-1234-56789abcdef6"; // Para escrever
 const CHARACTERISTIC_UUID_DEVICE_INFO = "12345678-1234-5678-1234-56789abcdef7";
 
-interface DeviceInfo {
-  model: string;
-  version_code: number;
-  features: string[];
-}
 
 export const Home = () => {
   //Variaveis uteis
@@ -63,7 +58,9 @@ export const Home = () => {
   );
   const [dataReceivedBatteryDuration, setDataReceivedBatteryDuration] =
     useState<string | null>(null);
-  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
+  const { deviceInfo, setDeviceInfo } =
+    useHomePropsContext();
+
 
 
   //Variaveis para funcao de fala
@@ -168,26 +165,52 @@ useEffect(() => {
     }
   }, [dataReceivedOCR]);
 
-  useEffect(() => {
-    if (dataReceivedBattery) {
-      if (parseInt(dataReceivedBattery, 10) === 0) return;
-      if (dataReceivedBattery === null) return;
-      if (parseInt(dataReceivedBattery, 10) > 20) {
-        if (!hasAnnouncedOnce.current) {
-          speak(
-            `Bateria a ${dataReceivedBattery}%. Tempo estimado de uso restante: ${dataReceivedBatteryDuration} horas.`,
-            0
-          );
-          hasAnnouncedOnce.current = true;
-        }
-      } else {
-        speak(
-          `Bateria a ${dataReceivedBattery}%. Tempo estimado de uso restante: ${dataReceivedBatteryDuration} horas. A bateria está imprópria para uso.`,
-          0
-        );
-      }
+useEffect(() => {
+  // 1. Verificação inicial: Sai se a string da bateria for nula, vazia ou um placeholder.
+  if (
+    !dataReceivedBattery ||
+    dataReceivedBattery === "-" ||
+    !dataReceivedBatteryDuration ||
+    dataReceivedBatteryDuration === "Calculando tempo restante..." ||
+    dataReceivedBatteryDuration === "Carregando" // Não falar durante o carregamento
+  ) {
+    return;
+  }
+
+  // 2. Extrai o número da porcentagem para a lógica de comparação.
+  //    parseFloat é melhor aqui, pois lida com casas decimais (ex: "85.3%").
+  //    O resultado será 85.3 para "85.3%".
+  const batteryLevel = parseFloat(dataReceivedBattery);
+
+  // 3. Verifica se a conversão foi bem-sucedida (não é NaN).
+  if (isNaN(batteryLevel)) {
+    return;
+  }
+
+  // 4. Lógica de anúncio baseada no nível numérico.
+  if (batteryLevel > 20) {
+    console.log("Tempo restante: ", dataReceivedBatteryDuration)
+    console.log(deviceInfo?.model!)
+    // Anúncio para bateria OK.
+    if (!hasAnnouncedOnce.current) {
+      // Usa as strings originais e formatadas na função speak.
+      speak(
+        `Bateria em ${parseInt(dataReceivedBattery)}%. Tempo restante: ${dataReceivedBatteryDuration}.`,
+        0
+      );
+      hasAnnouncedOnce.current = true;
     }
-  }, [dataReceivedBattery]);
+  } else {
+    // Anúncio para bateria fraca (sempre fala, pois é um alerta crítico).
+    speak(
+      `Atenção, bateria fraca em ${parseInt(dataReceivedBattery)}. Tempo restante: ${dataReceivedBatteryDuration}. Por favor, recarregue o dispositivo.`,
+      0
+    );
+  }
+  
+  // A dependência continua a mesma, pois o efeito deve rodar sempre que o
+  // estado da bateria (a string) mudar.
+}, [dataReceivedBattery]);
 
   //Use effect logica de conexao com internet
   useEffect(() => {
@@ -537,26 +560,60 @@ const checkWifiStatus = async (
     setDataReceivedOCR(dataInput);
   };
 
-  const onDataUpdateBattery = (
-    error: BleError | null,
-    characteristic: Characteristic | null
-  ) => {
-    if (error) {
-      console.error(error);
-      return;
-    } else if (!characteristic?.value) {
-      console.warn("No Data was received for BATTERY!");
-      return;
-    }
+const onDataUpdateBattery = (
+  error: BleError | null,
+  characteristic: Characteristic | null
+) => {
+  if (error) {
+    console.error("Erro no monitor de bateria:", error);
+    // Limpa os estados em caso de erro
+    setDataReceivedBattery("-");
+    setDataReceivedBatteryDuration("Erro de conexão");
+    return;
+  } else if (!characteristic?.value) {
+    console.warn("Nenhum dado recebido na notificação de Bateria!");
+    return;
+  }
 
-    const dataInput = Base64.decode(characteristic.value);
-    const [batteryStr, durationStr] = dataInput.split(",");
-    const batteryPercentage = Math.floor(parseFloat(batteryStr));
-    const duration = parseFloat(durationStr);
+  // 1. Decodifica a string completa
+  const dataInput = Base64.decode(characteristic.value);
+  // Exemplo de dataInput: "85.3%, 2 horas e 15 minutos" ou "Carregando"
 
-    setDataReceivedBatteryDuration(Math.abs(duration).toFixed(2));
-    setDataReceivedBattery(batteryPercentage.toString());
-  };
+  // 2. Separa a string pela vírgula
+  const parts = dataInput.split(",");
+
+  let batteryString = "-";
+  let durationString = "Calculando...";
+
+  // 3. Atribui os valores com base no número de partes
+  if (parts.length > 1) {
+    // Caso 1: Temos porcentagem E duração (ex: "85.3%, 2 horas")
+    
+    // A primeira parte é a porcentagem, com o símbolo %.
+    // .trim() remove espaços em branco caso o servidor envie "85.3% , ..."
+    batteryString = parts[0].trim(); 
+    
+    // A segunda parte é a string de duração.
+    durationString = parts[1].trim();
+
+  } else if (parts.length === 1 && parts[0].trim() !== "") {
+    // Caso 2: Temos apenas uma string de status (ex: "Carregando", "Carga completa")
+    // Verificamos se não é uma string vazia.
+    
+    // Nesse caso, a string de status principal é a duração/status.
+    durationString = parts[0].trim();
+    // A porcentagem pode ficar como um traço ou um ícone.
+    batteryString = "-";
+    
+    // Bônus: se a string for "Carregando", você pode querer mostrar o ícone de carregamento
+    // na UI, mas a lógica de armazenamento permanece a mesma.
+  }
+
+  // 4. Atualiza os estados com as strings exatas
+  setDataReceivedBatteryDuration(durationString);
+  setDataReceivedBattery(batteryString);
+  
+};
 
   const onDataUpdateWifi = (
   error: BleError | null,
@@ -733,6 +790,10 @@ const switchToOfflineMode = async (device: Device) => {
 
   const currentHostspot = hostspotMode[hostspot];
 
+  const batteryNumber = parseInt(dataReceivedBattery!);
+
+  const batteryLevelForDashboard = isNaN(batteryNumber) ? 0 : batteryNumber;
+
   return (
     <SafeAreaView style={styles.container} accessible>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -751,7 +812,7 @@ const switchToOfflineMode = async (device: Device) => {
         <Dashboard
           isOn={isOn}
           intervalDash={interval * 1000}
-          batteryLevel={dataReceivedBattery ? parseInt(dataReceivedBattery) : 0}
+          batteryLevel={batteryLevelForDashboard}
           currentModeIndex={mode}
           currentMode={currentMode}
           currentHostspot={currentHostspot}
@@ -771,7 +832,7 @@ const switchToOfflineMode = async (device: Device) => {
         />
         <About visible={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       </ScrollView>
-      <BottomBar mode={mode} hostspot={hostspot} interval={interval} deviceInfo={deviceInfo?.model} />
+      <BottomBar mode={mode} hostspot={hostspot} interval={interval} deviceInfo={deviceInfo?.model!} />
     </SafeAreaView>
   );
 };

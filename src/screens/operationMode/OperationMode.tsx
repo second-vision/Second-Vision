@@ -6,8 +6,9 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import { About, BottomBar, Devices, Header } from "../../shared/components";
+import { About, BottomBar, Devices, Header, Loading } from "../../shared/components";
 
 import { styles } from "./styles";
 import { useHomePropsContext } from "@/src/shared/context";
@@ -18,7 +19,6 @@ export const OperationMode = () => {
 
   const { interval, mode, setModeValue, hostspot, setHotspotValue, deviceInfo } =
     useHomePropsContext();
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleSelectMode = (mode: any) => {
@@ -36,7 +36,12 @@ export const OperationMode = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
+console.log("device info: ", deviceInfo)
+if (!deviceInfo) { // Esta condição agora significa "se deviceInfo for null"
+    return (
+      <Loading LoadingVisible={true} />
+    );
+  }
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -103,10 +108,10 @@ export const OperationMode = () => {
         </View>
 
          <View style={styles.operationMode}>
-    <Text style={styles.operationModeTitle}>Modo de Operação:</Text>
+    <Text style={styles.operationModeTitle}>Modo de Processamento:</Text>
 
     {/* Condição principal: verifica se é o modelo avançado */}
-    {deviceInfo === "RPi-5" ? (
+    {deviceInfo.model === "RPi-5" ? (
       // --- CAMINHO 1: Dispositivo é V5 (versão avançada) ---
       // Renderiza as duas opções, Offline e Online.
       <>
@@ -118,7 +123,7 @@ export const OperationMode = () => {
         >
           <Text style={styles.cardTitle}>Offline</Text>
           <Text style={styles.cardText}>
-            Usa o processamento local do dispositivo, sem precisar de internet.
+           Esse modo funciona sem conexão com a internet.
           </Text>
           <View style={styles.radio}>
             <View
@@ -137,7 +142,7 @@ export const OperationMode = () => {
         >
           <Text style={styles.cardTitle}>Online</Text>
           <Text style={styles.cardText}>
-            Usa a internet para processamento avançado na nuvem.
+            Esse modo apenas funciona com conexão à internet..
           </Text>
           <View style={styles.radio}>
             <View
@@ -157,9 +162,9 @@ export const OperationMode = () => {
         accessibilityLabel="Conectar à Internet"
         accessibilityHint="Este dispositivo necessita de internet para funcionar. Clique para configurar."
       >
-        <Text style={styles.cardTitle}>Conectar à Internet</Text>
+        <Text style={styles.cardTitle}>Online</Text>
         <Text style={styles.cardText}>
-          Esta versão do dispositivo necessita de uma conexão de internet para funcionar.
+          Esta versão necessita de internet para funcionar. Clique para configurar.
         </Text>
         {/* Podemos mostrar o rádio 'selecionado' se a internet já estiver ativa */}
         <View style={styles.radio}>
@@ -175,7 +180,7 @@ export const OperationMode = () => {
 
         <About visible={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       </ScrollView>
-      <BottomBar mode={mode} hostspot={hostspot} interval={interval} deviceInfo={deviceInfo}/>
+      <BottomBar mode={mode} hostspot={hostspot} interval={interval} deviceInfo={deviceInfo.model}/>
     </SafeAreaView>
   );
 };
