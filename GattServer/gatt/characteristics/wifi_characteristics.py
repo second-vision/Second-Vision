@@ -76,26 +76,20 @@ class WifiCommandCharacteristic(Characteristic):
             self.connection_event.set()
 
     def _disconnect_wifi_task(self):
-        """Task para desconectar de todas as redes Wi-Fi gerenciadas por nmcli."""
-        print("[WifiConfig] Iniciando tarefa de desconexão...")
+        """Desliga completamente o rádio Wi-Fi para entrar no modo offline."""
+        print("[WifiConfig] Desligando o rádio Wi-Fi...")
         try:
-            # Lista todas as conexões ativas
-            list_cmd = ["nmcli", "-t", "-f", "NAME,DEVICE", "connection", "show", "--active"]
-            result = subprocess.run(list_cmd, capture_output=True, text=True, check=True)
-
-            # Procura por conexões na interface wlan0
-            for line in result.stdout.strip().split('\n'):
-                if 'wlan0' in line:
-                    connection_name = line.split(':')[0]
-                    print(f"[WifiConfig] Desativando conexão: {connection_name}")
-                    # Desativa a conexão
-                    disconnect_cmd = ["sudo", "nmcli", "connection", "down", connection_name]
-                    subprocess.run(disconnect_cmd, check=True)
-            
-            print("[WifiConfig] Todas as conexões Wi-Fi ativas foram desativadas.")
-
+            # O comando correto não é desconectar, mas sim desligar o rádio.
+            # Isso é mais limpo e evita os erros do driver.
+            cmd = ["sudo", "nmcli", "radio", "wifi", "off"]
+            subprocess.run(cmd, check=True, capture_output=True, text=True)
+            print("[WifiConfig] Rádio Wi-Fi desligado com sucesso.")
+    
+        except subprocess.CalledProcessError as e:
+            print(f"[WifiConfig Thread] Erro ao desligar o rádio Wi-Fi com nmcli: {e}")
+            print(f"nmcli stderr: {e.stderr}")
         except Exception as e:
-            print(f"[WifiConfig Thread] Erro ao desconectar: {e}")
+            print(f"[WifiConfig Thread] Erro inesperado ao desconectar: {e}")
         finally:
             # Força uma nova verificação de status para notificar o app
             self.connection_event.set()
