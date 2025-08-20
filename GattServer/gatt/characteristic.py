@@ -51,7 +51,7 @@ class Characteristic(dbus.service.Object):
 
     @dbus.service.method(GATT_CHRC_IFACE, in_signature='a{sv}', out_signature='ay')
     def ReadValue(self, options):
-        print(f'ReadValue da característica base: {repr(self.value)}')
+        #print(f'ReadValue da característica base: {repr(self.value)}')
         return self.value
 
     @dbus.service.method(GATT_CHRC_IFACE)

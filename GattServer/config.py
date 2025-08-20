@@ -21,14 +21,14 @@ GATT_DESC_IFACE = 'org.bluez.GattDescriptor1'
 # Tenta inicializar o sensor. Se falhar, ina219 será None.
 try:
     ina219 = INA219(addr=0x42)
-    print("Sensor INA219 inicializado com sucesso.")
+    #print("Sensor INA219 inicializado com sucesso.")
 except Exception as e:
     print(f"ERRO: Não foi possível inicializar o sensor INA219: {e}")
     ina219 = None
 
 # --- Configurações de Visão Computacional ---
 # Carregamento do .env
-env_path = Path(__file__).parent.parent / 'config' / '.env' # Caminho mais robusto
+env_path = Path(__file__).parent.parent / 'config' / '.env'
 load_dotenv(dotenv_path=env_path)
 
 # Chaves e Endpoints da API

@@ -18,9 +18,7 @@ class ShutdownCharacteristic(Characteristic):
                          in_signature='aya{sv}',
                          out_signature='ay')
     def WriteValue(self, value, options):
-        print('Shutdown command received, shutting down...')
+        #print('Shutdown command received, shutting down...')
         self.value = value
-        # Encerra a aplicação GATT
         os.system('sudo systemctl stop bluetooth')
-        # Desliga o sistema operacional
         os.system('sudo shutdown now')

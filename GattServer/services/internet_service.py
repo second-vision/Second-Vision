@@ -17,12 +17,12 @@ def get_wifi_connection_status():
         for line in result.stdout.strip().split('\n'):
             if line.startswith('yes:'):
                 active_ssid = line.split(':', 1)[1]
-                return True, active_ssid # Retorna True e o nome do SSID
+                return True, active_ssid
         
-        return False, None # Nenhuma conexão ativa encontrada
+        return False, None
         
     except (subprocess.CalledProcessError, FileNotFoundError):
-        return False, None # O comando falhou ou não foi encontrado
+        return False, None
     except Exception as e:
         print(f"[Internet Service] Erro inesperado ao verificar Wi-Fi: {e}")
         return False, None

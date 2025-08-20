@@ -13,7 +13,6 @@ class Application(dbus.service.Object):
         service = TestService(bus, 0, connection_event)
         self.add_service(service)
         
-        # A referência agora deve apontar para a característica de status dentro do serviço
         self.wifi_status_characteristic = service.characteristics[4]
 
     def get_path(self):
@@ -25,7 +24,6 @@ class Application(dbus.service.Object):
     @dbus.service.method(DBUS_OM_IFACE, out_signature='a{oa{sa{sv}}}')
     def GetManagedObjects(self):
         response = {}
-        print('GetManagedObjects')
         for service in self.services:
             response[service.get_path()] = service.get_properties()
             chrcs = service.get_characteristics()

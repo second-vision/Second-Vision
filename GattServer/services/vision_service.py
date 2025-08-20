@@ -39,7 +39,7 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
     PROCESS_EVERY_N_FRAMES = 2  # Controla a frequência de processamento geral
     last_sent_objects_str = None
 
-    print("[Vision Service] Loop de captura e processamento iniciado.")
+    #print("[Vision Service] Loop de captura e processamento iniciado.")
     while True:
         try:
             ret, frame = cap.read()
@@ -71,7 +71,7 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
             if current_objects_str != last_sent_objects_str:
                 characteristic_objects.send_update(current_objects_str)
                 last_sent_objects_str = current_objects_str
-                print(f"[Vision Service] Objetos enviados: {current_objects_str}")
+                #print(f"[Vision Service] Objetos enviados: {current_objects_str}")
 
             # --- 2. Processamento de Texto (OCR) ---
             if is_online:
@@ -86,12 +86,11 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
             
             if stabilized_text:
                 characteristic_texts.send_update(stabilized_text)
-                print(f"[Vision Service] Texto enviado: '{stabilized_text}'")
+                #print(f"[Vision Service] Texto enviado: '{stabilized_text}'")
 
         except Exception as e:
             print(f"[Vision Service] ERRO INESPERADO NO LOOP PRINCIPAL: {e}")
-            # Adiciona uma pausa para evitar spam de logs em caso de erro contínuo
             time.sleep(5)
 
-    print("[Vision Service] Encerrando o loop de captura.")
+    #print("[Vision Service] Encerrando o loop de captura.")
     cap.release()

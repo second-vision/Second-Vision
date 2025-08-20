@@ -1,8 +1,4 @@
 # utils/callbacks.py
-
-# É uma boa prática adicionar type hinting aqui também.
-# A classe GLib.MainLoop não é facilmente importável para type hinting
-# sem adicionar uma dependência completa do GI, então usamos 'any' ou uma string.
 from typing import Any
 
 def register_app_cb():

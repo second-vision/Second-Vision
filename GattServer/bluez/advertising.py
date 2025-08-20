@@ -79,10 +79,8 @@ class Advertisement(dbus.service.Object):
                          in_signature='s',
                          out_signature='a{sv}')
     def GetAll(self, interface):
-        print('GetAll')
         if interface != LE_ADVERTISEMENT_IFACE:
             raise exceptions.InvalidArgsException()
-        print('returning props')
         return self.get_properties()[LE_ADVERTISEMENT_IFACE]
 
     @dbus.service.method(LE_ADVERTISEMENT_IFACE,
@@ -113,7 +111,6 @@ def register_ad_error_cb(mainloop, error):
 
 def advertising_main(mainloop, bus, adapter_name):
     adapter = adapters.find_adapter(bus, LE_ADVERTISING_MANAGER_IFACE, adapter_name)
-    print('adapter: %s' % (adapter,))
     if not adapter:
         raise Exception('LEAdvertisingManager1 interface not found')
 

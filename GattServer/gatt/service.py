@@ -9,7 +9,7 @@ class Service(dbus.service.Object):
     PATH_BASE = '/org/bluez/example/service'
 
     def __init__(self, bus, index, uuid_str, primary):
-        unique_id = str(uuid.uuid4())[:8]  # Gera um identificador único de 8 caracteres
+        unique_id = str(uuid.uuid4())[:8]
         self.path = f"{self.PATH_BASE}{index}_{unique_id}"
         self.bus = bus
         self.uuid = uuid_str

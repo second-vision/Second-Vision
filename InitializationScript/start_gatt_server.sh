@@ -1,6 +1,8 @@
 #!/bin/bash
-cd /home/second/GattServer
+cd /home/second
 
 source venv/bin/activate
+
+cd GattServer
 
 python3 -u main.py

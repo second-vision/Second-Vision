@@ -23,15 +23,13 @@ def _parse_object_api_response(result_json, threshold=0.75):
         predictions = result_json.get("predictions", [])
         
         for pred in predictions:
-            # 1. Filtra pela probabilidade
             if pred.get("probability", 0) >= threshold:
-                tag_name = pred.get("tagName") # Ex: "carro"
+                tag_name = pred.get("tagName")
                 
-                # 2. Adiciona diretamente à lista, sem traduzir ou filtrar por nome
                 if tag_name:
                     detected_objects_in_portuguese.append(tag_name)
         
-        print(f"[API Parser] Objetos da API (>=75%): {detected_objects_in_portuguese}")
+        #print(f"[API Parser] Objetos da API (>=75%): {detected_objects_in_portuguese}")
         return detected_objects_in_portuguese
         
     except Exception as e:
@@ -52,26 +50,22 @@ def _parse_text_api_response(result_json):
     """
     ocr_like_results = []
     try:
-        # Usa a mesma lógica de navegação da sua função
         for read_result in result_json.get("analyzeResult", {}).get("readResults", []):
             for line in read_result.get("lines", []):
                 text = line.get("text")
-                bbox = line.get("boundingBox") # A API fornece o bounding box da linha
+                bbox = line.get("boundingBox")
                 
                 if text and bbox:
-                    # Construímos a estrutura que imita a do PaddleOCR:
-                    # [ [bounding_box], [texto, confiança] ]
-                    # A API Read não dá confiança por linha, então usamos um valor fixo alto.
                     confidence = 0.85 
                     paddle_like_line = [bbox, [text, confidence]]
                     ocr_like_results.append(paddle_like_line)
                     
-        print(f"[API Parser] Linhas de texto extraídas da API: {len(ocr_like_results)}")
+        #print(f"[API Parser] Linhas de texto extraídas da API: {len(ocr_like_results)}")
         return ocr_like_results
 
     except Exception as e:
         print(f"[API Parser] Erro ao analisar resposta de texto: {e}")
-        return [] # Retorna uma lista vazia em caso de erro
+        return []
 
 
 def process_frame(frame, is_object_detection):
@@ -86,7 +80,6 @@ def process_frame(frame, is_object_detection):
         endpoint = TEXT_API_ENDPOINT
         key = TEXT_API_KEY
     
-    # Esta função interna contém a lógica de 'requests' que você já tinha
     return _send_image_to_api(endpoint, key, frame, is_object_detection)
 
 def _send_image_to_api(endpoint, subscription_key, frame, is_object_detection):
@@ -130,7 +123,7 @@ def _send_image_to_api(endpoint, subscription_key, frame, is_object_detection):
 
             # --- PASSO 2: Polling do resultado ---
             analysis_result = None
-            for _ in range(10): # Tenta por no máximo ~10 segundos
+            for _ in range(10):
                 result_response = requests.get(operation_url, headers=headers, timeout=10)
                 result_response.raise_for_status()
                 result_json = result_response.json()
@@ -139,12 +132,12 @@ def _send_image_to_api(endpoint, subscription_key, frame, is_object_detection):
                 if status == "succeeded":
                     print("[API] Análise assíncrona concluída com sucesso.")
                     analysis_result = result_json
-                    break # Sai do loop de polling
+                    break
                 elif status == "failed":
                     print("[API] ERRO: Análise assíncrona falhou.")
                     return None
                 
-                time.sleep(1) # Espera 1 segundo antes de tentar novamente
+                time.sleep(1)
             
             if analysis_result:
                 return _parse_text_api_response(analysis_result)
