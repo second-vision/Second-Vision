@@ -84,7 +84,7 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
             current_text = " | ".join(extracted_texts_phrases)
             stabilized_text = text_stabilizer.update(current_text)
             
-            if stabilized_text is not None: # Pode ser uma string vazia "", que é um update válido
+            if stabilized_text:
                 characteristic_texts.send_update(stabilized_text)
                 print(f"[Vision Service] Texto enviado: '{stabilized_text}'")
 
