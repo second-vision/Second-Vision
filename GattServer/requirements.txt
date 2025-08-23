@@ -1,0 +1,8 @@
+ultralytics
+paddleocr
+pyspellchecker
+fuzzywuzzy
+python-Levenshtein
+requests
+python-dotenv
+opencv-python-headless
