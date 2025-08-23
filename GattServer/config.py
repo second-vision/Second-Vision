@@ -2,8 +2,6 @@
 
 import dbus
 import os
-from pathlib import Path
-from dotenv import load_dotenv
 from hardware.ina219 import INA219
 
 # --- Constantes BlueZ/DBus ---
@@ -27,9 +25,6 @@ except Exception as e:
     ina219 = None
 
 # --- Configurações de Visão Computacional ---
-# Carregamento do .env
-env_path = Path(__file__).parent.parent / 'config' / '.env'
-load_dotenv(dotenv_path=env_path)
 
 # Chaves e Endpoints da API
 OBJECT_API_ENDPOINT = os.getenv("IMAGE_ENDPOINT")

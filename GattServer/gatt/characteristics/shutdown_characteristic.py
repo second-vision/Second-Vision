@@ -1,5 +1,6 @@
 # gatt/characteristics/shutdown_characteristics.py
 import dbus
+import os
 from gatt.characteristic import Characteristic
 from config import GATT_CHRC_IFACE
 

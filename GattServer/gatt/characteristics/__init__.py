@@ -2,4 +2,4 @@ from .battery_characteristic import BatteryCharacteristic
 from .device_info_characteristic import DeviceInfoCharacteristic
 from .shutdown_characteristic import ShutdownCharacteristic
 from .vision_characteristics import YoloCharacteristic, OcrPaddle
-from .wifi_characteristics import WifiStatusCommandCharacteristic, WifiCommandCharacteristic
+from .wifi_characteristics import WifiStatusCharacteristic, WifiCommandCharacteristic

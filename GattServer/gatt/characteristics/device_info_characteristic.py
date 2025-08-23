@@ -1,6 +1,7 @@
 # gatt/characteristics/device_info_characteristics.py
 import dbus
 import json
+import os
 from gatt.characteristic import Characteristic
 from config import GATT_CHRC_IFACE
 

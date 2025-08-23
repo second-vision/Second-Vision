@@ -109,17 +109,17 @@ def register_ad_error_cb(mainloop, error):
     mainloop.quit()
 
 
-def advertising_main(mainloop, bus, adapter_name):
-    adapter = adapters.find_adapter(bus, LE_ADVERTISING_MANAGER_IFACE, adapter_name)
-    if not adapter:
-        raise Exception('LEAdvertisingManager1 interface not found')
+def advertising_main(mainloop, bus, adapter_path):
+    #adapter = adapters.find_adapter(bus, LE_ADVERTISING_MANAGER_IFACE, adapter_path)
+    #if not adapter:
+        #raise Exception('LEAdvertisingManager1 interface not found')
 
-    adapter_props = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
-                                   "org.freedesktop.DBus.Properties")
+    #adapter_props = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
+                                   #"org.freedesktop.DBus.Properties")
 
-    adapter_props.Set("org.bluez.Adapter1", "Powered", dbus.Boolean(1))
+    #adapter_props.Set("org.bluez.Adapter1", "Powered", dbus.Boolean(1))
 
-    ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
+    ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter_path),
                                 LE_ADVERTISING_MANAGER_IFACE)
 
     test_advertisement = TestAdvertisement(bus, 0)

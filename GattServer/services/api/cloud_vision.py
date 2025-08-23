@@ -48,20 +48,17 @@ def _parse_text_api_response(result_json):
         list: Uma lista de "linhas", onde cada linha tem um formato similar ao do PaddleOCR.
               Ex: [ [bbox, [texto, confianca]], [bbox, [texto, confianca]], ... ]
     """
-    ocr_like_results = []
+    extracted_phrases = []
     try:
         for read_result in result_json.get("analyzeResult", {}).get("readResults", []):
             for line in read_result.get("lines", []):
                 text = line.get("text")
-                bbox = line.get("boundingBox")
-                
-                if text and bbox:
-                    confidence = 0.85 
-                    paddle_like_line = [bbox, [text, confidence]]
-                    ocr_like_results.append(paddle_like_line)
+
+                if isinstance(text, str) and text.strip():
+                    extracted_phrases.append(text)
                     
-        #print(f"[API Parser] Linhas de texto extraídas da API: {len(ocr_like_results)}")
-        return ocr_like_results
+        #print(f"[API Parser] Linhas de texto extraídas da API: {extracted_phrases}")
+        return extracted_phrases
 
     except Exception as e:
         print(f"[API Parser] Erro ao analisar resposta de texto: {e}")

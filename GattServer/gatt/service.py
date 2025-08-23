@@ -3,7 +3,7 @@ import dbus
 import dbus.service
 import uuid
 from config import GATT_SERVICE_IFACE, DBUS_PROP_IFACE, ina219
-from . import characteristics
+from .characteristics import YoloCharacteristic, OcrPaddle, ShutdownCharacteristic, BatteryCharacteristic, WifiStatusCharacteristic, WifiCommandCharacteristic, DeviceInfoCharacteristic
 
 class Service(dbus.service.Object):
     PATH_BASE = '/org/bluez/example/service'

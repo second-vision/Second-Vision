@@ -58,15 +58,16 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
             # --- 1. Processamento de Objetos ---
             if is_online:
                 # Delega o trabalho para o serviço de API na nuvem
-                final_objects_for_tracker = process_frame(frame, is_object_detection=True) or []
+                api_detections = process_frame(frame, is_object_detection=True) or []
+                stable_objects_list = list(set(api_detections))
             else:
                 # Delega o trabalho para o serviço de modelo local
-                final_objects_for_tracker = detect_objects_local(frame)
-            
-            tracker.update(final_objects_for_tracker)
-            stable_objects_list = tracker.get_stable_objects()
+                local_detections = detect_objects_local(frame)
+                tracker.update(local_detections)
+                stable_objects_list = tracker.get_stable_objects()
+
             stable_objects_list.sort()
-            current_objects_str = ", ".join(stable_objects_list) if stable_objects_list else "nenhum objeto detectado"
+            current_objects_str = ", ".join(stable_objects_list) if stable_objects_list else "none"
       
             if current_objects_str != last_sent_objects_str:
                 characteristic_objects.send_update(current_objects_str)

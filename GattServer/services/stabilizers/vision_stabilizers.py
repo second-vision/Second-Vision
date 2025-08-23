@@ -65,9 +65,8 @@ class TextStabilizer:
     
 
     def update(self, new_text_raw):
-      
+
         new_text_cleaned = " ".join(new_text_raw.split())
-        
 
         if new_text_cleaned: # Se há um novo texto detectado
             # Compara o novo texto com o candidato atual

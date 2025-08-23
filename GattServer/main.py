@@ -1,5 +1,13 @@
 # main.py
 
+import os
+from dotenv import load_dotenv
+from pathlib import Path
+
+env_path = Path('.') / 'config' / '.env'
+load_dotenv(dotenv_path=env_path)
+
+
 import dbus
 import dbus.mainloop.glib
 import functools
@@ -11,7 +19,7 @@ from gi.repository import GLib
 from bluez import advertising, adapters
 from gatt.application import Application
 from threads import battery_monitor_loop, internet_status_updater_loop
-from services.image_processor import camera_capture_loop
+from services.vision_service import camera_capture_loop
 from config import GATT_MANAGER_IFACE, BLUEZ_SERVICE_NAME, ina219
 from utils.callbacks import register_app_cb, register_app_error_cb
 
