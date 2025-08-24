@@ -28,6 +28,22 @@ class BatteryCharacteristic(Characteristic):
         init_thread.daemon = True
         init_thread.start()
 
+    @dbus.service.method(GATT_CHRC_IFACE)
+    def StartNotify(self):
+        """
+        Sobrescreve o método base para enviar uma notificação com o valor atual
+        imediatamente após o cliente se inscrever.
+        """
+        if self.notifying:
+            print(f'[Bateria] Notificações já ativas.')
+            return
+        
+        print(f'[Bateria] Ativando notificações e enviando valor inicial.')
+        self.notifying = True
+        
+        current_value_str = self._get_formatted_battery_string()
+        self.send_update(current_value_str)
+
     def _initial_buffer_fill(self):
         """
         Função executada em um thread para preencher o buffer de corrente na inicialização.
