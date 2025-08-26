@@ -29,10 +29,10 @@ Siga os passos abaixo para configurar o ambiente do servidor em um sistema opera
 
 O sistema operacional já inclui uma versão recente do BlueZ (serviço de Bluetooth). Porém, em alguns casos, pode ser necessário instalar manualmente o pacote completo do **BlueZ** e também o **NetworkManager**, já que o Netplan será configurado para utilizá-lo.
 
-**a. Instalar BlueZ, NetworkManager e ferramentas adicionais:**
+**a. Instalar BlueZ, NetworkManager:**
 ```bash
 sudo apt-get update
-sudo apt-get install -y bluez bluez-tools bluetooth network-manager     python3-pip python3-venv python3-dbus python3-gi i2c-tools
+sudo apt-get install -y bluez bluez-tools bluetooth network-manager
 ```
 
 **b. Habilitar Funcionalidades Experimentais do BlueZ:**
