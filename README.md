@@ -25,11 +25,17 @@ Este repositório contém o código-fonte do servidor GATT para o projeto **Seco
 
 Siga os passos abaixo para configurar o ambiente do servidor em um sistema operacional baseado em Debian, como o Raspberry Pi OS ou Ubuntu Server.
 
-### 1. Pré-requisitos: Configuração do Sistema e BlueZ
+### 1. Pré-requisitos: Configuração do Sistema, BlueZ e NetworkManager
 
-O sistema operacional já inclui uma versão recente do BlueZ (serviço de Bluetooth). A única configuração necessária é garantir que as funcionalidades experimentais de BLE estejam ativas.
+O sistema operacional já inclui uma versão recente do BlueZ (serviço de Bluetooth). Porém, em alguns casos, pode ser necessário instalar manualmente o pacote completo do **BlueZ** e também o **NetworkManager**, já que o Netplan será configurado para utilizá-lo.
 
-**a. Habilitar Funcionalidades Experimentais do BlueZ:**
+**a. Instalar BlueZ, NetworkManager e ferramentas adicionais:**
+```bash
+sudo apt-get update
+sudo apt-get install -y bluez bluez-tools bluetooth network-manager     python3-pip python3-venv python3-dbus python3-gi i2c-tools
+```
+
+**b. Habilitar Funcionalidades Experimentais do BlueZ:**
 Abra o arquivo de serviço do Bluetooth para edição.
 
 ```bash
@@ -80,7 +86,8 @@ sudo netplan apply
 
 Este projeto utiliza o ambiente virtual localizado em `/home/second`.
 
-**a. Crie os diretórios e o ambiente virtual:**```bash
+**a. Crie os diretórios e o ambiente virtual:**
+```bash
 # Crie o diretório do projeto
 mkdir -p /home/second/GattServer
 
@@ -168,7 +175,8 @@ sudo chmod +x /home/second/start_gatt_server.sh
 ```bash
 sudo nano /etc/systemd/system/gatt_server.service
 ```
-Cole o seguinte conteúdo:```ini
+Cole o seguinte conteúdo:
+```ini
 [Unit]
 Description=Servidor GATT Second Vision
 # Garante que o serviço só inicie após a rede e o bluetooth estarem prontos
