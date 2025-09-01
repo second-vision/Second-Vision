@@ -57,9 +57,10 @@ Instale os pacotes essenciais para a execução de scripts Python que interagem 
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y python3-pip python3-venv python3-dbus python3-gi i2c-tools
-sudo apt install libdbus-1-dev libdbus-glib-1-dev python3-dev build-essential
-sudo apt install python3-gi-cairo gir1.2-gtk-3.0
+sudo apt-get install -y \
+  python3-pip python3-venv python3-dbus python3-gi i2c-tools \
+  libdbus-1-dev libdbus-glib-1-dev python3-dev build-essential \
+  libgirepository1.0-dev gir1.2-glib-2.0
 ```
 
 ### 2. Configuração de Rede (Netplan)
