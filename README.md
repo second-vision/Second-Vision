@@ -8,7 +8,7 @@ Este repositório contém o código-fonte do servidor GATT para o projeto **Seco
 
 *   **Servidor GATT BLE:** Expõe serviços e características Bluetooth para comunicação com o aplicativo cliente.
 *   **Processamento Híbrido de IA:**
-    *   **Modo Offline:** Utiliza modelos locais (YOLO para objetos, PaddleOCR for texto) para funcionar sem conexão com a internet.
+    *   **Modo Offline:** Utiliza modelos locais (YOLO para objetos, PaddleOCR para texto) para funcionar sem conexão com a internet.
     *   **Modo Online:** Utiliza APIs de nuvem para detecção de objetos e OCR com maior precisão e variedade quando uma conexão de internet está disponível.
 *   **Gerenciamento de Conexão:** O Wi-Fi do dispositivo pode ser totalmente controlado pelo aplicativo cliente, incluindo conexão a novas redes e desconexão.
 *   **Monitoramento de Hardware:** Expõe o status da bateria (porcentagem e tempo restante estimado) via BLE.
