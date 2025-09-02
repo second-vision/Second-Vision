@@ -8,7 +8,7 @@ import {
   Splash,
   TermsOfUse,
 } from "@/src/screens";
-import { DeviceProvider, ModeProvider } from "@/src/shared/context";
+import { DeviceProvider, ModeProvider, MenuProvider } from "@/src/shared/context";
 import { createStackNavigator } from "@react-navigation/stack";
 
 const Stack = createStackNavigator();
@@ -17,6 +17,7 @@ export default function RootLayout() {
   return (
     <ModeProvider>
         <DeviceProvider>
+          <MenuProvider>
           <Stack.Navigator>
             <Stack.Screen
               name="SplashStack"
@@ -59,7 +60,9 @@ export default function RootLayout() {
               options={{ headerShown: false }}
             />
           </Stack.Navigator>
+          </MenuProvider>
         </DeviceProvider>
     </ModeProvider>
+    
   );
 }

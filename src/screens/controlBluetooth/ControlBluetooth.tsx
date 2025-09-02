@@ -6,17 +6,24 @@ import { BleManager, State } from "react-native-ble-plx";
 
 import { NavigationProp } from "@/app/types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useBluetoothManager, useTermsManager } from "@/src/shared/hooks";
 
 const bleManager = new BleManager();
 
 export const ControlBluetooth = () => {
-  const [bluetoothState, setBluetoothState] = useState("");
   const navigation = useNavigation<NavigationProp>();
 
-  const checkBluetoothState = async () => {
-    const state: State = await bleManager.state();
-    setBluetoothState(state);
-  };
+  const {
+        checkBluetoothState,
+        handleBluetoothState,
+        bluetoothState
+  
+      } = useBluetoothManager();
+
+      const {
+        checkTermsAcceptance,
+  
+      } = useTermsManager();
 
   useEffect(() => {
     const backAction = () => {
@@ -36,36 +43,8 @@ export const ControlBluetooth = () => {
   }, []);
 
   useEffect(() => {
-    const checkTermsAcceptance = async () => {
-      const accepted = await AsyncStorage.getItem("hasAcceptedTerms");
-      if (accepted !== "true") {
-        navigation.replace("TermsOfUseStack");
-      } else {
-        handleBluetoothState();
-      }
-    };
 
-    const handleBluetoothState = () => {
-      if (bluetoothState === "Resetting") {
-        const timer = setInterval(async () => {
-          const state: State = await bleManager.state();
-          setBluetoothState(state);
-          if (state === "PoweredOn" || state === "PoweredOff") {
-            clearInterval(timer);
-          }
-        }, 1000);
-
-        return () => clearInterval(timer);
-      }
-
-      if (bluetoothState === "PoweredOn") {
-        navigation.replace("BluetoothOnStack");
-      } else if (bluetoothState === "PoweredOff") {
-        navigation.replace("BluetoothOffStack");
-      }
-    };
-
-    checkTermsAcceptance();
+    checkTermsAcceptance(handleBluetoothState);
   }, [bluetoothState, navigation]);
   return <View></View>;
 };

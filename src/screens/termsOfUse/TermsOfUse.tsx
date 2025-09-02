@@ -1,37 +1,14 @@
 import { ScrollView, View, Text, Pressable, Alert } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import ExitApp from "react-native-exit-app";
 import { useNavigation } from "expo-router";
 
 import { styles } from "./styles";
 import { NavigationProp } from "@/app/types/types";
+import { useTermsManager } from "@/src/shared/hooks";
 
 export const TermsOfUse = () => {
   const navigation = useNavigation<NavigationProp>();
-  const acceptTerms = async () => {
-    await AsyncStorage.setItem("hasAcceptedTerms", "true");
-    navigation.replace("ControlBluetoothStack");
-  };
-
-  const rejectTerms = () => {
-    Alert.alert(
-      "Rejeitar Termos",
-      "Você realmente deseja rejeitar os termos e sair do aplicativo?",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel",
-        },
-        {
-          text: "Sim",
-          onPress: () => {
-            ExitApp.exitApp();
-          },
-        },
-      ]
-    );
-  };
-
+  const { rejectTerms, acceptTerms} = useTermsManager();
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title} accessibilityRole="text">

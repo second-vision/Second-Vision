@@ -7,27 +7,31 @@ import * as Speech from "expo-speech";
 
 import { NavigationProp } from "@/app/types/types";
 import { styles } from "./styles";
-import { requestPermissions } from "@/src/shared/hooks";
+import { requestPermissions, useSpeech } from "@/src/shared/hooks";
+import { useBluetoothManager } from "@/src/shared/hooks/useBluetoothManager";
 
 const bleManager = new BleManager();
 
 export const BluetoothOff = () => {
   const navigation = useNavigation<NavigationProp>();
   const [bluetoothState, setBluetoothState] = useState<State | string>("");
+  const { speak, hasAnnouncedOnce } = useSpeech(0);
+
+    const {
+      checkBluetoothState,
+      enableBluetooth
+
+    } = useBluetoothManager();
 
   useEffect(() => {
     const handleRequest = async () => {
       await requestPermissions();
     };
-
     handleRequest();
-
     checkBluetoothState();
-
     speak("Habilite o Bluetooth no botão abaixo");
 
     const backAction = () => {
-     
       return true;
     };
 
@@ -35,13 +39,11 @@ export const BluetoothOff = () => {
       "hardwareBackPress",
       backAction
     );
-
-   
+ 
     const stateSubscription = bleManager.onStateChange((state) => {
       setBluetoothState(state);
     }, true); 
-
-    
+  
     return () => {
       stateSubscription.remove();
       backHandler.remove();
@@ -53,25 +55,6 @@ export const BluetoothOff = () => {
       navigation.replace("BluetoothOnStack");
     }
   }, [bluetoothState, navigation]);
-
-  const checkBluetoothState = async () => {
-    const state: State = await bleManager.state();
-    setBluetoothState(state); 
-  };
-
-  const speak = async (text: string) => {
-    Speech.speak(text, {
-      language: "pt-BR",
-    });
-  };
-
-  const enableBluetooth = async () => {
-    try {
-      await BluetoothStateManager.requestToEnable();
-    } catch (error) {
-      console.error("Bluetooth não foi ativado", error);
-    }
-  };
 
   return (
     <View style={styles.container}>

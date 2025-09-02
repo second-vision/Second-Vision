@@ -12,22 +12,20 @@ import { useNavigation } from "expo-router";
 
 import { About, BottomBar, Devices, Header } from "../../shared/components";
 import { styles } from "./styles";
-import { useHomePropsContext } from "@/src/shared/context";
+import { useHomePropsContext, useMenu } from "@/src/shared/context";
 import { NavigationProp } from "@/app/types/types";
 
 const MAX_INTERVAL_SECONDS = 30;
 
 export const IntervalTime = () => {
   const navigation = useNavigation<NavigationProp>();
+const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
 
-  const { interval, mode, setIntervalValue, hostspot } = useHomePropsContext();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { interval, mode, setIntervalValue, hostspot, deviceInfo } = useHomePropsContext();
   const [inputValueInt, setInputValueInt] = useState("0");
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
   const sendShutdownCommand = () => {};
+
   const handleInputChange = (value: string) => {
     const filteredValue = value.replace(/[^0-9]/g, "");
 
@@ -90,9 +88,9 @@ export const IntervalTime = () => {
           </Pressable>
         </View>
 
-        <About visible={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+        <About visible={isMenuOpen} onClose={closeMenu} />
       </ScrollView>
-      <BottomBar mode={mode} hostspot={hostspot} interval={interval} />
+      <BottomBar mode={mode} hostspot={hostspot} interval={interval} deviceInfo={deviceInfo?.model!} />
     </SafeAreaView>
   );
 };
