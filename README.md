@@ -58,7 +58,7 @@ Instale os pacotes essenciais para a execução de scripts Python que interagem 
 ```bash
 sudo apt-get update
 sudo apt-get install -y \
-  python3-pip python3-venv python3-dbus python3-gi i2c-tools \
+  python3-pip python3-venv python3-dbus python3-gi python3-smbus i2c-tools \
   libdbus-1-dev libdbus-glib-1-dev python3-dev build-essential \
   libgirepository1.0-dev gir1.2-glib-2.0
 ```
@@ -84,6 +84,7 @@ network:
 ```bash
 sudo netplan apply
 ```
+**OBS: Caso a internet pare de funcionar após esse processo, reinicie o sistema operacional.
 
 ### 3. Estrutura de Diretórios e Ambiente Virtual
 
@@ -102,7 +103,7 @@ python3 -m venv venv
 **b. Clone o repositório do projeto:**
 ```bash
 cd /home/second/GattServer
-git clone https://repositorio/aqui.git . 
+git clone https://github.com/second-vision/Second-Vision.git . 
 # O ponto '.' no final clona o conteúdo na pasta atual
 ```
 
