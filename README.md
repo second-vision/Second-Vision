@@ -84,7 +84,7 @@ network:
 ```bash
 sudo netplan apply
 ```
-**OBS: Caso a internet pare de funcionar após esse processo, reinicie o sistema operacional.
+*OBS: Caso a internet pare de funcionar após esse processo, reinicie o sistema operacional.*
 
 ### 3. Estrutura de Diretórios e Ambiente Virtual
 
