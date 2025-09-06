@@ -10,11 +10,13 @@ interface IHomePropsContextType {
   interval: number;
   mode: number;
   hostspot: number;
+  hostspotUI: number;
   setIntervalValue: (value: number) => void;
   setModeValue: (value: number) => void;
   setHotspotValue: (value: number) => void;
-  deviceInfo: DeviceInfo | null; // <-- MUDANÇA: Agora pode ser o objeto ou null
-  setDeviceInfo: (value: DeviceInfo | null) => void; // <-- MUDANÇA: Aceita o objeto ou null
+  setHotspotValueUI: (value: number) => void;
+  deviceInfo: DeviceInfo | null;
+  setDeviceInfo: (value: DeviceInfo | null) => void;
 }
 
 const HomePropsContext = createContext<IHomePropsContextType | undefined>(undefined);
@@ -22,12 +24,12 @@ const HomePropsContext = createContext<IHomePropsContextType | undefined>(undefi
 export const ModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [interval, setIntervalValue] = useState<number>(0);
   const [mode, setModeValue] = useState<number>(0);
-  const [hostspot, setHotspotValue] = useState<number>(0);
+  const [hostspot, setHotspotValue] = useState<number>(2);
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
-
+  const [hostspotUI, setHotspotValueUI] = useState<number>(0);
 
   return (
-    <HomePropsContext.Provider value={{ interval, mode, setIntervalValue, setModeValue, hostspot, setHotspotValue, deviceInfo, setDeviceInfo}}>
+    <HomePropsContext.Provider value={{ interval, mode, setIntervalValue, setModeValue, hostspot, setHotspotValue, deviceInfo, setDeviceInfo, hostspotUI, setHotspotValueUI}}>
       {children}
     </HomePropsContext.Provider>
   );

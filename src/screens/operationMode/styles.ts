@@ -1,6 +1,5 @@
 import { Dimensions, StyleSheet } from "react-native";
 
-
 const { width } = Dimensions.get("window");
 
 const boxShadow = {
@@ -20,10 +19,11 @@ export const styles = StyleSheet.create({
 		justifyContent: "space-between",
 	},
 	scrollContent: {
-		paddingVertical: 20,
+		paddingVertical: 40,
 	},
 	operationMode: {
 		marginHorizontal: 20,
+		marginVertical: 10,
 		display: "flex",
 		gap: 15,
 	},
@@ -31,7 +31,7 @@ export const styles = StyleSheet.create({
 		color: "#001268",
 		fontWeight: "800",
 		fontSize: width * 0.04,
-		paddingVertical: 10,
+		paddingVertical: 5,
 	},
 	operationModeText: {
 		color: "#001268",

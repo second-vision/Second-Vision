@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "space-between",
-    marginTop: 30,
+    marginTop: 40
   },
   background: {
     position: "absolute",

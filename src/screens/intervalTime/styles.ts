@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
 		justifyContent: "space-between",
 	},
 	scrollContent: {
-		paddingVertical: 20,
+		paddingVertical: 40,
 	},
 	interval: {
 		marginHorizontal: 20,
@@ -37,7 +37,7 @@ export const styles = StyleSheet.create({
 		borderWidth: 1,
 	},
 	intervalButton: {
-		padding: 10,
+		padding: 15,
 		backgroundColor: "#001268",
 		borderRadius: 10,
 	},

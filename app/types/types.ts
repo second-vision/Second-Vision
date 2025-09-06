@@ -10,6 +10,7 @@ export type RootStackParamList = {
   HomeStack: undefined;
   IntervalTimeStack: undefined;
   OperationModeStack: undefined;
+  SettingsStack: undefined;
 };
 
 export type NavigationProp = StackNavigationProp<RootStackParamList>;

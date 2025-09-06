@@ -54,7 +54,6 @@ const requestFineLocationPermission = async () => {
 };
 
 const handlePermissionResults = (results: string[]) => {
-
   if (results.every((res) => res === PermissionsAndroid.RESULTS.GRANTED)) {
     return true;
   }

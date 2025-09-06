@@ -30,11 +30,16 @@ export const HOSTSPOT_MODES = {
       description: "Esse modo apenas funciona com conexão à internet.",
     },
   ],
-  default: [
+  RPi0: [
+    {
+      id: 0,
+      name: "Offline",
+      description: "Este dispositivo necessita de internet para funcionar. Clique para configurar.",
+    },
     {
       id: 1,
       name: "Online",
-      description: "Este dispositivo necessita de internet para funcionar. Clique para configurar.",
-    },
+      description: "Este dispositivo está conectado e funcionando.",
+    }
   ],
 };

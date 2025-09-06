@@ -1,27 +1,23 @@
 import { useEffect, useState } from "react";
-import BluetoothStateManager from "react-native-bluetooth-state-manager";
 import { useNavigation } from "@react-navigation/native";
 import { BleManager, State } from "react-native-ble-plx";
 import { Text, View, Image, Pressable, BackHandler } from "react-native";
 import * as Speech from "expo-speech";
-
 import { NavigationProp } from "@/app/types/types";
 import { styles } from "./styles";
 import { requestPermissions, useSpeech } from "@/src/shared/hooks";
 import { useBluetoothManager } from "@/src/shared/hooks/useBluetoothManager";
+import { useSettings } from "@/src/shared/context";
 
 const bleManager = new BleManager();
 
 export const BluetoothOff = () => {
   const navigation = useNavigation<NavigationProp>();
   const [bluetoothState, setBluetoothState] = useState<State | string>("");
-  const { speak, hasAnnouncedOnce } = useSpeech(0);
+  const { speakEnabled } = useSettings();
+  const { speak } = useSpeech(0);
 
-    const {
-      checkBluetoothState,
-      enableBluetooth
-
-    } = useBluetoothManager();
+  const { checkBluetoothState, enableBluetooth } = useBluetoothManager();
 
   useEffect(() => {
     const handleRequest = async () => {
@@ -29,7 +25,9 @@ export const BluetoothOff = () => {
     };
     handleRequest();
     checkBluetoothState();
-    speak("Habilite o Bluetooth no botão abaixo");
+    if (speakEnabled) {
+      speak("Habilite o Bluetooth no botão abaixo");
+    }
 
     const backAction = () => {
       return true;
@@ -39,11 +37,11 @@ export const BluetoothOff = () => {
       "hardwareBackPress",
       backAction
     );
- 
+
     const stateSubscription = bleManager.onStateChange((state) => {
       setBluetoothState(state);
-    }, true); 
-  
+    }, true);
+
     return () => {
       stateSubscription.remove();
       backHandler.remove();
@@ -52,6 +50,7 @@ export const BluetoothOff = () => {
 
   useEffect(() => {
     if (bluetoothState === "PoweredOn") {
+      Speech.stop();
       navigation.replace("BluetoothOnStack");
     }
   }, [bluetoothState, navigation]);
@@ -63,8 +62,7 @@ export const BluetoothOff = () => {
           source={require("../../shared/assets/images/device_icon.png")}
           style={styles.image}
           resizeMode="contain"
-          accessibilityLabel="Ícone de dispositivo Bluetooth"
-          accessibilityHint="Imagem que representa a função de habilitar o Bluetooth"
+          accessibilityLabel="Ícone representando o Bluetooth"
         />
       </View>
       <View style={styles.textBlue}>
@@ -79,8 +77,7 @@ export const BluetoothOff = () => {
         <Pressable
           style={styles.scanButton}
           onPress={enableBluetooth}
-          accessibilityLabel="Habilitar Bluetooth"
-          accessibilityHint="Toque para ativar o Bluetooth e acessar a tela de controle"
+          accessibilityHint="Toque para ativar o Bluetooth e acessar a tela de escaneamento"
           accessibilityRole="button"
         >
           <Text style={styles.scanButtonText}>Habilitar Bluetooth</Text>

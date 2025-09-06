@@ -9,17 +9,26 @@ import { Device } from "react-native-ble-plx";
 import {
   DATA_SERVICE_UUID,
   CHARACTERISTIC_UUID_WIFI_STATUS,
-  CHARACTERISTIC_UUID_WIFI_COMMAND
+  CHARACTERISTIC_UUID_WIFI_COMMAND,
 } from "@/src/shared/constants/ble";
 
-export function useWifiManager(deviceConnection: Device | null, hostspot: number, setHotspotValue: (val: number) => void) {
+export function useWifiManager(
+  deviceConnection: Device | null,
+  hostspot: number,
+  hostspotUI: number,
+  setHotspotValue: (val: number) => void
+) {
   const [ssid, setSsid] = useState("");
   const [password, setPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
 
-  // --- SUBMIT ---
-  const handleWifiSubmit = async (ssid: string, password: string, device: Device): Promise<boolean> => {
+  // --- SUBMIT DE DADOS DO ROTEADOR ---
+  const handleWifiSubmit = async (
+    ssid: string,
+    password: string,
+    device: Device
+  ): Promise<boolean> => {
     try {
       const isConnected = await device.isConnected();
       if (!isConnected) {
@@ -28,9 +37,11 @@ export function useWifiManager(deviceConnection: Device | null, hostspot: number
       }
 
       const wifiData = { ssid, password };
-      const base64Data = Buffer.from(JSON.stringify(wifiData), "utf-8").toString("base64");
+      const base64Data = Buffer.from(
+        JSON.stringify(wifiData),
+        "utf-8"
+      ).toString("base64");
 
-      console.log("Enviando comando Wi-Fi...");
       await device.writeCharacteristicWithResponseForService(
         DATA_SERVICE_UUID,
         CHARACTERISTIC_UUID_WIFI_COMMAND,
@@ -47,10 +58,8 @@ export function useWifiManager(deviceConnection: Device | null, hostspot: number
           CHARACTERISTIC_UUID_WIFI_STATUS
         );
         const decoded = Buffer.from(result.value!, "base64").toString("utf-8");
-        console.log("Status atual:", decoded);
 
         if (decoded.includes(`Conectado a: ${ssid}`)) {
-          console.log("Conexão Wi-Fi bem sucedida!");
           return true;
         }
       }
@@ -76,7 +85,11 @@ export function useWifiManager(deviceConnection: Device | null, hostspot: number
 
     if (savedSsid && savedPassword) {
       setIsConnecting(true);
-      const connected = await handleWifiSubmit(savedSsid, savedPassword, deviceConnection);
+      const connected = await handleWifiSubmit(
+        savedSsid,
+        savedPassword,
+        deviceConnection
+      );
       setIsConnecting(false);
 
       if (!connected) {
@@ -95,7 +108,10 @@ export function useWifiManager(deviceConnection: Device | null, hostspot: number
   // --- ENVIAR NOVAS CREDENCIAIS ---
   const handleSubmitCredentials = async () => {
     if (!ssid || !password) {
-      Alert.alert("Campos obrigatórios", "Por favor, preencha o SSID e a senha.");
+      Alert.alert(
+        "Campos obrigatórios",
+        "Por favor, preencha o SSID e a senha."
+      );
       return;
     }
 
@@ -132,115 +148,101 @@ export function useWifiManager(deviceConnection: Device | null, hostspot: number
       SendIntentAndroid.openSettings("android.settings.TETHER_SETTINGS");
     } catch (error) {
       console.error("Erro ao abrir config:", error);
-      Alert.alert("Erro", "Não foi possível abrir roteador, tentando abrir config geral", [
-        { text: "OK", onPress: () => SendIntentAndroid.openSettings("android.settings.SETTINGS") }
-      ]);
+      Alert.alert(
+        "Erro",
+        "Não foi possível abrir roteador, tentando abrir config geral",
+        [
+          {
+            text: "OK",
+            onPress: () =>
+              SendIntentAndroid.openSettings("android.settings.SETTINGS"),
+          },
+        ]
+      );
     }
   };
 
   //Use effect logica de conexao com internet
-    useEffect(() => {
-  
+  useEffect(() => {
     const runWifiCheck = async () => {
-   
       if (!deviceConnection) {
-        return; 
+        return;
       }
-  
-      setIsConnecting(true)
-      console.log("teste")
+
+      setIsConnecting(true);
+
       const status = await checkWifiStatus(deviceConnection);
-  
-      if (hostspot !== 1 && status.connected) {
-        await switchToOfflineMode(deviceConnection); 
-        console.log("chegou")
-        setIsConnecting(false)
+      if (hostspot === 0 && status.connected && hostspotUI === 1) {
+        await switchToOfflineMode(deviceConnection);
+        setIsConnecting(false);
         return;
       }
-      
-      if (hostspot !== 0 && !status.connected) {
+
+      if (hostspot === 1 && !status.connected && hostspotUI === 0) {
         await handleSelectHotspot();
-        console.log("chegou1")
-        setIsConnecting(false)
+        setIsConnecting(false);
         return;
       }
-      console.log("chegou2")
-        setIsConnecting(false)
-      return
-    }
-  
-      runWifiCheck();
-    }, [hostspot]);
-  
-    //funcoes para conexao com internet
-  
-  
+
+      setIsConnecting(false);
+      return;
+    };
+
+    runWifiCheck();
+  }, [hostspot]);
+
+  // --- VERIFICAR STATUS ATUAL DO WIFI ---
   const checkWifiStatus = async (
     device: Device
   ): Promise<{ connected: boolean; ssid: string | null }> => {
     try {
-      // Garante que ainda estamos conectados via BLE antes de tentar a leitura
       const isBleConnected = await device.isConnected();
       if (!isBleConnected) {
-        console.log("Verificação de status cancelada: dispositivo BLE desconectado.");
         return { connected: false, ssid: null };
       }
-  
-      console.log("Verificando status atual do Wi-Fi no dispositivo...");
-  
-            // Lê o valor da característica
-            const result = await device.readCharacteristicForService(
-              DATA_SERVICE_UUID,
-              CHARACTERISTIC_UUID_WIFI_STATUS
-            );
-  
-            // Decodifica a resposta
-            const decoded = Buffer.from(result.value!, "base64").toString("utf-8");
-            console.log("Resposta do dispositivo:", decoded);
-  
-            // Interpreta a resposta do servidor Python
-            // Ex: "Conectado a: MinhaRede" ou "Conectado a: Nenhum"
-            if (decoded.includes("Conectado a:") && !decoded.includes("Nenhum")) {
-              // Extrai o nome do SSID da string para exibir na UI
-              const ssid = decoded.split("Conectado a: ")[1]?.trim();
-              console.log(`Dispositivo já está conectado ao Wi-Fi: ${ssid}`);
-              return { connected: true, ssid: ssid || "desconhecido" };
-            } else {
-              console.log("Dispositivo não está conectado a nenhuma rede Wi-Fi.");
-              return { connected: false, ssid: null };}
-  
-         
+
+      // Lê o valor da característica
+      const result = await device.readCharacteristicForService(
+        DATA_SERVICE_UUID,
+        CHARACTERISTIC_UUID_WIFI_STATUS
+      );
+
+      // Decodifica a resposta
+      const decoded = Buffer.from(result.value!, "base64").toString("utf-8");
+
+      // Interpreta a resposta do servidor Python
+      // Ex: "Conectado a: MinhaRede" ou "Conectado a: Nenhum"
+      if (decoded.includes("Conectado a:") && !decoded.includes("Nenhum")) {
+        const ssid = decoded.split("Conectado a: ")[1]?.trim();
+
+        return { connected: true, ssid: ssid || "desconhecido" };
+      } else {
+        return { connected: false, ssid: null };
+      }
     } catch (error) {
       console.error("Erro ao verificar o status do Wi-Fi:", error);
-      // Retorna 'false' em caso de qualquer erro de comunicação
       return { connected: false, ssid: null };
     }
   };
-  
-  // Função no seu app para mudar para o modo offline
+
+  // Função para mudar para o modo offline
   const switchToOfflineMode = async (device: Device) => {
     try {
       // 1. Cria o objeto de comando
       const commandData = {
         command: "offline",
       };
-  
+
       // 2. Converte para string JSON e Base64
       const jsonString = JSON.stringify(commandData);
       const base64Data = Buffer.from(jsonString, "utf-8").toString("base64");
-  
-      // 3. Escreve na mesma característica de Wi-Fi
+
+      // 3. Escreve na característica de Wi-Fi
       await device.writeCharacteristicWithResponseForService(
         DATA_SERVICE_UUID,
         CHARACTERISTIC_UUID_WIFI_COMMAND,
         base64Data
       );
-  
-      console.log("Comando 'offline' enviado com sucesso!");
-      // O servidor irá desconectar e, graças à Dinâmica 1,
-      // ele enviará uma notificação de status "Conectado a: Nenhum",
-      // que seu app receberá, confirmando a mudança.
-      
     } catch (error) {
       console.error("Erro ao tentar mudar para o modo offline:", error);
       alert("Não foi possível solicitar o modo offline.");
@@ -259,6 +261,7 @@ export function useWifiManager(deviceConnection: Device | null, hostspot: number
     handleSelectHotspot,
     openHotspotSettings,
     handleWifiSubmit,
-    setIsConnecting
+    setIsConnecting,
+    checkWifiStatus,
   };
 }

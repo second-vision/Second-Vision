@@ -6,3 +6,5 @@ export * from "./termsOfUse/TermsOfUse";
 export * from "./splash/Splash";
 export * from "./intervalTime/IntervalTime";
 export * from "./operationMode/OperationMode";
+export * from "./termsOfUse/TermsOfUse";
+export * from "./settings/Settings";

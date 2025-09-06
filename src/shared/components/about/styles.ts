@@ -32,12 +32,6 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 10,
   },
-  textInfo: {
-    paddingTop: 0,
-    paddingRight: 20,
-    paddingBottom: 20,
-    paddingLeft: 20,
-  },
   textTitle: {
     fontWeight: "bold",
     fontSize: width * 0.04,
@@ -65,5 +59,12 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
     flex: 1,
     fontWeight: "bold",
+  },
+  modalScrollContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 20, // garante espaço no final do scroll
+    paddingTop: 0,
+    paddingRight: 20,
+    paddingLeft: 20,
   },
 });

@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { SafeAreaView, ScrollView } from "react-native";
-
-import {About,BottomBar,Dashboard,Devices,Header,Loading,ModalWifi } from "@/src/shared/components";
+import {
+  About,
+  BottomBar,
+  Dashboard,
+  Devices,
+  Header,
+  Loading,
+  ModalWifi,
+} from "@/src/shared/components";
 import { useDeviceContext, useHomePropsContext } from "@/src/shared/context";
 import { styles } from "./styles";
 
@@ -15,14 +22,20 @@ import { Device } from "react-native-ble-plx";
 
 export const Home = () => {
   //Variaveis uteis
-  const [isOn] = useState(true);
   const { deviceConnection } = useDeviceContext();
   const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
-  const [isScanningM ] = useState(true);
+  const [isScanningM] = useState(true);
   const [allDevices] = useState<Device[]>([]);
 
   //Configurações do usuario
-  const { mode, interval, hostspot, setHotspotValue } = useHomePropsContext();
+  const {
+    mode,
+    interval,
+    hostspot,
+    hostspotUI,
+    setHotspotValue,
+    setHotspotValueUI,
+  } = useHomePropsContext();
 
   //Conexão de internet
   const {
@@ -36,18 +49,20 @@ export const Home = () => {
     handleSubmitCredentials,
     handleSelectHotspot,
     openHotspotSettings,
-    handleWifiSubmit
-  } = useWifiManager(deviceConnection, hostspot, setHotspotValue);
+    handleWifiSubmit,
+    checkWifiStatus,
+  } = useWifiManager(deviceConnection, hostspot, hostspotUI, setHotspotValue);
 
   //Funcoes de recebimento dos dados
   const {
+    isOn,
     deviceInfo,
     objectData,
     ocrData,
     battery,
     batteryDuration,
-    sendShutdownCommand
-  } = useDeviceConnection(deviceConnection, setHotspotValue);
+    sendShutdownCommand,
+  } = useDeviceConnection(deviceConnection, setHotspotValueUI, checkWifiStatus);
 
   //Estados para falas
   useAnnouncements({
@@ -59,14 +74,17 @@ export const Home = () => {
     batteryDuration,
     interval,
     isScanningM,
-    allDevices
+    allDevices,
+    hostspotUI,
   });
 
+  // Variaveis para UI
   const currentMode = MODES[mode];
 
-  const hostspotModes = deviceInfo?.model === "RPi-5" ? HOSTSPOT_MODES.RPi5 : HOSTSPOT_MODES.default;
+  const hostspotModes =
+    deviceInfo?.model === "RPi-5" ? HOSTSPOT_MODES.RPi5 : HOSTSPOT_MODES.RPi0;
 
-  const currentHostspot = hostspotModes[hostspot];
+  const currentHostspot = hostspotModes[hostspotUI];
 
   const batteryNumber = parseInt(battery!);
 
@@ -74,10 +92,12 @@ export const Home = () => {
 
   return (
     <SafeAreaView style={styles.container} accessible>
-      <ScrollView contentContainerStyle={styles.scrollContent}>    
-         <Loading
-            LoadingVisible={isConnecting}
-         />
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Loading
+          LoadingVisible={isConnecting}
+          accessibilityLabel="Carregando"
+          accessibilityRole="progressbar"
+        />
         <Header
           toggleMenu={toggleMenu}
           props="Second Vision"
@@ -92,6 +112,13 @@ export const Home = () => {
           currentModeIndex={mode}
           currentMode={currentMode}
           currentHostspot={currentHostspot}
+          handleClickForRPi0={() => {
+            if (hostspotUI === 0) {
+              setHotspotValue(1);
+            } else if (hostspotUI === 1) {
+              setHotspotValue(0);
+            }
+          }}
         />
         <ModalWifi
           handleSelectHotspot={handleSelectHotspot}
@@ -104,11 +131,19 @@ export const Home = () => {
           setPassword={setPassword}
           SendWifiSubmit={handleWifiSubmit}
           device={deviceConnection}
-          onClose={() => {setModalVisible(false); setHotspotValue(0)}}
+          onClose={() => {
+            setModalVisible(false);
+            setHotspotValue(2);
+          }}
         />
         <About visible={isMenuOpen} onClose={closeMenu} />
       </ScrollView>
-      <BottomBar mode={mode} hostspot={hostspot} interval={interval} deviceInfo={deviceInfo?.model!} />
+      <BottomBar
+        mode={mode}
+        hostspot={hostspot}
+        interval={interval}
+        deviceInfo={deviceInfo?.model!}
+      />
     </SafeAreaView>
   );
 };

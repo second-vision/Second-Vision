@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   SafeAreaView,
   View,
@@ -7,6 +7,7 @@ import {
   Text,
   Pressable,
   Alert,
+  AccessibilityInfo,
 } from "react-native";
 import { useNavigation } from "expo-router";
 
@@ -19,33 +20,49 @@ const MAX_INTERVAL_SECONDS = 30;
 
 export const IntervalTime = () => {
   const navigation = useNavigation<NavigationProp>();
-const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
+  const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
+  const inputRef = useRef<TextInput>(null);
 
-  const { interval, mode, setIntervalValue, hostspot, deviceInfo } = useHomePropsContext();
-  const [inputValueInt, setInputValueInt] = useState("0");
+  const { interval, mode, setIntervalValue, hostspot, deviceInfo } =
+    useHomePropsContext();
+  const [inputValueInt, setInputValueString] = useState("0");
 
   const sendShutdownCommand = () => {};
 
   const handleInputChange = (value: string) => {
     const filteredValue = value.replace(/[^0-9]/g, "");
 
+    if (!filteredValue) {
+      setInputValueString("0");
+      return;
+    }
+
     const intervalInSeconds = parseInt(filteredValue, 10);
+
+    if (intervalInSeconds < 0) {
+      Alert.alert("Valor inválido", "O valor não pode ser negativo.");
+      setInputValueString("0");
+      return;
+    }
 
     if (intervalInSeconds > MAX_INTERVAL_SECONDS) {
       Alert.alert(
         "Valor excedido",
-        "O intervalo máximo permitido é de 30 segundos.",
-        [{ text: "OK" }]
+        `O intervalo máximo permitido é de ${MAX_INTERVAL_SECONDS} segundos.`,
+        [{ text: "OK", onPress: () => inputRef.current?.focus() }]
       );
-      setIntervalValue(MAX_INTERVAL_SECONDS);
-      setInputValueInt(MAX_INTERVAL_SECONDS.toString());
+      setInputValueString(MAX_INTERVAL_SECONDS.toString());
     } else {
-      setIntervalValue(intervalInSeconds);
-      setInputValueInt(filteredValue);
+      setInputValueString(filteredValue);
     }
   };
 
   const handleSave = () => {
+    const intervalInSeconds = parseInt(inputValueInt, 10) || 0;
+    setIntervalValue(intervalInSeconds);
+    AccessibilityInfo.announceForAccessibility(
+      `Intervalo salvo com sucesso.`
+    );
     navigation.navigate("HomeStack");
   };
 
@@ -61,7 +78,9 @@ const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
         <Devices />
 
         <View style={styles.interval}>
-          <Text style={styles.intervalTitle}>Intervalo entre falas:</Text>
+          <Text style={styles.intervalTitle} accessibilityRole="header">
+            Intervalo entre falas
+          </Text>
 
           <Text style={styles.intervalText}>
             Regule o intervalo entre as falas emitidas após Second Vision
@@ -69,20 +88,24 @@ const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
           </Text>
 
           <TextInput
+            ref={inputRef}
             style={styles.inputInterval}
             onChangeText={handleInputChange}
             value={inputValueInt}
-            placeholder="Intervalo entre Falas"
+            placeholder="Digite o intervalo em segundos"
             keyboardType="numeric"
-            accessibilityLabel="Campo de intervalo entre falas"
-            accessibilityHint="Insira o intervalo em milissegundos entre as falas emitidas"
+            maxLength={3}
+            accessibilityRole="adjustable"
+            accessibilityLabel="Intervalo entre falas, em segundos"
+            accessibilityHint="Digite um número de 0 a 30 segundos para configurar o intervalo"
           />
 
           <Pressable
             style={styles.intervalButton}
             onPress={handleSave}
+            accessibilityRole="button"
             accessibilityLabel="Salvar intervalo"
-            accessibilityHint="Toque aqui para salvar o intervalo configurado"
+            accessibilityHint="Toque para salvar e voltar para a tela inicial"
           >
             <Text style={styles.intervalButtonText}>Salvar</Text>
           </Pressable>
@@ -90,7 +113,13 @@ const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
 
         <About visible={isMenuOpen} onClose={closeMenu} />
       </ScrollView>
-      <BottomBar mode={mode} hostspot={hostspot} interval={interval} deviceInfo={deviceInfo?.model!} />
+
+      <BottomBar
+        mode={mode}
+        hostspot={hostspot}
+        interval={interval}
+        deviceInfo={deviceInfo?.model!}
+      />
     </SafeAreaView>
   );
 };

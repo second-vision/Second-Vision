@@ -13,7 +13,7 @@ export const Splash = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoaded(true);
-      navigation.replace("ControlBluetoothStack"); 
+      navigation.replace("ControlBluetoothStack");
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -22,7 +22,7 @@ export const Splash = () => {
   return (
     <View style={styles.container}>
       <Video
-        source={require("../../shared/assets/images/splash.mp4")} 
+        source={require("../../shared/assets/images/splash.mp4")}
         style={styles.video}
         resizeMode="cover"
         onEnd={() => setIsLoaded(true)}

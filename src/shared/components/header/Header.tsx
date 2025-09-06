@@ -25,7 +25,7 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  if (route.name == "BluetoothOnStack") {
+  if (route.name !== "HomeStack") {
     return (
       <View style={[styles.headerOptions]}>
         <Pressable
@@ -45,7 +45,7 @@ export const Header: React.FC<HeaderProps> = ({
         <Text style={[styles.information]}></Text>
       </View>
     );
-  } else if (route.name == "HomeStack") {
+  } else {
     return (
       <View style={[styles.headerOptions]}>
         <Pressable
@@ -70,26 +70,6 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <Ionicons name="power" size={32} color="#001268" />
         </Pressable>
-      </View>
-    );
-  } else {
-    return (
-      <View style={[styles.headerOptions]}>
-        <Pressable
-          onPress={toggleMenu}
-          style={[styles.information]}
-          accessibilityLabel="Abrir menu de informações"
-          accessibilityRole="button"
-        >
-          <Ionicons
-            name="information-circle-outline"
-            size={35}
-            color="#001268"
-            style={[styles.information2]}
-          />
-        </Pressable>
-        <Text style={[styles.textFont]}>{props}</Text>
-        <Text style={[styles.information]}></Text>
       </View>
     );
   }

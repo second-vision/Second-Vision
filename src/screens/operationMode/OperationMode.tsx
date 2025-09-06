@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
   SafeAreaView,
@@ -6,11 +5,15 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  ActivityIndicator,
 } from "react-native";
-import { About, BottomBar, Devices, Header, Loading } from "../../shared/components";
+import {
+  About,
+  BottomBar,
+  Devices,
+  Header,
+  Loading,
+} from "../../shared/components";
 import { MODES, HOSTSPOT_MODES } from "@/src/shared/constants/modes";
-
 
 import { styles } from "./styles";
 import { useHomePropsContext, useMenu } from "@/src/shared/context";
@@ -19,8 +22,15 @@ import { NavigationProp } from "@/app/types/types";
 export const OperationMode = () => {
   const navigation = useNavigation<NavigationProp>();
   const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
-  const { interval, mode, setModeValue, hostspot, setHotspotValue, deviceInfo } =
-    useHomePropsContext();
+  const {
+    interval,
+    mode,
+    setModeValue,
+    hostspot,
+    hostspotUI,
+    setHotspotValue,
+    deviceInfo,
+  } = useHomePropsContext();
 
   const handleSelectMode = (mode: any) => {
     setModeValue(mode);
@@ -28,18 +38,25 @@ export const OperationMode = () => {
   };
 
   const handleSelectHotspot = async (hotspot: any) => {
+    if (hotspot == hostspotUI) return;
+    console.log(hotspot)
+    console.log(hostspot)
     setHotspotValue(hotspot);
     navigation.navigate("HomeStack");
   };
 
   const sendShutdownCommand = () => {};
 
-console.log("device info: ", deviceInfo)
-if (!deviceInfo) { // Esta condição agora significa "se deviceInfo for null"
+  if (!deviceInfo) {
     return (
-      <Loading LoadingVisible={true} />
+      <Loading
+        LoadingVisible={true}
+        accessibilityLabel="Carregando"
+        accessibilityRole="progressbar"
+      />
     );
   }
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -51,48 +68,77 @@ if (!deviceInfo) { // Esta condição agora significa "se deviceInfo for null"
         />
         <Devices />
 
-        
-<View style={styles.operationMode}>
-  <Text style={styles.operationModeTitle}>Modos de Operação:</Text>
-  {MODES.map((m) => (
-    <TouchableOpacity
-      key={m.id}
-      style={styles.operationCard}
-      onPress={() => handleSelectMode(m.id)}
-      accessibilityLabel={`Modo ${m.name}`}
-      accessibilityHint={m.description}
-    >
-      <Text style={styles.cardTitle}>{m.name}</Text>
-      <Text style={styles.cardText}>{m.description}</Text>
-      <View style={styles.radio}>
-        <View style={mode === m.id ? styles.radioSelected : styles.radioInternal} />
-      </View>
-    </TouchableOpacity>
-  ))}
-</View>
+        <View style={styles.operationMode}>
+          <Text style={styles.operationModeTitle} accessibilityRole="header">
+            Modos de Operação
+          </Text>
+          {MODES.map((m) => (
+            <TouchableOpacity
+              key={m.id}
+              style={styles.operationCard}
+              onPress={() => handleSelectMode(m.id)}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: mode === m.id }}
+              accessibilityLabel={m.name}
+              accessibilityHint={m.description}
+            >
+              <Text style={styles.cardTitle}>{m.name}</Text>
+              <Text style={styles.cardText}>{m.description}</Text>
+              <View style={styles.radio}>
+                <View
+                  style={
+                    mode === m.id ? styles.radioSelected : styles.radioInternal
+                  }
+                />
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-    <View style={styles.operationMode}>
-  <Text style={styles.operationModeTitle}>Modo de Processamento:</Text>
-  {(deviceInfo?.model === "RPi-5" ? HOSTSPOT_MODES.RPi5 : HOSTSPOT_MODES.default).map((m) => (
-    <TouchableOpacity
-      key={m.id}
-      style={styles.operationCard}
-      onPress={() => handleSelectHotspot(m.id)}
-      accessibilityLabel={`Modo ${m.name}`}
-      accessibilityHint={m.description}
-    >
-      <Text style={styles.cardTitle}>{m.name}</Text>
-      <Text style={styles.cardText}>{m.description}</Text>
-      <View style={styles.radio}>
-        <View style={hostspot === m.id ? styles.radioSelected : styles.radioInternal} />
-      </View>
-    </TouchableOpacity>
-  ))}
-</View>
+        
+          {deviceInfo?.model === "RPi-5" && (
+            <View style={styles.operationMode}>
+              <Text
+                style={styles.operationModeTitle}
+                accessibilityRole="header"
+              >
+                Modo de Processamento
+              </Text>
+              {HOSTSPOT_MODES.RPi5.map((m) => (
+                <TouchableOpacity
+                  key={m.id}
+                  style={styles.operationCard}
+                  onPress={() => handleSelectHotspot(m.id)}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: hostspotUI === m.id }}
+                  accessibilityLabel={m.name}
+                  accessibilityHint={m.description}
+                >
+                  <Text style={styles.cardTitle}>{m.name}</Text>
+                  <Text style={styles.cardText}>{m.description}</Text>
+                  <View style={styles.radio}>
+                    <View
+                      style={
+                        hostspotUI === m.id
+                          ? styles.radioSelected
+                          : styles.radioInternal
+                      }
+                    />
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
 
         <About visible={isMenuOpen} onClose={closeMenu} />
       </ScrollView>
-      <BottomBar mode={mode} hostspot={hostspot} interval={interval} deviceInfo={deviceInfo.model}/>
+
+      <BottomBar
+        mode={mode}
+        hostspot={hostspot}
+        interval={interval}
+        deviceInfo={deviceInfo.model}
+      />
     </SafeAreaView>
   );
 };

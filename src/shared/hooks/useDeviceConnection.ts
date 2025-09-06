@@ -2,8 +2,13 @@
 import { useEffect, useState } from "react";
 import { Base64 } from "js-base64";
 import { Buffer } from "buffer";
-import { Device, BleError, Characteristic } from "react-native-ble-plx";
-import { useHomePropsContext } from "@/src/shared/context";
+import {
+  Device,
+  BleError,
+  Characteristic,
+  BleManager,
+} from "react-native-ble-plx";
+import { useHomePropsContext, useSettings } from "@/src/shared/context";
 import {
   DATA_SERVICE_UUID,
   CHARACTERISTIC_UUID_OBJECT,
@@ -11,24 +16,43 @@ import {
   CHARACTERISTIC_UUID_BATTERY,
   CHARACTERISTIC_UUID_WIFI_STATUS,
   CHARACTERISTIC_UUID_DEVICE_INFO,
-  CHARACTERISTIC_UUID_SHUTDOWN
+  CHARACTERISTIC_UUID_SHUTDOWN,
 } from "@/src/shared/constants/ble";
 import { Alert } from "react-native";
 import * as Speech from "expo-speech";
 
 import { useNavigation } from "expo-router";
 import { NavigationProp } from "@/app/types/types";
+import { useSpeech } from "./useSpeech";
 
-export function useDeviceConnection(deviceConnection: Device | null, setHotspotValue: (val: number) => void) {
+const bleManager = new BleManager();
+
+export function useDeviceConnection(
+  deviceConnection: Device | null,
+  setHotspotValueUI: (val: number) => void,
+  checkWifiStatus: (
+    device: Device
+  ) => Promise<{ connected: boolean; ssid: string | null }>
+) {
   const { deviceInfo, setDeviceInfo } = useHomePropsContext();
+  const [isOn, setIsOn] = useState(true);
   const [objectData, setObjectData] = useState<string | null>(null);
   const [ocrData, setOcrData] = useState<string | null>(null);
   const [battery, setBattery] = useState<string | null>(null);
   const [batteryDuration, setBatteryDuration] = useState<string | null>(null);
   const navigation = useNavigation<NavigationProp>();
+  const { speakEnabled } = useSettings();
+
+  const { speak } = useSpeech(0);
+
+  const [bluetoothState, setBluetoothState] = useState("PoweredOn");
+
+  let objectDataTimeout: NodeJS.Timeout | null = null;
 
   useEffect(() => {
     if (!deviceConnection) return;
+
+    let stateSubscription: { remove: () => void } | null = null;
 
     const init = async () => {
       try {
@@ -37,21 +61,44 @@ export function useDeviceConnection(deviceConnection: Device | null, setHotspotV
           DATA_SERVICE_UUID,
           CHARACTERISTIC_UUID_DEVICE_INFO
         );
-
+        const status = await checkWifiStatus(deviceConnection);
+        if (status.connected) {
+          setHotspotValueUI(1);
+        } else {
+          setHotspotValueUI(0);
+        }
         const infoString = Buffer.from(char.value!, "base64").toString("utf-8");
-        setDeviceInfo(JSON.parse(infoString));
+        // Converte para objeto
+        const infoObject = JSON.parse(infoString);
 
-        console.log("Device info:", infoString);
-
+        // Altera o model para simular RPi-0
+        //infoObject.model = "RPi-0";
+        setDeviceInfo(infoObject);
         // Inicia streaming
         startStreamingData(deviceConnection);
+
+        stateSubscription = bleManager.onStateChange((state) => {
+          setBluetoothState(state);
+        }, true);
       } catch (err) {
         console.error("Erro inicialização BLE:", err);
       }
     };
 
     init();
+    return () => {
+      if (stateSubscription) {
+        stateSubscription.remove();
+      }
+    };
   }, [deviceConnection]);
+
+  useEffect(() => {
+    if (bluetoothState === "PoweredOff") {
+      Speech.stop();
+      navigation.replace("ControlBluetoothStack");
+    }
+  }, [bluetoothState]);
 
   const startStreamingData = (device: Device) => {
     device.monitorCharacteristicForService(
@@ -79,17 +126,24 @@ export function useDeviceConnection(deviceConnection: Device | null, setHotspotV
     );
   };
 
-  const onDataUpdateOBJECT = (error: BleError | null, characteristic: Characteristic | null) => {
+  const onDataUpdateOBJECT = (
+    error: BleError | null,
+    characteristic: Characteristic | null
+  ) => {
     if (error) {
       console.error("YOLO error:", error);
       return;
     }
+
     if (characteristic?.value) {
       setObjectData(Base64.decode(characteristic.value));
     }
   };
 
-  const onDataUpdateOCR = (error: BleError | null, characteristic: Characteristic | null) => {
+  const onDataUpdateOCR = (
+    error: BleError | null,
+    characteristic: Characteristic | null
+  ) => {
     if (error) {
       console.error("OCR error:", error);
       return;
@@ -99,7 +153,10 @@ export function useDeviceConnection(deviceConnection: Device | null, setHotspotV
     }
   };
 
-  const onDataUpdateBattery = (error: BleError | null, characteristic: Characteristic | null) => {
+  const onDataUpdateBattery = (
+    error: BleError | null,
+    characteristic: Characteristic | null
+  ) => {
     if (error) {
       console.error("Battery error:", error);
       setBattery("-");
@@ -108,6 +165,10 @@ export function useDeviceConnection(deviceConnection: Device | null, setHotspotV
     }
     if (characteristic?.value) {
       const dataInput = Base64.decode(characteristic.value);
+
+      // Reinicia o timeout a cada dado recebido
+      if (objectDataTimeout) clearTimeout(objectDataTimeout);
+
       const parts = dataInput.split(",");
 
       if (parts.length > 1) {
@@ -117,33 +178,44 @@ export function useDeviceConnection(deviceConnection: Device | null, setHotspotV
         setBattery("-");
         setBatteryDuration(parts[0].trim());
       }
+      objectDataTimeout = setTimeout(() => {
+        // Se passar 30 segundos sem receber dados, define false (servidor parou de responder)
+        setIsOn(false);
+      }, 70_000);
+      // Marca como ativo sempre que recebe dados
+      setIsOn(true);
     }
   };
 
-  const onDataUpdateWifi = (error: BleError | null, characteristic: Characteristic | null) => {
+  const onDataUpdateWifi = (
+    error: BleError | null,
+    characteristic: Characteristic | null
+  ) => {
     if (error) {
       console.error("Wi-Fi error:", error);
-      setHotspotValue(0);
+      setHotspotValueUI(0);
       return;
     }
     if (characteristic?.value) {
       const dataInput = Base64.decode(characteristic.value);
-      console.log("Wi-Fi status:", dataInput);
 
       if (dataInput.includes("Conectado a:") && !dataInput.includes("Nenhum")) {
-        setHotspotValue(1);
+        setHotspotValueUI(1);
       } else {
-        setHotspotValue(0);
+        setHotspotValueUI(0);
       }
     }
   };
 
-
   //funcao de desligar
   const sendShutdownCommand = async (device: Device) => {
+    if (speakEnabled) {
+      speak("Você realmente deseja desligar o dispositivo?", 0);
+    }
     Alert.alert(
       "Confirmação de Desligamento",
       "Você realmente deseja desligar o dispositivo?",
+
       [
         {
           text: "Cancelar",
@@ -201,6 +273,7 @@ export function useDeviceConnection(deviceConnection: Device | null, setHotspotV
     ocrData,
     battery,
     batteryDuration,
-    sendShutdownCommand
+    sendShutdownCommand,
+    isOn,
   };
 }

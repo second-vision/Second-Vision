@@ -1,33 +1,39 @@
-import { ScrollView, View, Text, Pressable, Alert } from "react-native";
-import { useNavigation } from "expo-router";
-
+import { ScrollView, View, Text, Pressable } from "react-native";
 import { styles } from "./styles";
-import { NavigationProp } from "@/app/types/types";
-import { useTermsManager } from "@/src/shared/hooks";
+import { useSpeech, useTermsManager } from "@/src/shared/hooks";
+import { useEffect } from "react";
+import { useSettings } from "@/src/shared/context";
 
 export const TermsOfUse = () => {
-  const navigation = useNavigation<NavigationProp>();
-  const { rejectTerms, acceptTerms} = useTermsManager();
-  
+  const { rejectTerms, acceptTerms } = useTermsManager();
+  const { speakEnabled } = useSettings();
+  const { speak } = useSpeech(0);
+
+  useEffect(() => {
+    if (speakEnabled) {
+    speak("Aceite os termos de uso para continuar.", 0);
+    }
+  }, []);
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title} accessibilityRole="text">
+      <Text style={styles.title} accessibilityRole="header">
         Termos e Condições Gerais de Uso do Aplicativo de Auxílio para
         Deficientes Visuais.
       </Text>
 
-      <Text style={styles.sectionTitle} accessibilityRole="text">
+      <Text style={styles.sectionTitle} accessibilityRole="header">
         1. Do Objeto
       </Text>
       <Text style={styles.sectionText} accessibilityRole="text">
         O aplicativo de auxílio para deficientes visuais, desenvolvido para
-        funcionar em conjunto com o dispositivo Raspberry Pi 5, visa detectar
-        objetos potencialmente perigosos e textos estáticos, convertendo essas
-        informações em áudio. O serviço é destinado a melhorar a segurança e a
-        autonomia dos usuários deficientes visuais.
+        funcionar em conjunto com o dispositivo Raspberry Pi 5 ou Raspberry Pi
+        0, visa detectar objetos potencialmente perigosos e textos estáticos,
+        convertendo essas informações em áudio. O serviço é destinado a melhorar
+        a segurança e a autonomia dos usuários deficientes visuais.
       </Text>
 
-      <Text style={styles.sectionTitle} accessibilityRole="text">
+      <Text style={styles.sectionTitle} accessibilityRole="header">
         2. Da Aceitação
       </Text>
       <Text style={styles.sectionText} accessibilityRole="text">
@@ -36,7 +42,7 @@ export const TermsOfUse = () => {
         utilizar o serviço.
       </Text>
 
-      <Text style={styles.sectionTitle} accessibilityRole="text">
+      <Text style={styles.sectionTitle} accessibilityRole="header">
         3. Do Acesso dos Usuários
       </Text>
       <Text style={styles.sectionText} accessibilityRole="text">
@@ -45,7 +51,7 @@ export const TermsOfUse = () => {
         atualizações.
       </Text>
 
-      <Text style={styles.sectionTitle} accessibilityRole="text">
+      <Text style={styles.sectionTitle} accessibilityRole="header">
         4. Dos Serviços
       </Text>
       <Text style={styles.sectionText} accessibilityRole="text">
@@ -55,7 +61,7 @@ export const TermsOfUse = () => {
         responsabilidade pela segurança continua a ser sua.
       </Text>
 
-      <Text style={styles.sectionTitle} accessibilityRole="text">
+      <Text style={styles.sectionTitle} accessibilityRole="header">
         5. Das Responsabilidades
       </Text>
       <Text style={styles.sectionText} accessibilityRole="text">
@@ -75,7 +81,7 @@ export const TermsOfUse = () => {
         inadequado do aplicativo ou de falhas no dispositivo.
       </Text>
 
-      <Text style={styles.sectionTitle} accessibilityRole="text">
+      <Text style={styles.sectionTitle} accessibilityRole="header">
         6. Dos Direitos Autorais
       </Text>
       <Text style={styles.sectionText} accessibilityRole="text">
@@ -84,7 +90,7 @@ export const TermsOfUse = () => {
         aplicativo.
       </Text>
 
-      <Text style={styles.sectionTitle} accessibilityRole="text">
+      <Text style={styles.sectionTitle} accessibilityRole="header">
         7. Das Alterações
       </Text>
       <Text style={styles.sectionText} accessibilityRole="text">
@@ -92,7 +98,7 @@ export const TermsOfUse = () => {
         comunicadas aos usuários através do próprio aplicativo.
       </Text>
 
-      <Text style={styles.sectionTitle} accessibilityRole="text">
+      <Text style={styles.sectionTitle} accessibilityRole="header">
         8. Da Política de Privacidade
       </Text>
       <Text style={styles.sectionText} accessibilityRole="text">
@@ -100,7 +106,7 @@ export const TermsOfUse = () => {
         aplicativo, que detalha a coleta e uso de dados pessoais.
       </Text>
 
-      <Text style={styles.sectionTitle} accessibilityRole="text">
+      <Text style={styles.sectionTitle} accessibilityRole="header">
         9. Do Foro
       </Text>
       <Text style={styles.sectionText} accessibilityRole="text">
@@ -118,10 +124,11 @@ export const TermsOfUse = () => {
         >
           <Text style={styles.ButtonText}>Recusar Termos</Text>
         </Pressable>
+
         <Pressable
           onPress={acceptTerms}
           style={styles.Button}
-          accessibilityLabel="Aceitar Bluetooth"
+          accessibilityLabel="Aceitar Termos"
           accessibilityHint="Toque para aceitar os termos e usar o aplicativo."
           accessibilityRole="button"
         >

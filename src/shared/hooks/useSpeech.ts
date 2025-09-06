@@ -5,6 +5,7 @@ import * as Speech from "expo-speech";
 export function useSpeech(interval: number) {
   const isSpeakingRef = useRef<boolean>(false);
   const hasAnnouncedOnce = useRef<boolean>(false);
+  const hasAnnouncedOnceReverse = useRef<boolean>(true);
 
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -17,17 +18,15 @@ export function useSpeech(interval: number) {
   /**
    * Fala um texto. 
    * @param text Texto para falar
-   * @param mode 0 = sempre fala / 1 = respeita fila
+   * @param mode 0 = sempre fala por cima da fila e sem intervalo / 1 = respeita fila com intervalo de fala definido
    */
   const speak = async (text: string, mode: number = 0) => {
     if (mode === 1) {
-      // fila controlada
       if (!isSpeakingRef.current) {
         isSpeakingRef.current = true;
         await processSpeakQueue(text);
       }
     } else if (mode === 0) {
-      // fala mesmo se já estiver falando
       if (isSpeakingRef.current) {
         await Speech.speak(text, { language: "pt-BR" });
       } else {
@@ -46,6 +45,7 @@ export function useSpeech(interval: number) {
   return {
     speak,
     stop,
-    hasAnnouncedOnce, // exportado caso queira controlar mensagens únicas
+    hasAnnouncedOnce,
+    hasAnnouncedOnceReverse
   };
 }

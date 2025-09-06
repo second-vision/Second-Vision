@@ -4,18 +4,18 @@ const { width } = Dimensions.get("window");
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 20,
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#000000aa',
+    justifyContent: "center",
+    backgroundColor: "#000000aa",
   },
   modalContent: {
     margin: 20,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     elevation: 5,
   },
@@ -28,25 +28,25 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
     padding: 8,
     borderRadius: 6,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
   },
   buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     gap: 10,
   },
-  alignCloseButton:{
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingBottom: 10
+  alignCloseButton: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    paddingBottom: 10,
   },
-  closeButton:{
+  closeButton: {
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: '#e0e0e0', 
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#e0e0e0",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   sendButton: {
@@ -59,12 +59,22 @@ export const styles = StyleSheet.create({
     borderWidth: 2,
 
     borderRadius: 10,
-    // flex: 1,
-    // top: 30,
   },
   sendButtonText: {
     fontSize: width * 0.03,
     letterSpacing: 0.25,
     color: "#fff",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+  },
+  iconButton: {
+    padding: 5,
   },
 });
