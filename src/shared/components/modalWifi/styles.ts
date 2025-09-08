@@ -1,5 +1,5 @@
-import { Dimensions, StyleSheet } from "react-native";
-const { width } = Dimensions.get("window");
+import { StyleSheet } from "react-native";
+import { theme } from "../../styles";
 
 export const styles = StyleSheet.create({
   container: {
@@ -10,17 +10,16 @@ export const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: "#000000aa",
+    backgroundColor: theme.colors.black,
   },
   modalContent: {
     margin: 20,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.background,
     borderRadius: 12,
     elevation: 5,
   },
   modalTitle: {
-    fontSize: 16,
     marginBottom: 10,
   },
   input: {
@@ -28,7 +27,7 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
     padding: 8,
     borderRadius: 6,
-    borderColor: "#ccc",
+    borderColor: theme.colors.line,
   },
   buttonRow: {
     flexDirection: "row",
@@ -44,7 +43,7 @@ export const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: "#e0e0e0",
+    backgroundColor: theme.colors.closeButton,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -54,23 +53,22 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderColor: "#0a398a",
-    backgroundColor: "#0A398A",
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.primary,
     borderWidth: 2,
 
     borderRadius: 10,
   },
   sendButtonText: {
-    fontSize: width * 0.03,
     letterSpacing: 0.25,
-    color: "#fff",
+    color: theme.colors.background,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: theme.colors.line,
     borderRadius: 8,
     paddingHorizontal: 10,
   },

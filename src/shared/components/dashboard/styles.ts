@@ -1,9 +1,7 @@
-import { Dimensions, StyleSheet } from "react-native";
-
-const { width } = Dimensions.get("window");
-
+import { StyleSheet } from "react-native";
+import { theme } from "../../styles";
 const boxShadow = {
-  shadowColor: "#000",
+  shadowColor: theme.colors.black,
   shadowOffset: {
     width: 0,
     height: 2,
@@ -18,9 +16,8 @@ export const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   dashboardTitle: {
-    color: "#001268",
+    color: theme.colors.primary,
     fontWeight: "800",
-    fontSize: width * 0.04,
     paddingVertical: 15,
   },
   campos: {
@@ -34,9 +31,8 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   nivel: {
-    color: "#001268",
+    color: theme.colors.primary,
     fontWeight: "900",
-    fontSize: width * 0.05,
   },
   category: {
     fontWeight: "light",
@@ -50,19 +46,17 @@ export const styles = StyleSheet.create({
     height: 80,
     padding: 10,
     borderRadius: 5,
-    backgroundColor: "#F6F7F8",
+    backgroundColor: theme.colors.backgroundVariant,
     ...boxShadow,
   },
   cardTitle: {
     flex: 1,
-    color: "#001268",
+    color: theme.colors.primary,
     fontWeight: "800",
-    fontSize: width * 0.04,
     paddingHorizontal: 6,
   },
   cardText: {
     flex: 3,
-    fontSize: width * 0.03,
     maxWidth: "80%",
   },
 });

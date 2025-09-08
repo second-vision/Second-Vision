@@ -1,8 +1,5 @@
-import { Dimensions, StyleSheet } from "react-native";
-
-const { width } = Dimensions.get("window");
-const numColumns = width > 600 ? 3 : 2;
-
+import {  StyleSheet } from "react-native";
+import { theme } from "../../styles";
 export const styles = StyleSheet.create({
   container: {
     padding: 10,
@@ -15,7 +12,7 @@ export const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: "#f3f3ff",
+    backgroundColor: theme.colors.modal,
     marginTop: 0,
     marginLeft: 0,
     marginRight: 0,
@@ -28,13 +25,12 @@ export const styles = StyleSheet.create({
   line: {
     height: 1,
     width: "100%",
-    backgroundColor: "#ccc",
+    backgroundColor: theme.colors.line,
     marginBottom: 10,
     marginTop: 10,
   },
   textTitle: {
     fontWeight: "bold",
-    fontSize: width * 0.04,
     marginBottom: 10,
   },
   itemContainer: {
@@ -43,13 +39,11 @@ export const styles = StyleSheet.create({
     marginTop: 10,
   },
   bullet: {
-    fontSize: width * 0.04,
     lineHeight: 22,
     marginRight: 10,
   },
   itemText: {
     flex: 1,
-    fontSize: width * 0.035,
     lineHeight: 22,
     fontWeight: "bold",
   },

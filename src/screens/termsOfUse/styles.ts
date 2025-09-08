@@ -1,22 +1,20 @@
 import { StyleSheet } from "react-native";
-
+import { theme } from "../../shared/styles";
 export const styles = StyleSheet.create({
   container: {
     padding: 20,
     marginTop: 30,
   },
   title: {
-    fontSize: 18,
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#001268",
+    color: theme.colors.primary,
   },
   sectionTitle: {
-    fontSize: 16,
     fontWeight: "bold",
     marginTop: 15,
     marginBottom: 5,
-    color: "#001268",
+    color: theme.colors.primary,
   },
   sectionText: {
     fontSize: 14,
@@ -32,15 +30,15 @@ export const styles = StyleSheet.create({
     marginBottom: 30,
   },
   Button: {
-    backgroundColor: "#001268",
+    backgroundColor: theme.colors.primary,
     padding: 10,
     borderRadius: 10,
   },
   ButtonText: {
-    color: "#FFFFFF",
+    color: theme.colors.background,
   },
   ButtonReject: {
-    backgroundColor: "#FF0000",
+    backgroundColor: theme.colors.tertiary,
     padding: 10,
     borderRadius: 10,
   },

@@ -1,12 +1,13 @@
 import {
   ActivityIndicator,
-  Text,
   View,
   SafeAreaView,
   Modal,
 } from "react-native";
 import { styles } from "./styles";
-
+import { AppText } from "../appText/AppText";
+import { FontSizes } from "@/src/shared/constants/fontSizes";
+import { theme } from "../../styles";
 interface LoadingProps {
   LoadingVisible: boolean;
   accessibilityLabel: string;
@@ -24,8 +25,8 @@ export const Loading: React.FC<LoadingProps> = ({ LoadingVisible }) => {
           transparent
         >
           <View style={styles.loadingOverlay} accessible={true} accessibilityLabel="Carregando, por favor aguarde">
-            <ActivityIndicator size="large" color="#ffffffff" />
-            <Text style={styles.loadingText} accessible={true} >Conectando...</Text>
+            <ActivityIndicator size="large" color={theme.colors.background} />
+            <AppText baseSize={FontSizes.Large} style={styles.loadingText} accessible={true} >Conectando...</AppText>
           </View>
         </Modal>
       </View>

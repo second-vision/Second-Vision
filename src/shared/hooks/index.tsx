@@ -5,3 +5,4 @@ export * from "./useSpeech";
 export * from "./useWifiManager";
 export * from "./useBluetoothManager";
 export * from "./useTermsManager";
+export * from "./useConfiguration";

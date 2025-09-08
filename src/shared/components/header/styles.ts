@@ -1,8 +1,5 @@
-import { Dimensions, StyleSheet } from "react-native";
-
-const { width } = Dimensions.get("window");
-
-
+import { StyleSheet } from "react-native";
+import { theme } from "../../styles";
 export const styles = StyleSheet.create({
   headerOptions: {
     flexDirection: "row",
@@ -28,8 +25,7 @@ export const styles = StyleSheet.create({
     width: "50%",
     textAlign: "center",
     fontWeight: "bold",
-    fontSize: width * 0.05,
-    color: "#001268",
+    color: theme.colors.primary,
    
   },
 });

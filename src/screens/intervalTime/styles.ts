@@ -1,9 +1,5 @@
-import { Dimensions, StyleSheet } from "react-native";
-
-
-const { width } = Dimensions.get("window");
-
-
+import { StyleSheet } from "react-native";
+import { theme } from "../../shared/styles";
 export const styles = StyleSheet.create({
 	container: {
 		flex: 1,
@@ -16,33 +12,32 @@ export const styles = StyleSheet.create({
 		marginHorizontal: 20,
 	},
 	intervalTitle: {
-		color: "#001268",
+		color: theme.colors.primary,
 		fontWeight: "800",
-		fontSize: width * 0.04,
 		paddingVertical: 15,
 	},
 	intervalText: {
-		color: "#001268",
+		color: theme.colors.primary,
 	},
 	inputInterval: {
 		flexDirection: "row",
 		alignItems: "center",
 		marginVertical: 15,
 		padding: 15,
-		borderRadius: 10,
-		backgroundColor: "#F6F7F8",
+		borderRadius: 12,
+		backgroundColor: theme.colors.backgroundVariant,
 		gap: 10,
-		borderColor: "#000",
+		borderColor: theme.colors.black,
 		borderStyle: "solid",
 		borderWidth: 1,
 	},
 	intervalButton: {
 		padding: 15,
-		backgroundColor: "#001268",
-		borderRadius: 10,
+		backgroundColor: theme.colors.primary,
+		borderRadius: 12,
 	},
 	intervalButtonText: {
-		color: "#F6F7F8",
+		color: theme.colors.backgroundVariant,
 		textAlign: "center",
 	},
 });

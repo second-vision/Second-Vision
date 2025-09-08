@@ -4,18 +4,23 @@ import {
   View,
   ScrollView,
   TextInput,
-  Text,
   Pressable,
   Alert,
   AccessibilityInfo,
 } from "react-native";
 import { useNavigation } from "expo-router";
 
-import { About, BottomBar, Devices, Header } from "../../shared/components";
+import {
+  About,
+  AppText,
+  BottomBar,
+  Devices,
+  Header,
+} from "../../shared/components";
 import { styles } from "./styles";
 import { useHomePropsContext, useMenu } from "@/src/shared/context";
 import { NavigationProp } from "@/app/types/types";
-
+import { FontSizes } from "@/src/shared/constants/fontSizes";
 const MAX_INTERVAL_SECONDS = 30;
 
 export const IntervalTime = () => {
@@ -60,9 +65,7 @@ export const IntervalTime = () => {
   const handleSave = () => {
     const intervalInSeconds = parseInt(inputValueInt, 10) || 0;
     setIntervalValue(intervalInSeconds);
-    AccessibilityInfo.announceForAccessibility(
-      `Intervalo salvo com sucesso.`
-    );
+    AccessibilityInfo.announceForAccessibility(`Intervalo salvo com sucesso.`);
     navigation.navigate("HomeStack");
   };
 
@@ -78,14 +81,18 @@ export const IntervalTime = () => {
         <Devices />
 
         <View style={styles.interval}>
-          <Text style={styles.intervalTitle} accessibilityRole="header">
+          <AppText
+            baseSize={FontSizes.Large}
+            style={styles.intervalTitle}
+            accessibilityRole="header"
+          >
             Intervalo entre falas
-          </Text>
+          </AppText>
 
-          <Text style={styles.intervalText}>
+          <AppText baseSize={FontSizes.Normal} style={styles.intervalText}>
             Regule o intervalo entre as falas emitidas após Second Vision
             efetuar a detecção.
-          </Text>
+          </AppText>
 
           <TextInput
             ref={inputRef}
@@ -95,7 +102,6 @@ export const IntervalTime = () => {
             placeholder="Digite o intervalo em segundos"
             keyboardType="numeric"
             maxLength={3}
-            accessibilityRole="adjustable"
             accessibilityLabel="Intervalo entre falas, em segundos"
             accessibilityHint="Digite um número de 0 a 30 segundos para configurar o intervalo"
           />
@@ -107,7 +113,12 @@ export const IntervalTime = () => {
             accessibilityLabel="Salvar intervalo"
             accessibilityHint="Toque para salvar e voltar para a tela inicial"
           >
-            <Text style={styles.intervalButtonText}>Salvar</Text>
+            <AppText
+              baseSize={FontSizes.Normal}
+              style={styles.intervalButtonText}
+            >
+              Salvar
+            </AppText>
           </Pressable>
         </View>
 

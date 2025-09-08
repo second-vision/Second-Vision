@@ -1,4 +1,3 @@
-import React from "react";
 import {
   View,
   Text,
@@ -7,40 +6,48 @@ import {
   SafeAreaView,
   ScrollView,
   AccessibilityInfo,
+  ActivityIndicator,
 } from "react-native";
-import Slider from "@react-native-community/slider";
+import { Slider } from "@miblanchard/react-native-slider";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./styles";
-import { About, BottomBar, Devices, Header } from "@/src/shared/components";
-import { useHomePropsContext, useMenu } from "@/src/shared/context";
+import { theme } from "../../shared/styles";
+import {
+  About,
+  AppText,
+  BottomBar,
+  Devices,
+  Header,
+} from "@/src/shared/components";
+import {
+  useHomePropsContext,
+  useMenu,
+  useSettings,
+} from "@/src/shared/context";
+import { useConfiguration } from "@/src/shared/hooks";
+import { FontSizes } from "@/src/shared/constants/fontSizes";
 
 export const Settings = () => {
   const { interval, mode, hostspot, deviceInfo } = useHomePropsContext();
-  const [fontSize, setFontSize] = React.useState(16);
-  const [speakEnabled, setSpeakEnabled] = React.useState(false);
   const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
-
-  // Atualiza tamanho da fonte e anuncia para usuário com deficiência visual
-  const handleFontSizeChange = (value: number) => {
-    setFontSize(value);
-    if (speakEnabled) {
-      AccessibilityInfo.announceForAccessibility(`Tamanho da fonte: ${value}`);
-    }
-  };
-
-  const handleSpeakToggle = (value: boolean) => {
-    setSpeakEnabled(value);
-    AccessibilityInfo.announceForAccessibility(
-      `Guiamento sonoro ${value ? "ativado" : "desativado"}`
-    );
-  };
+  const { speakEnabled, fontSize, setFontSize, loading, toggleSpeak } =
+    useSettings();
+  const { resetSettings, handleFontSizeChange, handleSpeakToggle } =
+    useConfiguration({
+      speakEnabled,
+      toggleSpeak,
+      setFontSize,
+    });
 
   const sendShutdownCommand = () => {};
-  const resetSettings = () => {
-    setFontSize(16);
-    setSpeakEnabled(false);
-    AccessibilityInfo.announceForAccessibility("Configurações redefinidas");
-  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -55,44 +62,89 @@ export const Settings = () => {
 
         <View style={styles.containerConfig}>
           {/* Tamanho da Fonte */}
-          <Text
-            style={[styles.title, { fontSize }]}
+          <AppText
+            baseSize={FontSizes.Normal}
+            style={styles.title}
             accessibilityRole="header"
             accessibilityLabel={`Tamanho da fonte atual: ${fontSize}`}
           >
             Tamanho da fonte
-          </Text>
-          <Text style={styles.subtitle}>
+          </AppText>
+          <AppText baseSize={FontSizes.Small} style={[styles.subtitle]}>
             Aumente ou diminua o texto conforme sua preferência.
-          </Text>
+          </AppText>
 
           <View style={styles.sliderRow}>
-            <Text style={styles.sliderLabel}>−</Text>
-            <Slider
-              style={styles.slider}
-              minimumValue={12}
-              maximumValue={24}
-              step={1}
-              value={fontSize}
-              onValueChange={handleFontSizeChange}
-              minimumTrackTintColor="#0a398a"
-              maximumTrackTintColor="#DADADA"
-              thumbTintColor="#0a398a"
+            {/* Botão para decrementar */}
+            <View style={{ width: "10%" }}>
+              <TouchableOpacity
+                onPress={() => {
+                  const newValue = Math.max(fontSize - 1, 12); // limite mínimo
+                  setFontSize(newValue);
+                  if (speakEnabled) {
+                    AccessibilityInfo.announceForAccessibility(
+                      `Tamanho da fonte: ${newValue}`
+                    );
+                  }
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Diminuir tamanho da fonte"
+              >
+                <Text style={styles.sliderLabel}>−</Text>
+              </TouchableOpacity>
+            </View>
+            {/* Wrapper acessível */}
+            <View
+              style={{ flex: 1 }}
+              accessible
               accessibilityRole="adjustable"
               accessibilityLabel="Ajustar tamanho da fonte"
               accessibilityHint="Arraste para aumentar ou diminuir o tamanho do texto"
-            />
-            <Text style={styles.sliderLabel}>+</Text>
+              accessibilityValue={{ min: 12, max: 24, now: fontSize }}
+            >
+              <Slider
+                value={fontSize}
+                onValueChange={handleFontSizeChange}
+                minimumValue={12}
+                maximumValue={24}
+                step={1}
+                minimumTrackTintColor={theme.colors.primary}
+                maximumTrackTintColor={theme.colors.closeButton}
+                thumbTintColor={theme.colors.primary}
+                containerStyle={styles.slider}
+              />
+            </View>
+
+            {/* Botão para incrementar */}
+            <View style={{ width: "10%" }}>
+              <TouchableOpacity
+                onPress={() => {
+                  const newValue = Math.min(fontSize + 1, 24); // limite máximo
+                  setFontSize(newValue);
+                  if (speakEnabled) {
+                    AccessibilityInfo.announceForAccessibility(
+                      `Tamanho da fonte: ${newValue}`
+                    );
+                  }
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Aumentar tamanho da fonte"
+              >
+                <Text style={[styles.sliderLabel, styles.mais]}>+</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Guiamento Sonoro */}
           <View style={styles.section}>
             <View style={{ width: "80%" }}>
-              <Text style={styles.title}>Guiamento Sonoro</Text>
-              <Text style={styles.subtitle}>
+              <AppText baseSize={FontSizes.Normal} style={styles.title}>
+                Guiamento Sonoro
+              </AppText>
+              <AppText baseSize={FontSizes.Small} style={styles.subtitle}>
                 Ative ou desative o guiamento sonoro que narra o fluxo de uso do
                 sistema.
-              </Text>
+              </AppText>
             </View>
             <Switch
               style={{
@@ -100,8 +152,8 @@ export const Settings = () => {
               }}
               value={speakEnabled}
               onValueChange={handleSpeakToggle}
-              thumbColor={speakEnabled ? "#0a398a" : "#f4f3f4"}
-              trackColor={{ false: "#d3d3d3", true: "#d3d3d3" }}
+              thumbColor={speakEnabled ? theme.colors.primary : theme.colors.backgroundVariant}
+              trackColor={{ false: theme.colors.line, true: theme.colors.line }}
               accessibilityRole="switch"
               accessibilityLabel="Guiamento sonoro"
               accessibilityHint="Ative ou desative a narração do sistema"
@@ -116,8 +168,10 @@ export const Settings = () => {
             accessibilityLabel="Redefinir configurações"
             accessibilityHint="Reinicia tamanho da fonte e guiamento sonoro"
           >
-            <Ionicons name="refresh" size={20} color="#fff" />
-            <Text style={styles.resetText}>Redefinir configurações</Text>
+            <Ionicons name="refresh" size={20} color={theme.colors.background} />
+            <AppText baseSize={FontSizes.Normal} style={styles.resetText}>
+              Redefinir configurações
+            </AppText>
           </TouchableOpacity>
         </View>
 

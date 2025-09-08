@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
-
+import { theme } from "../../shared/styles";
 const boxShadow = {
-  shadowColor: "#000",
+  shadowColor: theme.colors.black,
   shadowOffset: {
     width: 0,
     height: 2,
@@ -15,14 +15,7 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "space-between",
-    marginTop: 40
-  },
-  background: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    height: "100%",
+    marginTop: 40,
   },
   body: {
     flex: 1,
@@ -33,7 +26,7 @@ export const styles = StyleSheet.create({
     height: 90,
     marginHorizontal: 10,
     borderRadius: 5,
-    backgroundColor: "#F6F7F8",
+    backgroundColor: theme.colors.backgroundVariant,
     ...boxShadow,
   },
   noPeripherals: {
@@ -49,19 +42,17 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 16,
     paddingHorizontal: 16,
-    backgroundColor: "#0a398a",
+    backgroundColor: theme.colors.primary,
     margin: 10,
     borderRadius: 12,
     flex: 1,
     ...boxShadow,
   },
   scanButtonText: {
-    fontSize: 16,
     letterSpacing: 0.25,
-    color: "#FFFFFF",
+    color: theme.colors.background,
   },
   peripheralName: {
-    fontSize: 16,
     textAlign: "center",
   },
 });

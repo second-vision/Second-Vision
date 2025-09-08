@@ -1,7 +1,5 @@
-import { Dimensions, StyleSheet } from "react-native";
-
-const { width } = Dimensions.get("window");
-
+import { StyleSheet } from "react-native";
+import { theme } from "../../shared/styles";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -17,40 +15,37 @@ export const styles = StyleSheet.create({
     marginBottom: 60,
   },
   text: {
-    fontSize: width * 0.044,
     fontWeight: "medium",
   },
   headerText: {
-    fontSize: width * 0.055,
     marginBottom: 10,
-    color: "#0A398A",
+    color: theme.colors.primary,
     fontWeight: "medium",
   },
   textBlue: {
-    width: "100%",
-    paddingLeft: 40,
     bottom: 20,
+    textAlign: "center",
   },
   buttonGroup: {
     flexDirection: "row",
-    width: "70%",
+    width: "85%",
+    justifyContent: "center",
   },
   scanButton: {
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderColor: "#0a398a",
-    backgroundColor: "#0A398A",
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.primary,
     borderWidth: 2,
     margin: 10,
-    borderRadius: 10,
+    borderRadius: 12,
     flex: 1,
     top: 30,
   },
   scanButtonText: {
-    fontSize: width * 0.04,
     letterSpacing: 0.25,
-    color: "#fff",
+    color: theme.colors.background,
   },
 });

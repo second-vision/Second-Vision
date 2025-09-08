@@ -3,18 +3,18 @@ import {
   SafeAreaView,
   View,
   ScrollView,
-  Text,
   TouchableOpacity,
 } from "react-native";
 import {
   About,
+  AppText,
   BottomBar,
   Devices,
   Header,
   Loading,
 } from "../../shared/components";
 import { MODES, HOSTSPOT_MODES } from "@/src/shared/constants/modes";
-
+import { FontSizes } from "@/src/shared/constants/fontSizes";
 import { styles } from "./styles";
 import { useHomePropsContext, useMenu } from "@/src/shared/context";
 import { NavigationProp } from "@/app/types/types";
@@ -69,9 +69,9 @@ export const OperationMode = () => {
         <Devices />
 
         <View style={styles.operationMode}>
-          <Text style={styles.operationModeTitle} accessibilityRole="header">
+          <AppText baseSize={FontSizes.Large} style={styles.operationModeTitle} accessibilityRole="header">
             Modos de Operação
-          </Text>
+          </AppText>
           {MODES.map((m) => (
             <TouchableOpacity
               key={m.id}
@@ -82,8 +82,8 @@ export const OperationMode = () => {
               accessibilityLabel={m.name}
               accessibilityHint={m.description}
             >
-              <Text style={styles.cardTitle}>{m.name}</Text>
-              <Text style={styles.cardText}>{m.description}</Text>
+              <AppText baseSize={FontSizes.Normal} style={styles.cardTitle}>{m.name}</AppText>
+              <AppText baseSize={FontSizes.ExtraSmall} style={styles.cardText}>{m.description}</AppText>
               <View style={styles.radio}>
                 <View
                   style={
@@ -98,12 +98,13 @@ export const OperationMode = () => {
         
           {deviceInfo?.model === "RPi-5" && (
             <View style={styles.operationMode}>
-              <Text
+              <AppText
                 style={styles.operationModeTitle}
                 accessibilityRole="header"
+                baseSize={FontSizes.Large} 
               >
                 Modo de Processamento
-              </Text>
+              </AppText>
               {HOSTSPOT_MODES.RPi5.map((m) => (
                 <TouchableOpacity
                   key={m.id}
@@ -114,8 +115,8 @@ export const OperationMode = () => {
                   accessibilityLabel={m.name}
                   accessibilityHint={m.description}
                 >
-                  <Text style={styles.cardTitle}>{m.name}</Text>
-                  <Text style={styles.cardText}>{m.description}</Text>
+                  <AppText baseSize={FontSizes.Normal}  style={styles.cardTitle}>{m.name}</AppText>
+                  <AppText baseSize={FontSizes.Small}  style={styles.cardText}>{m.description}</AppText>
                   <View style={styles.radio}>
                     <View
                       style={

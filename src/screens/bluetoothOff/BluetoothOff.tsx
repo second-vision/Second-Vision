@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { BleManager, State } from "react-native-ble-plx";
-import { Text, View, Image, Pressable, BackHandler } from "react-native";
+import { View, Image, Pressable, BackHandler } from "react-native";
 import * as Speech from "expo-speech";
 import { NavigationProp } from "@/app/types/types";
 import { styles } from "./styles";
 import { requestPermissions, useSpeech } from "@/src/shared/hooks";
 import { useBluetoothManager } from "@/src/shared/hooks/useBluetoothManager";
 import { useSettings } from "@/src/shared/context";
+import { AppText } from "@/src/shared/components";
+import { FontSizes } from "@/src/shared/constants/fontSizes";
 
 const bleManager = new BleManager();
 
@@ -66,12 +68,14 @@ export const BluetoothOff = () => {
         />
       </View>
       <View style={styles.textBlue}>
-        <Text style={styles.headerText} accessibilityRole="header">
+        <View>
+        <AppText baseSize={FontSizes.Large} style={styles.headerText} accessibilityRole="header">
           Ligar o Bluetooth.
-        </Text>
-        <Text style={styles.text}>
+        </AppText>
+        <AppText baseSize={FontSizes.Normal} style={styles.text}>
           Acesse o centro de controle e ligue o Bluetooth.
-        </Text>
+        </AppText>
+        </View>
       </View>
       <View style={styles.buttonGroup}>
         <Pressable
@@ -80,7 +84,7 @@ export const BluetoothOff = () => {
           accessibilityHint="Toque para ativar o Bluetooth e acessar a tela de escaneamento"
           accessibilityRole="button"
         >
-          <Text style={styles.scanButtonText}>Habilitar Bluetooth</Text>
+          <AppText baseSize={FontSizes.Normal} style={styles.scanButtonText}>Habilitar Bluetooth</AppText>
         </Pressable>
       </View>
     </View>

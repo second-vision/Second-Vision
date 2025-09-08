@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-
+import { theme } from "../../styles";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -9,12 +9,12 @@ export const styles = StyleSheet.create({
   loadingOverlay: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#000000aa',
+    backgroundColor: theme.colors.black,
   },
   loadingText:{
       marginTop: 10,
     fontSize: 16,
-    color: '#ffffffff',
+    color: theme.colors.background,
     textAlign: 'center'
   }
 

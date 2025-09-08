@@ -1,9 +1,7 @@
-import { Dimensions, StyleSheet } from "react-native";
-
-const { width } = Dimensions.get("window");
-
+import { StyleSheet } from "react-native";
+import { theme } from "../../shared/styles";
 const boxShadow = {
-	shadowColor: "#000",
+	shadowColor: theme.colors.black,
 	shadowOffset: {
 		width: 0,
 		height: 2,
@@ -28,13 +26,13 @@ export const styles = StyleSheet.create({
 		gap: 15,
 	},
 	operationModeTitle: {
-		color: "#001268",
+		color: theme.colors.primary,
 		fontWeight: "800",
-		fontSize: width * 0.04,
+		
 		paddingVertical: 5,
 	},
 	operationModeText: {
-		color: "#001268",
+		color: theme.colors.primary,
 	},
 	inputOperationMode: {
 		flexDirection: "row",
@@ -42,19 +40,19 @@ export const styles = StyleSheet.create({
 		marginVertical: 15,
 		padding: 15,
 		borderRadius: 10,
-		backgroundColor: "#F6F7F8",
+		backgroundColor: theme.colors.backgroundVariant,
 		gap: 10,
-		borderColor: "#000",
+		borderColor: theme.colors.black,
 		borderStyle: "solid",
 		borderWidth: 1,
 	},
 	operationModeButton: {
 		padding: 15,
-		backgroundColor: "#001268",
+		backgroundColor: theme.colors.primary,
 		borderRadius: 10,
 	},
 	operationModeButtonText: {
-		color: "#F6F7F8",
+		color: theme.colors.backgroundVariant,
 		textAlign: "center",
 	},
 	operationCard: {
@@ -63,21 +61,19 @@ export const styles = StyleSheet.create({
 		height: 80,
 		padding: 16,
 		borderRadius: 5,
-		backgroundColor: "#F6F7F8",
+		backgroundColor: theme.colors.backgroundVariant,
 		gap: 10,
 		...boxShadow,
 	},
 	cardTitle: {
 		flex: 1,
-		color: "#001268",
+		color: theme.colors.primary,
 		fontWeight: "800",
-		fontSize: width * 0.04,
 		paddingHorizontal: 10,
 		
 	},
 	cardText: {
 		flex: 3,
-		fontSize: width * 0.03,
 		maxWidth: "80%",
 	
 	},
@@ -86,7 +82,7 @@ export const styles = StyleSheet.create({
         width: 20,
         borderRadius: 10,
         borderWidth: 2,
-        borderColor: '#0082FC',
+        borderColor: theme.colors.secundary,
         marginRight: 10,
 		padding: 2,
 		alignItems: "center",
@@ -97,15 +93,15 @@ export const styles = StyleSheet.create({
         width: 10,
         borderRadius: 10,
         borderWidth: 2,
-        borderColor: '#0082FC',
+        borderColor: theme.colors.secundary,
         
-        backgroundColor: '#0082FC', // Cor para o botão selecionado
+        backgroundColor: theme.colors.secundary, // Cor para o botão selecionado
     },
 	radioInternal:{
 		height: 10,
         width: 10,
         borderRadius: 10,
        
-        backgroundColor: '#FFFFFF'
+        backgroundColor: theme.colors.background
 	}
 });

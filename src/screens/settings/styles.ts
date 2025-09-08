@@ -1,26 +1,23 @@
 import { StyleSheet } from "react-native";
-
+import { theme } from "../../shared/styles";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "space-between",
-
   },
   containerConfig: {
-    padding: 20
+    padding: 20,
   },
   scrollContent: {
-		paddingVertical: 40,
-	},
+    paddingVertical: 40,
+  },
 
   title: {
-    fontSize: 16,
     fontWeight: "700",
-    color: "#0a398a",
+    color: theme.colors.primary,
   },
   subtitle: {
-    fontSize: 14,
-    color: "#555",
+    color: theme.colors.text,
     marginBottom: 10,
   },
   sliderRow: {
@@ -29,15 +26,17 @@ export const styles = StyleSheet.create({
     marginBottom: 40,
   },
   sliderLabel: {
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: "bold",
-    color: "#0a398a",
-    marginHorizontal: 5,
+    color: theme.colors.primary,
+
+  },
+  mais:{
+    textAlign: "right",
   },
   slider: {
-    width: 200,
-    height: 40,
-    
+    flex: 1,
+
   },
   section: {
     marginBottom: 40,
@@ -47,14 +46,13 @@ export const styles = StyleSheet.create({
   resetButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#0a398a",
+    backgroundColor: theme.colors.primary,
     padding: 12,
-    borderRadius: 25,
+    borderRadius: 12,
     justifyContent: "center",
   },
   resetText: {
-    color: "#fff",
-    fontSize: 16,
+    color: theme.colors.background,
     marginLeft: 8,
     fontWeight: "600",
   },

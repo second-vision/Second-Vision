@@ -1,17 +1,17 @@
 import { StyleSheet } from "react-native";
-
+import { theme } from "../../styles";
 export const styles = StyleSheet.create({
 
   bottomNav: {
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: "#fff",
-    paddingVertical: 20,
+    backgroundColor: theme.colors.background,
+    paddingVertical: 10,
     
-    position: "absolute", // Faz o bottomNav ser fixado na parte inferior
-    bottom: 0, // Fixando no fundo da tela
-    left: 0, // Deixa alinhado à esquerda
-    right: 0, // Deixa alinhado à direita
+    position: "absolute", 
+    bottom: 0, 
+    left: 0, 
+    right: 0, 
     borderTopRightRadius: 15,
     borderTopLeftRadius: 15,
     
@@ -19,9 +19,10 @@ export const styles = StyleSheet.create({
   },
   navItem: {
     alignItems: "center",
-    width: "33.3%",
+    paddingVertical: 5, 
+  paddingHorizontal: 20,
  
   },
 
-  navText: { fontSize: 12, color: "#333", marginTop: 5 },
+  navText: { fontSize: 12, color: theme.colors.text, marginTop: 5 },
 });

@@ -1,22 +1,19 @@
 import {
-  Text,
   View,
   Image,
   TouchableOpacity,
   Modal,
-  Dimensions,
   SectionList,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./styles";
-
+import { AppText } from "../appText/AppText";
+import { FontSizes } from "@/src/shared/constants/fontSizes";
+import { theme } from "../../styles";
 interface AboutProps {
   visible: boolean;
   onClose: () => void;
 }
-
-const { width } = Dimensions.get("window");
-const numColumns = width > 600 ? 3 : 2;
 
 export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
   const itens = [
@@ -74,7 +71,7 @@ export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
           accessibilityLabel="Fechar"
           accessibilityHint="Fecha o modal sobre informações"
         >
-          <Ionicons name="close-circle-outline" size={30} color="black" />
+          <Ionicons name="close-circle-outline" size={30} color={theme.colors.black} />
         </TouchableOpacity>
 
         <View style={styles.modalInfo}>
@@ -103,26 +100,26 @@ export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
             <View style={{ flexDirection: "row" }}>
               {item.map((obj: any) => (
                 <View key={obj.id} style={styles.itemContainerFlat}>
-                  <Text style={styles.bullet}>{"\u2022"}</Text>
-                  <Text style={styles.itemText}>{obj.texto}</Text>
+                  <AppText baseSize={FontSizes.Normal} style={styles.bullet}>{"\u2022"}</AppText>
+                  <AppText baseSize={FontSizes.Small}style={styles.itemText}>{obj.texto}</AppText>
                 </View>
               ))}
             </View>
           )}
           renderSectionHeader={({ section }) => (
             <View>
-              <Text style={styles.line} />
-              <Text style={styles.textTitle}>{section.title}</Text>
+              <AppText style={styles.line} />
+              <AppText baseSize={FontSizes.Normal} style={styles.textTitle}>{section.title}</AppText>
             </View>
           )}
           contentContainerStyle={styles.modalScrollContainer}
           stickySectionHeadersEnabled={false}
           ListHeaderComponent={
             <View>
-              <Text style={styles.textTitle} accessibilityRole="header">
+              <AppText baseSize={FontSizes.Normal} style={styles.textTitle} accessibilityRole="header">
                 Tutorial de uso do sistema.
-              </Text>
-              <Text accessibilityRole="text">
+              </AppText>
+              <AppText baseSize={FontSizes.Small} accessibilityRole="text">
                 Primeiro, certifique-se de que a câmera está conectada ao
                 dispositivo e que a bateria está carregada. Em seguida, acione a
                 alavanca fisica para ligá-lo. Dentro do aplicativo, habilite o
@@ -132,13 +129,13 @@ export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
                 conexão. Basta clicar para se conectar. Após isso, você estará
                 na tela principal de controle do dispositivo e no recebimento
                 das informações.
-              </Text>
-              <Text style={styles.line} />
-              <Text accessibilityRole="text">
+              </AppText>
+              <AppText style={styles.line} />
+              <AppText baseSize={FontSizes.Small} accessibilityRole="text">
                 No rodapé da tela, você encontrará opções para regular o
                 intervalo da fala das informações e para alterar o modo de
                 operação do sistema. Existem três modos disponíveis:
-              </Text>
+              </AppText>
               <View accessibilityRole="list">
                 {itens.map((item, index) => (
                   <View
@@ -146,17 +143,17 @@ export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
                     style={styles.itemContainer}
                     accessible={true}
                   >
-                    <Text accessibilityRole="text" style={styles.bullet}>
+                    <AppText baseSize={FontSizes.Normal} accessibilityRole="text" style={styles.bullet}>
                       {"\u2022"}
-                    </Text>
-                    <Text accessibilityRole="text" style={styles.itemText}>
+                    </AppText>
+                    <AppText baseSize={FontSizes.Small} accessibilityRole="text" style={styles.itemText}>
                       {item}
-                    </Text>
+                    </AppText>
                   </View>
                 ))}
               </View>
-              <Text style={styles.line} />
-              <Text accessibilityRole="text">
+              <AppText style={styles.line} />
+              <AppText baseSize={FontSizes.Small} accessibilityRole="text">
                 Na tela principal, são exibidas informações sobre o sistema,
                 como a porcentagem restante da bateria do dispositivo físico, se
                 o sistema está ligado ou desligado, o tempo de intervalo de
@@ -164,7 +161,7 @@ export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
                 processamento, que pode ser online ou offline, o online
                 necessita de internet pois utiliza um identificador hospedado em
                 nuvem, a vantagem desse modo é a alta variedade de objetos.
-              </Text>
+              </AppText>
             </View>
           }
         />

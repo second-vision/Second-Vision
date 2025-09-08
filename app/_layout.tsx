@@ -13,7 +13,7 @@ import {
   DeviceProvider,
   ModeProvider,
   MenuProvider,
-  SettingsProvider
+  SettingsProvider,
 } from "@/src/shared/context";
 import { createStackNavigator } from "@react-navigation/stack";
 
