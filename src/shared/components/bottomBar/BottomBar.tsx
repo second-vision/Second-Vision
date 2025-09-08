@@ -3,7 +3,7 @@ import { View, TouchableOpacity } from "react-native";
 import { styles } from "./styles";
 import { Ionicons } from "@expo/vector-icons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { theme } from "../../styles";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { NavigationProp } from "@/app/types/types";
@@ -27,7 +27,10 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
       <TouchableOpacity
         style={[
           styles.navItem,
-          isActive("HomeStack") && { backgroundColor: theme.colors.primary, borderRadius: 30 },
+          isActive("HomeStack") && {
+            backgroundColor: theme.colors.primary,
+            borderRadius: 30,
+          },
         ]}
         onPress={() => navigation.navigate("HomeStack")}
         accessibilityLabel="Página inicial"
@@ -35,7 +38,11 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
       >
         <Ionicons
           name={isActive("HomeStack") ? "home" : "home-outline"}
-          color={isActive("HomeStack") ? theme.colors.background : theme.colors.primary}
+          color={
+            isActive("HomeStack")
+              ? theme.colors.background
+              : theme.colors.primary
+          }
           size={30}
         />
       </TouchableOpacity>
@@ -44,7 +51,10 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
       <TouchableOpacity
         style={[
           styles.navItem,
-          isActive("IntervalTimeStack") && { backgroundColor: theme.colors.primary, borderRadius: 30 },
+          isActive("IntervalTimeStack") && {
+            backgroundColor: theme.colors.primary,
+            borderRadius: 30,
+          },
         ]}
         onPress={() => navigation.navigate("IntervalTimeStack")}
         accessibilityLabel="Intervalo de fala"
@@ -52,7 +62,11 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
       >
         <Ionicons
           name={isActive("IntervalTimeStack") ? "timer" : "timer-outline"}
-          color={isActive("IntervalTimeStack") ? theme.colors.background : theme.colors.primary}
+          color={
+            isActive("IntervalTimeStack")
+              ? theme.colors.background
+              : theme.colors.primary
+          }
           size={30}
         />
       </TouchableOpacity>
@@ -61,24 +75,38 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
       <TouchableOpacity
         style={[
           styles.navItem,
-          isActive("OperationModeStack") && { backgroundColor: theme.colors.primary, borderRadius: 30 },
+          isActive("OperationModeStack") && {
+            backgroundColor: theme.colors.primary,
+            borderRadius: 30,
+          },
         ]}
         onPress={() => navigation.navigate("OperationModeStack")}
         accessibilityLabel="Modo de operação"
         accessibilityHint="Navega para a tela de modos de operação"
       >
-        <MaterialCommunityIcons
-          name={isActive("SettingsStack") ? "pencil-outline" : "pencil"}
-          size={30}
-          color={isActive("OperationModeStack") ? theme.colors.background : theme.colors.primary}
-        />
+        {isActive("OperationModeStack") ? (
+          <MaterialCommunityIcons
+            name="pencil"
+            size={30}
+            color={theme.colors.background}
+          />
+        ) : (
+          <SimpleLineIcons
+            name="pencil"
+            size={28}
+            color={theme.colors.primary}
+          />
+        )}
       </TouchableOpacity>
 
       {/* Settings */}
       <TouchableOpacity
         style={[
           styles.navItem,
-          isActive("SettingsStack") && { backgroundColor: theme.colors.primary, borderRadius: 30 },
+          isActive("SettingsStack") && {
+            backgroundColor: theme.colors.primary,
+            borderRadius: 30,
+          },
         ]}
         onPress={() => navigation.navigate("SettingsStack")}
         accessibilityLabel="Configurações"
@@ -86,7 +114,11 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
       >
         <Ionicons
           name={isActive("SettingsStack") ? "settings" : "settings-outline"}
-          color={isActive("SettingsStack") ? theme.colors.background : theme.colors.primary}
+          color={
+            isActive("SettingsStack")
+              ? theme.colors.background
+              : theme.colors.primary
+          }
           size={30}
         />
       </TouchableOpacity>
