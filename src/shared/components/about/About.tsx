@@ -46,6 +46,7 @@ export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
     { id: "8", texto: "Semáforo" },
     { id: "9", texto: "Placa de Pare" },
     { id: "10", texto: "Hidrante" },
+    { id: "11", texto: "Faixa de Pedestre" },
   ];
 
   const splitInPairs = (data: any[]) => {
