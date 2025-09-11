@@ -6,6 +6,7 @@ export const theme = {
     black: "#000", 
     background: "#FFF",
     backgroundVariant: "#F6F7F8",
+    backgroundModal: "#000000aa",
     text: "#333",
     line: "#ccc",
     modal: "#f3f3ff",

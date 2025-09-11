@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: theme.colors.black,
+    backgroundColor: theme.colors.backgroundModal,
   },
   modalContent: {
     margin: 20,

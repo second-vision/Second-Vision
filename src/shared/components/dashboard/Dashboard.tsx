@@ -11,7 +11,6 @@ interface DashboardProps {
   intervalDash: number;
   batteryLevel: number;
   currentModeIndex: number;
-  handleClickForRPi0: () => void;
   currentMode: {
     name: string;
     description: string;
@@ -28,7 +27,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
   batteryLevel,
   currentMode,
   currentHostspot,
-  handleClickForRPi0,
 }) => {
   let batteryIcon: any;
   if (batteryLevel === 100) {
@@ -47,7 +45,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
   return (
     <SafeAreaView>
       <View style={styles.dashboard}>
-        <AppText baseSize={FontSizes.Large} style={styles.dashboardTitle} accessibilityRole="header">
+        <AppText
+          baseSize={FontSizes.Large}
+          style={styles.dashboardTitle}
+          accessibilityRole="header"
+        >
           Estatísticas de Uso
         </AppText>
 
@@ -60,14 +62,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
               accessibilityLabel="Ícone da Bateria"
             />
             <AppText
-            baseSize={FontSizes.Large}
+              baseSize={FontSizes.Large}
               style={styles.nivel}
               accessibilityLabel={`Bateria: ${batteryLevel}%`}
               accessibilityRole="text"
             >
               {batteryLevel}%
             </AppText>
-            <AppText baseSize={FontSizes.Normal} accessibilityRole="text">Bateria</AppText>
+            <AppText baseSize={FontSizes.Normal} accessibilityRole="text">
+              Bateria
+            </AppText>
           </View>
 
           <View style={styles.info}>
@@ -84,7 +88,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
             >
               {isOn ? "Ligado" : "Desligado"}
             </AppText>
-            <AppText baseSize={FontSizes.Normal} accessibilityRole="text">Sistema</AppText>
+            <AppText baseSize={FontSizes.Normal} accessibilityRole="text">
+              Sistema
+            </AppText>
           </View>
 
           <View style={styles.info}>
@@ -101,13 +107,21 @@ export const Dashboard: React.FC<DashboardProps> = ({
             >
               {intervalDash / 1000}s
             </AppText>
-            <AppText baseSize={FontSizes.Normal} style={styles.category} accessibilityRole="text">
+            <AppText
+              baseSize={FontSizes.Normal}
+              style={styles.category}
+              accessibilityRole="text"
+            >
               Intervalo
             </AppText>
           </View>
         </View>
         <View style={styles.operationMode}>
-          <AppText baseSize={FontSizes.Large} style={styles.dashboardTitle} accessibilityRole="header">
+          <AppText
+            baseSize={FontSizes.Large}
+            style={styles.dashboardTitle}
+            accessibilityRole="header"
+          >
             Modo de Operação
           </AppText>
           <View
@@ -115,55 +129,52 @@ export const Dashboard: React.FC<DashboardProps> = ({
             accessible={true}
             accessibilityLabel={`${currentMode.name}. ${currentMode.description}`}
           >
-            <AppText baseSize={FontSizes.Normal} style={styles.cardTitle} accessibilityRole="text">
+            <AppText
+              baseSize={FontSizes.Normal}
+              style={styles.cardTitle}
+              accessibilityRole="text"
+            >
               {currentMode.name}
             </AppText>
-            <AppText baseSize={FontSizes.Small} style={styles.cardText} accessibilityRole="text">
+            <AppText
+              baseSize={FontSizes.Small}
+              style={styles.cardText}
+              accessibilityRole="text"
+            >
               {currentMode.description}
             </AppText>
           </View>
         </View>
-        {deviceInfo?.model === "RPi-0" ? (
-          <TouchableOpacity
-            style={styles.operationMode}
-            onPress={() => handleClickForRPi0()}
-            activeOpacity={0.8}
+
+        <View style={styles.operationMode}>
+          <AppText
+            baseSize={FontSizes.Large}
+            style={styles.dashboardTitle}
+            accessibilityRole="header"
           >
-            <AppText baseSize={FontSizes.Large} style={styles.dashboardTitle} accessibilityRole="header">
-              Modo de Conexão
-            </AppText>
-            <View
-              style={styles.operationCard}
-              accessible={true}
-              accessibilityLabel={`${currentHostspot.name}. ${currentHostspot.description}`}
+            Modo de Conexão
+          </AppText>
+          <View
+            style={styles.operationCard}
+            accessible={true}
+            accessibilityLabel={`${currentHostspot.name}. ${currentHostspot.description}`}
+          >
+            <AppText
+              baseSize={FontSizes.Normal}
+              style={styles.cardTitle}
+              accessibilityRole="text"
             >
-              <AppText baseSize={FontSizes.Normal} style={styles.cardTitle} accessibilityRole="text">
-                {currentHostspot.name}
-              </AppText>
-              <AppText baseSize={FontSizes.Small} style={styles.cardText} accessibilityRole="text">
-                {currentHostspot.description}
-              </AppText>
-            </View>
-          </TouchableOpacity>
-        ) : (
-          <View style={styles.operationMode}>
-            <AppText baseSize={FontSizes.Large} style={styles.dashboardTitle} accessibilityRole="header">
-              Modo de Conexão
+              {currentHostspot.name}
             </AppText>
-            <View
-              style={styles.operationCard}
-              accessible={true}
-              accessibilityLabel={`${currentHostspot.name}. ${currentHostspot.description}`}
+            <AppText
+              baseSize={FontSizes.Small}
+              style={styles.cardText}
+              accessibilityRole="text"
             >
-              <AppText baseSize={FontSizes.Normal} style={styles.cardTitle} accessibilityRole="text">
-                {currentHostspot.name}
-              </AppText>
-              <AppText baseSize={FontSizes.Small} style={styles.cardText} accessibilityRole="text">
-                {currentHostspot.description}
-              </AppText>
-            </View>
+              {currentHostspot.description}
+            </AppText>
           </View>
-        )}
+        </View>
       </View>
     </SafeAreaView>
   );

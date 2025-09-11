@@ -5,6 +5,12 @@ import { Device } from "react-native-ble-plx";
 import { Vibration } from "react-native";
 import { useSettings } from "../context";
 
+interface DeviceInfo {
+  model: string;
+  version_code: number;
+  features: string[];
+}
+
 type AnnouncementsProps = {
   isOn: boolean | null;
   mode: number | null;
@@ -16,6 +22,7 @@ type AnnouncementsProps = {
   hostspotUI: number;
   isScanningM: boolean;
   allDevices: Device[];
+  deviceInfo: DeviceInfo | null;
 };
 
 export function useAnnouncements({
@@ -29,6 +36,7 @@ export function useAnnouncements({
   interval,
   isScanningM,
   allDevices,
+  deviceInfo
 }: AnnouncementsProps) {
   const { speakEnabled } = useSettings();
 
@@ -41,18 +49,19 @@ export function useAnnouncements({
         speak("Sistema ligado e pronto para uso", 0);
       }
     } else if (isOn !== null) {
-      if (speakEnabled) {
-        speak(
-          "Sistema de identificação parou de funcionar, tente reiniciar o dispositivo físico",
-          0
-        );
-      }
+      speak(
+        "Sistema de identificação parou de funcionar, tente reiniciar o dispositivo físico",
+        0
+      );
     }
   }, [isOn]);
 
   // 2. Mudança de modo de operação
   useEffect(() => {
-    if (mode === 0) {
+    if (
+      (mode === 0 && deviceInfo?.model === "RPi-0" && hostspotUI === 1) ||
+      deviceInfo?.model === "RPi-5"
+    ) {
       if (speakEnabled) {
         speak(
           "Esse modo detecta tanto objetos possivelmente perigosos como textos estáticos.",

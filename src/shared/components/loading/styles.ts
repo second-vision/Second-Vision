@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
   loadingOverlay: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: theme.colors.black,
+    backgroundColor: theme.colors.backgroundModal,
   },
   loadingText:{
       marginTop: 10,

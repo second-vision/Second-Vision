@@ -1,10 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import {
-  SafeAreaView,
-  View,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { SafeAreaView, View, ScrollView, TouchableOpacity } from "react-native";
 import {
   About,
   AppText,
@@ -18,6 +13,7 @@ import { FontSizes } from "@/src/shared/constants/fontSizes";
 import { styles } from "./styles";
 import { useHomePropsContext, useMenu } from "@/src/shared/context";
 import { NavigationProp } from "@/app/types/types";
+import { useEffect } from "react";
 
 export const OperationMode = () => {
   const navigation = useNavigation<NavigationProp>();
@@ -32,6 +28,12 @@ export const OperationMode = () => {
     deviceInfo,
   } = useHomePropsContext();
 
+  useEffect(() => {
+    if (deviceInfo?.model === "RPi-0" && hostspotUI === 0) {
+      setModeValue(2);
+    }
+  }, [deviceInfo?.model, hostspotUI]);
+
   const handleSelectMode = (mode: any) => {
     setModeValue(mode);
     navigation.navigate("HomeStack");
@@ -39,8 +41,6 @@ export const OperationMode = () => {
 
   const handleSelectHotspot = async (hotspot: any) => {
     if (hotspot == hostspotUI) return;
-    console.log(hotspot)
-    console.log(hostspot)
     setHotspotValue(hotspot);
     navigation.navigate("HomeStack");
   };
@@ -69,43 +69,71 @@ export const OperationMode = () => {
         <Devices />
 
         <View style={styles.operationMode}>
-          <AppText baseSize={FontSizes.Large} style={styles.operationModeTitle} accessibilityRole="header">
+          <AppText
+            baseSize={FontSizes.Large}
+            style={styles.operationModeTitle}
+            accessibilityRole="header"
+          >
             Modos de Operação
           </AppText>
-          {MODES.map((m) => (
-            <TouchableOpacity
-              key={m.id}
-              style={styles.operationCard}
-              onPress={() => handleSelectMode(m.id)}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: mode === m.id }}
-              accessibilityLabel={m.name}
-              accessibilityHint={m.description}
-            >
-              <AppText baseSize={FontSizes.Normal} style={styles.cardTitle}>{m.name}</AppText>
-              <AppText baseSize={FontSizes.ExtraSmall} style={styles.cardText}>{m.description}</AppText>
-              <View style={styles.radio}>
-                <View
-                  style={
-                    mode === m.id ? styles.radioSelected : styles.radioInternal
-                  }
-                />
-              </View>
-            </TouchableOpacity>
-          ))}
+
+          {(deviceInfo?.model === "RPi-0" && hostspotUI === 0
+            ? MODES.filter((m) => m.id === 2) // mostra só o Objetos
+            : MODES
+          ).map((m) => {
+            return (
+              <TouchableOpacity
+                key={m.id}
+                style={styles.operationCard}
+                onPress={() =>
+                  deviceInfo?.model === "RPi-0" && hostspotUI === 0
+                    ? null // não deixa clicar
+                    : handleSelectMode(m.id)
+                }
+                disabled={deviceInfo?.model === "RPi-0" && hostspotUI === 0} // desabilita toque
+                accessibilityRole="radio"
+                accessibilityState={{ selected: mode === m.id }}
+                accessibilityLabel={m.name}
+                accessibilityHint={m.description}
+              >
+                <AppText baseSize={FontSizes.Normal} style={styles.cardTitle}>
+                  {m.name}
+                </AppText>
+                <AppText
+                  baseSize={FontSizes.ExtraSmall}
+                  style={styles.cardText}
+                >
+                  {m.description}
+                </AppText>
+                <View style={styles.radio}>
+                  <View
+                    style={
+                      mode === m.id
+                        ? styles.radioSelected
+                        : styles.radioInternal
+                    }
+                  />
+                </View>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
-        
-          {deviceInfo?.model === "RPi-5" && (
-            <View style={styles.operationMode}>
-              <AppText
-                style={styles.operationModeTitle}
-                accessibilityRole="header"
-                baseSize={FontSizes.Large} 
-              >
-                Modo de Processamento
-              </AppText>
-              {HOSTSPOT_MODES.RPi5.map((m) => (
+        <View style={styles.operationMode}>
+          <AppText
+            style={styles.operationModeTitle}
+            accessibilityRole="header"
+            baseSize={FontSizes.Large}
+          >
+            Modo de Processamento
+          </AppText>
+
+          {(deviceInfo?.model === "RPi-5" || deviceInfo?.model === "RPi-0") && (
+            <>
+              {(deviceInfo?.model === "RPi-5"
+                ? HOSTSPOT_MODES.RPi5
+                : HOSTSPOT_MODES.RPi0
+              ).map((m) => (
                 <TouchableOpacity
                   key={m.id}
                   style={styles.operationCard}
@@ -115,8 +143,12 @@ export const OperationMode = () => {
                   accessibilityLabel={m.name}
                   accessibilityHint={m.description}
                 >
-                  <AppText baseSize={FontSizes.Normal}  style={styles.cardTitle}>{m.name}</AppText>
-                  <AppText baseSize={FontSizes.Small}  style={styles.cardText}>{m.description}</AppText>
+                  <AppText baseSize={FontSizes.Normal} style={styles.cardTitle}>
+                    {m.name}
+                  </AppText>
+                  <AppText baseSize={FontSizes.Small} style={styles.cardText}>
+                    {m.description}
+                  </AppText>
                   <View style={styles.radio}>
                     <View
                       style={
@@ -128,8 +160,9 @@ export const OperationMode = () => {
                   </View>
                 </TouchableOpacity>
               ))}
-            </View>
+            </>
           )}
+        </View>
 
         <About visible={isMenuOpen} onClose={closeMenu} />
       </ScrollView>

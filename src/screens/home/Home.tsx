@@ -76,6 +76,7 @@ export const Home = () => {
     isScanningM,
     allDevices,
     hostspotUI,
+    deviceInfo
   });
 
   // Variaveis para UI
@@ -112,13 +113,6 @@ export const Home = () => {
           currentModeIndex={mode}
           currentMode={currentMode}
           currentHostspot={currentHostspot}
-          handleClickForRPi0={() => {
-            if (hostspotUI === 0) {
-              setHotspotValue(1);
-            } else if (hostspotUI === 1) {
-              setHotspotValue(0);
-            }
-          }}
         />
         <ModalWifi
           handleSelectHotspot={handleSelectHotspot}

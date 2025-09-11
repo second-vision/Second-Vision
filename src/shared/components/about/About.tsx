@@ -4,6 +4,8 @@ import {
   TouchableOpacity,
   Modal,
   SectionList,
+  Pressable,
+  Linking,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./styles";
@@ -72,7 +74,11 @@ export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
           accessibilityLabel="Fechar"
           accessibilityHint="Fecha o modal sobre informações"
         >
-          <Ionicons name="close-circle-outline" size={30} color={theme.colors.black} />
+          <Ionicons
+            name="close-circle-outline"
+            size={30}
+            color={theme.colors.black}
+          />
         </TouchableOpacity>
 
         <View style={styles.modalInfo}>
@@ -101,8 +107,12 @@ export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
             <View style={{ flexDirection: "row" }}>
               {item.map((obj: any) => (
                 <View key={obj.id} style={styles.itemContainerFlat}>
-                  <AppText baseSize={FontSizes.Normal} style={styles.bullet}>{"\u2022"}</AppText>
-                  <AppText baseSize={FontSizes.Small}style={styles.itemText}>{obj.texto}</AppText>
+                  <AppText baseSize={FontSizes.Normal} style={styles.bullet}>
+                    {"\u2022"}
+                  </AppText>
+                  <AppText baseSize={FontSizes.Small} style={styles.itemText}>
+                    {obj.texto}
+                  </AppText>
                 </View>
               ))}
             </View>
@@ -110,26 +120,33 @@ export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
           renderSectionHeader={({ section }) => (
             <View>
               <AppText style={styles.line} />
-              <AppText baseSize={FontSizes.Normal} style={styles.textTitle}>{section.title}</AppText>
+              <AppText baseSize={FontSizes.Normal} style={styles.textTitle}>
+                {section.title}
+              </AppText>
             </View>
           )}
           contentContainerStyle={styles.modalScrollContainer}
           stickySectionHeadersEnabled={false}
           ListHeaderComponent={
             <View>
-              <AppText baseSize={FontSizes.Normal} style={styles.textTitle} accessibilityRole="header">
+              <AppText
+                baseSize={FontSizes.Normal}
+                style={styles.textTitle}
+                accessibilityRole="header"
+              >
                 Tutorial de uso do sistema.
               </AppText>
               <AppText baseSize={FontSizes.Small} accessibilityRole="text">
-                Primeiro, certifique-se de que a câmera está conectada ao
-                dispositivo e que a bateria está carregada. Em seguida, acione a
-                alavanca fisica para ligá-lo. Dentro do aplicativo, habilite o
-                Bluetooth caso não esteja ativo, clique no botão de escanear
-                Bluetooth para encontrar o dispositivo. Se os passos anteriores
-                foram realizados corretamente, ele exibirá o dispositivo para
-                conexão. Basta clicar para se conectar. Após isso, você estará
-                na tela principal de controle do dispositivo e no recebimento
-                das informações.
+                Primeiro, certifique-se de que a bateria está carregada, no
+                revestimento do dispositivvo há textos em braille para guiar a
+                localização do botão de ligar e a entrada para carregar. Em
+                seguida, acione a alavanca fisica para ligá-lo. Dentro do
+                aplicativo, habilite o Bluetooth caso não esteja ativo, clique
+                no botão de escanear Bluetooth para encontrar o dispositivo. Se
+                os passos anteriores foram realizados corretamente, ele exibirá
+                o dispositivo para conexão. Basta clicar para se conectar. Após
+                isso, você estará na tela principal de controle do dispositivo e
+                no recebimento das informações.
               </AppText>
               <AppText style={styles.line} />
               <AppText baseSize={FontSizes.Small} accessibilityRole="text">
@@ -144,10 +161,18 @@ export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
                     style={styles.itemContainer}
                     accessible={true}
                   >
-                    <AppText baseSize={FontSizes.Normal} accessibilityRole="text" style={styles.bullet}>
+                    <AppText
+                      baseSize={FontSizes.Normal}
+                      accessibilityRole="text"
+                      style={styles.bullet}
+                    >
                       {"\u2022"}
                     </AppText>
-                    <AppText baseSize={FontSizes.Small} accessibilityRole="text" style={styles.itemText}>
+                    <AppText
+                      baseSize={FontSizes.Small}
+                      accessibilityRole="text"
+                      style={styles.itemText}
+                    >
                       {item}
                     </AppText>
                   </View>
@@ -161,7 +186,42 @@ export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
                 fala, o modo de operação ativo no momento e o modo de
                 processamento, que pode ser online ou offline, o online
                 necessita de internet pois utiliza um identificador hospedado em
-                nuvem, a vantagem desse modo é a alta variedade de objetos.
+                nuvem, a vantagem desse modo é a alta variedade de objetos e
+                precisão.
+              </AppText>
+              <AppText style={styles.line} />
+              <AppText baseSize={FontSizes.Small} accessibilityRole="text">
+                É importante ressaltar que se o seu produto for a Second Vision
+                V0, o modo offline apenas detecta objetos, e o modo online
+                detecta objetos e textos. Já o produto Second Vision V5, detecta
+                ambos em qualquer modo.
+              </AppText>
+              <AppText style={styles.line} />
+              <AppText
+                baseSize={FontSizes.Small}
+                accessibilityRole="text"
+              >
+                Para mais informações sobre nossas políticas de privacidade e
+                termos de uso, visite o site oficial:{" "}
+                <Pressable
+                  onPress={() =>
+                    Linking.openURL(
+                      "https://sites.google.com/view/secondvision/home"
+                    )
+                  }
+                  accessibilityRole="link"
+                  accessibilityLabel="Abrir site oficial Second Vision"
+                  accessibilityHint="Abre no navegador o site com políticas de privacidade e termos de uso"
+                >
+                  <AppText
+                    baseSize={FontSizes.Small}
+                    style={[
+                      { color: "blue", textDecorationLine: "underline" },
+                    ]}
+                  >
+                    https://sites.google.com/view/secondvision/home
+                  </AppText>
+                </Pressable>
               </AppText>
             </View>
           }

@@ -1,9 +1,4 @@
-import {
-  View,
-  SafeAreaView,
-  Modal,
-  TouchableOpacity,
-} from "react-native";
+import { View, SafeAreaView, Modal, TouchableOpacity } from "react-native";
 import { styles } from "./styles";
 import React, { useState } from "react";
 import { TextInput } from "react-native-gesture-handler";
@@ -66,15 +61,16 @@ export const ModalWifi: React.FC<ModalWifiProps> = ({
                   <Ionicons name="close" size={22} color={theme.colors.text} />
                 </TouchableOpacity>
               </View>
-              <AppText
-                baseSize={FontSizes.Normal}
-                style={styles.modalTitle}
-                accessibilityRole="header"
+              <View
+                accessible
+                accessibilityRole="text"
                 accessibilityLabel="Certifique que o roteador do celular está ligado e digite o nome e a senha do roteador para prosseguir."
               >
-                Certifique que o roteador do celular está ligado e digite o nome
-                e a senha do roteador para prosseguir.
-              </AppText>
+                <AppText baseSize={FontSizes.Normal} style={styles.modalTitle}>
+                  Certifique que o roteador do celular está ligado e digite o
+                  nome e a senha do roteador para prosseguir.
+                </AppText>
+              </View>
 
               <TextInput
                 style={styles.input}
@@ -117,14 +113,24 @@ export const ModalWifi: React.FC<ModalWifiProps> = ({
                   onPress={openHotspotSettings}
                   accessibilityLabel="Botão para abrir as configurações do roteador"
                 >
-                  <AppText baseSize={FontSizes.Normal} style={styles.sendButtonText}>Abrir Roteador</AppText>
+                  <AppText
+                    baseSize={FontSizes.Normal}
+                    style={styles.sendButtonText}
+                  >
+                    Abrir Roteador
+                  </AppText>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.sendButton}
                   onPress={handleSubmitCredentials}
                   accessibilityLabel="Botão para enviar nome e senha do roteador"
                 >
-                  <AppText baseSize={FontSizes.Normal} style={styles.sendButtonText}>Enviar</AppText>
+                  <AppText
+                    baseSize={FontSizes.Normal}
+                    style={styles.sendButtonText}
+                  >
+                    Enviar
+                  </AppText>
                 </TouchableOpacity>
               </View>
             </View>

@@ -34,7 +34,7 @@ export function useDeviceConnection(
     device: Device
   ) => Promise<{ connected: boolean; ssid: string | null }>
 ) {
-  const { deviceInfo, setDeviceInfo } = useHomePropsContext();
+  const { deviceInfo, setDeviceInfo, setModeValue, hostspotUI } = useHomePropsContext();
   const [isOn, setIsOn] = useState(true);
   const [objectData, setObjectData] = useState<string | null>(null);
   const [ocrData, setOcrData] = useState<string | null>(null);
@@ -73,6 +73,9 @@ export function useDeviceConnection(
 
         // Altera o model para simular RPi-0
         //infoObject.model = "RPi-0";
+        if (infoObject.model === "RPi-0" && hostspotUI === 0) {
+          setModeValue(2);
+        }
         setDeviceInfo(infoObject);
         // Inicia streaming
         startStreamingData(deviceConnection);

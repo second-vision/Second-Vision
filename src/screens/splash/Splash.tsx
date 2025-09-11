@@ -20,7 +20,7 @@ export const Splash = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View accessible={false} style={styles.container}>
       <Video
         source={require("../../shared/assets/images/splash.mp4")}
         style={styles.video}
@@ -28,6 +28,7 @@ export const Splash = () => {
         onEnd={() => setIsLoaded(true)}
         muted={false}
         repeat={false}
+        accessible={false}
       />
     </View>
   );

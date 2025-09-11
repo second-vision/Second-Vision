@@ -53,6 +53,7 @@ export const BluetoothOn = () => {
     batteryDuration: null,
     interval: 0,
     hostspotUI: 2,
+    deviceInfo: null,
     isScanningM, // Apenas esses dois ultimos estados são necessários
     allDevices,
   });

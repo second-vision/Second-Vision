@@ -34,12 +34,12 @@ export const HOSTSPOT_MODES = {
     {
       id: 0,
       name: "Offline",
-      description: "Este dispositivo necessita de internet para funcionar. Clique para configurar.",
+      description: "Esse modo funciona sem conexão com a internet.",
     },
     {
       id: 1,
       name: "Online",
-      description: "Este dispositivo está conectado e funcionando.",
+      description: "Esse modo apenas funciona com conexão à internet.",
     }
   ],
 };
