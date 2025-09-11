@@ -69,7 +69,7 @@ O projeto integra tecnologias de ponta em hardware embarcado, IA e desenvolvimen
 
 ## 📦 Instalação do Servidor
 
-Para configurar o ambiente do servidor em um Raspberry Pi, siga as instruções detalhadas no nosso **[Guia de Instalação do Servidor]([https://github.com/second-vision/Second-Vision/blob/GattServer/README.md])**.
+Para configurar o ambiente do servidor em um Raspberry Pi, siga as instruções detalhadas no nosso **[Guia de Instalação do Servidor](https://github.com/second-vision/Second-Vision/blob/GattServer/README.md)**
 
 ## 🏆 Jornada e Reconhecimento
 
