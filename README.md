@@ -61,7 +61,7 @@ O projeto integra tecnologias de ponta em hardware embarcado, IA e desenvolvimen
 -   **Gerenciamento de Rede:** `NetworkManager` controlado via script para alternância dinâmica entre os modos online e offline.
 -   **Hardware:** Raspberry Pi 5 / Zero 2 W, Câmera com IA, UPS HAT com sensor INA219.
 
-#### Aplicativo Cliente
+#### Aplicativo Cliente (**Publicado na Play Store**)
 -   **Framework:** React Native (Expo)
 -   **Linguagem:** TypeScript
 -   **Comunicação BLE:** `react-native-ble-plx`
