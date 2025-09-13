@@ -1,4 +1,6 @@
 requests
 python-dotenv
+fuzzywuzzy
+python-Levenshtein
 opencv-python-headless
 dbus-python

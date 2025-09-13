@@ -116,7 +116,7 @@ mkdir -p /home/second/GattServerV0
 
 # Crie o ambiente virtual no diretório /home/second
 cd /home/second
-python3 -m venv venv
+python3 -m venv venv --system-site-packages
 ```
 
 **b. Clone o repositório do projeto:**
