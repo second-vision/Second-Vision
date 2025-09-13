@@ -1,16 +1,17 @@
 # services/models/local_vision.py
 
-import sys
+import threading
 import time
+import sys
 
+# Tenta importar as bibliotecas essenciais e define uma flag de disponibilidade
 try:
     from picamera2 import Picamera2
-    from picamera2.post_processing import PostProcessing
     from picamera2.devices import IMX500
     from picamera2.devices.imx500 import postprocess_nanodet_detection
     PICAMERA2_AVAILABLE = True
 except ImportError:
-    print("\n[AI Cam] ERRO: Biblioteca 'picamera2' não encontrada.")
+    print("\n[AI Cam] ERRO: Biblioteca 'picamera2' ou dependências não encontradas.")
     print("[AI Cam] O modo offline de detecção de objetos não funcionará.")
     print("[AI Cam] Instale com: pip install picamera2\n")
     PICAMERA2_AVAILABLE = False
@@ -19,22 +20,19 @@ except Exception as e:
     PICAMERA2_AVAILABLE = False
 
 
-class AICameraService(PostProcessing):
+class AICameraService:
     """
-    Gerencia a Câmera com IA (IMX500) usando o framework de pós-processamento
-    da Picamera2 para extrair os resultados da detecção de objetos.
+    Gerencia a Câmera com IA (IMX500), capturando e processando os metadados
+    de detecção de objetos em um thread de background.
     """
     def __init__(self, 
                  model_path="/usr/share/imx500-models/imx500_network_ssd_mobilenetv2_fpnlite_320x320_pp.rpk",
                  labels_path="assets/coco_labels.txt", 
                  threshold=0.70):
-        """
-        Inicializa e inicia o serviço da câmera com IA.
-        """
-        super().__init__()
         
         self.latest_objects = []
-        self._lock = threading.Lock() # Usamos um lock para thread-safety ao acessar latest_objects
+        self._lock = threading.Lock()
+        self.is_running = False
         self.threshold = threshold
         self.picam2 = None
         self.imx500 = None
@@ -57,20 +55,23 @@ class AICameraService(PostProcessing):
             self.intrinsics.update_with_defaults()
             print("[AI Cam] Modelo e labels carregados.")
 
-            # --- 2. Inicialização e Configuração da Picamera2 ---
+            # --- 2. Inicialização da Picamera2 ---
             self.picam2 = Picamera2(self.imx500.camera_num)
             config = self.picam2.create_preview_configuration(
                 main={"size": (640, 480)},
+                # O stream 'raw' é necessário para o IMX500 receber os dados
                 raw=self.picam2.sensor_modes[self.imx500.mode_index]
             )
             self.picam2.configure(config)
             
-            # --- 3. Anexa este objeto como o hook de pós-processamento ---
-            self.picam2.start_post_processing(self)
-            
             self.imx500.show_network_fw_progress_bar()
             self.picam2.start()
-            print("[AI Cam] Câmera iniciada com o framework de Pós-Processamento.")
+            print("[AI Cam] Câmera iniciada com Picamera2.")
+            
+            # --- 3. Inicia nosso thread de processamento ---
+            self.is_running = True
+            self.thread = threading.Thread(target=self._processing_loop, daemon=True)
+            self.thread.start()
 
         except FileNotFoundError:
             print(f"\n[AI Cam] ERRO CRÍTICO: Arquivo de modelo ou de labels não encontrado.")
@@ -82,17 +83,16 @@ class AICameraService(PostProcessing):
             print(f"[AI Cam] ERRO CRÍTICO ao inicializar a Câmera com IA: {e}")
             if self.picam2: self.picam2.stop()
             self.picam2 = None
-
-    def process(self, request):
+    
+    def _parse_detections(self, metadata):
         """
-        Este método é chamado automaticamente pela Picamera2 para cada frame
-        e contém a lógica de decodificação dos resultados da IA.
+        Decodifica os metadados da IA e retorna uma lista de nomes de objetos.
         """
-        metadata = request.capture_metadata()
-        
+        # A forma correta de obter os resultados é chamar o método na instância do IMX500.
+        # Adicionamos add_batch=True para compatibilidade.
         np_outputs = self.imx500.get_outputs(metadata, add_batch=True)
         if np_outputs is None:
-            return
+            return None
 
         boxes, scores, classes = \
             postprocess_nanodet_detection(outputs=np_outputs[0], conf=self.threshold, iou_thres=0.70)[0]
@@ -105,8 +105,23 @@ class AICameraService(PostProcessing):
                 if label and label != "-":
                     detected_labels.append(label)
         
-        with self._lock:
-            self.latest_objects = detected_labels
+        return detected_labels
+
+    def _processing_loop(self):
+        """
+        Loop em background que captura metadados, os processa e armazena os resultados.
+        """
+        while self.is_running and self.picam2:
+            try:
+                metadata = self.picam2.capture_metadata()
+                objects = self._parse_detections(metadata)
+                
+                if objects is not None:
+                    with self._lock:
+                        self.latest_objects = objects
+            except Exception as e:
+                print(f"[AI Cam] Erro no loop de processamento: {e}")
+                time.sleep(1)
 
     def get_latest_objects(self):
         """Retorna a lista mais recente de objetos detectados (thread-safe)."""
@@ -114,19 +129,15 @@ class AICameraService(PostProcessing):
             return list(self.latest_objects)
 
     def stop(self):
-        """Para a câmera e o framework de pós-processamento."""
+        """Para a câmera e o thread."""
+        self.is_running = False
         if self.picam2:
-            try:
-                self.picam2.stop_post_processing()
-                self.picam2.stop()
-                print("[AI Cam] Câmera parada com sucesso.")
-            except Exception as e:
-                print(f"[AI Cam] Erro ao parar a câmera: {e}")
+            self.picam2.stop()
+            print("[AI Cam] Câmera parada.")
 
-# --- Instância Única do Serviço da Câmera ---
+# --- Instância Única e Funções Públicas ---
+# Esta instância é criada quando o módulo é importado pela primeira vez.
 ai_camera_service = AICameraService()
-
-# --- Funções de Interface Pública para o Vision Service ---
 
 def detect_objects_local_ai_cam():
     """
