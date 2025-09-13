@@ -57,11 +57,7 @@ class AICameraService:
 
             # --- 2. Inicialização da Picamera2 ---
             self.picam2 = Picamera2(self.imx500.camera_num)
-            config = self.picam2.create_preview_configuration(
-                main={"size": (640, 480)},
-                # O stream 'raw' é necessário para o IMX500 receber os dados
-                raw=self.picam2.sensor_modes[self.imx500.mode_index]
-            )
+            config = self.picam2.create_preview_configuration(main={"size": (640, 480)})
             self.picam2.configure(config)
             
             self.imx500.show_network_fw_progress_bar()
