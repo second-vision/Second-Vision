@@ -82,41 +82,36 @@ class AICameraService:
     
     def _parse_detections(self, metadata):
         """
-        Decodifica os metadados da IA de forma manual e segura para extrair os
-        nomes das classes dos objetos detectados.
+        Decodifica os metadados da IA de forma segura, tratando a saída como
+        uma tupla de múltiplos tensores (caixas, pontuações, classes).
         """
         np_outputs = self.imx500.get_outputs(metadata)
-        if np_outputs is None:
-            return None
+        if np_outputs is None or len(np_outputs) < 3: # Garante que temos pelo menos 3 tensores de saída
+            return []
     
-        # A saída da maioria dos modelos SSD/NanoDet é uma lista de arrays.
-        # O array principal contém as pontuações de classe para cada "caixa" de predição.
-        # Exemplo de shape: (1, 3598, 80) -> 1 lote, 3598 caixas, 80 classes
-        class_scores = np_outputs[0] 
+        # --- ESTRUTURA DE SAÍDA MAIS COMUM ---
+        # np_outputs[0]: Caixas (Boxes) - Não precisamos delas, mas estão lá.
+        # np_outputs[1]: Pontuações de Confiança (Scores)
+        # np_outputs[2]: Índices de Classe (Classes)
+        
+        # Adicionamos [0] no final para remover a dimensão do "lote" (batch)
+        scores = np_outputs[1][0]  # Shape: (N,) onde N é o número de detecções
+        classes = np_outputs[2][0] # Shape: (N,)
     
-        # --- NOVA LÓGICA DE EXTRAÇÃO MANUAL ---
+        # --- LÓGICA DE FILTRAGEM SIMPLIFICADA ---
         detected_labels = []
         labels = self.intrinsics.labels
         
-        # Verifica se há alguma predição para processar
-        if class_scores.shape[1] > 0:
+        # Itera sobre os resultados já decodificados pelo hardware/driver
+        for i in range(len(scores)):
+            score = scores[i]
             
-            # Encontra o índice da classe com a maior pontuação para cada caixa de predição
-            # axis=2 significa que estamos procurando o máximo ao longo das 80 classes
-            best_class_indices = np.argmax(class_scores[0], axis=1)
-            
-            # Encontra a pontuação de confiança para essas melhores classes
-            best_class_scores = np.max(class_scores[0], axis=1)
-            
-            # Agora, itera apenas sobre as melhores predições
-            for i in range(len(best_class_scores)):
-                score = best_class_scores[i]
+            if score > self.threshold:
+                class_index = int(classes[i])
                 
-                if score > self.threshold:
-                    class_index = best_class_indices[i]
-                    label = labels[int(class_index)]
-                    
-                    # Adiciona à lista de detecções, mas evita duplicatas
+                # Verificação de segurança para o índice da classe
+                if 0 <= class_index < len(labels):
+                    label = labels[class_index]
                     if label and label != "-" and label not in detected_labels:
                         detected_labels.append(label)
     
