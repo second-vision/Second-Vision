@@ -12,8 +12,7 @@ try:
     PICAMERA2_AVAILABLE = True
 except ImportError:
     print("\n[AI Cam] ERRO: Biblioteca 'picamera2' ou dependências não encontradas.")
-    print("[AI Cam] O modo offline de detecção de objetos não funcionará.")
-    print("[AI Cam] Instale com: pip install picamera2\n")
+    print("[AI Cam] O modo offline de detecção de objetos não funcionará.\n")
     PICAMERA2_AVAILABLE = False
 except Exception as e:
     print(f"\n[AI Cam] ERRO ao importar dependências da Picamera2: {e}")
@@ -23,7 +22,7 @@ except Exception as e:
 class AICameraService:
     """
     Gerencia a Câmera com IA (IMX500), capturando e processando os metadados
-    de detecção de objetos em um thread de background.
+    de detecção de objetos e os frames de imagem em um thread de background.
     """
     def __init__(self, 
                  model_path="/usr/share/imx500-models/imx500_network_ssd_mobilenetv2_fpnlite_320x320_pp.rpk",
@@ -31,6 +30,7 @@ class AICameraService:
                  threshold=0.70):
         
         self.latest_objects = []
+        self.latest_frame = None 
         self._lock = threading.Lock()
         self.is_running = False
         self.threshold = threshold
@@ -84,8 +84,6 @@ class AICameraService:
         """
         Decodifica os metadados da IA e retorna uma lista de nomes de objetos.
         """
-        # A forma correta de obter os resultados é chamar o método na instância do IMX500.
-        # Adicionamos add_batch=True para compatibilidade.
         np_outputs = self.imx500.get_outputs(metadata, add_batch=True)
         if np_outputs is None:
             return None
@@ -105,15 +103,22 @@ class AICameraService:
 
     def _processing_loop(self):
         """
-        Loop em background que captura metadados, os processa e armazena os resultados.
+        Loop em background que captura frames de imagem e metadados, 
+        processa os resultados e os armazena de forma segura.
         """
         while self.is_running and self.picam2:
             try:
+                # Captura o frame da imagem
+                frame = self.picam2.capture_array("main")
+                # Captura os metadados associados
                 metadata = self.picam2.capture_metadata()
+                
                 objects = self._parse_detections(metadata)
                 
-                if objects is not None:
-                    with self._lock:
+                # Armazena ambos (frame e objetos) de forma segura
+                with self._lock:
+                    self.latest_frame = frame
+                    if objects is not None:
                         self.latest_objects = objects
             except Exception as e:
                 print(f"[AI Cam] Erro no loop de processamento: {e}")
@@ -123,6 +128,11 @@ class AICameraService:
         """Retorna a lista mais recente de objetos detectados (thread-safe)."""
         with self._lock:
             return list(self.latest_objects)
+
+    def get_latest_frame(self):
+        """Retorna o frame de imagem mais recente capturado (thread-safe)."""
+        with self._lock:
+            return self.latest_frame
 
     def stop(self):
         """Para a câmera e o thread."""
