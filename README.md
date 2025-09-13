@@ -1,8 +1,8 @@
-# Second Vision - Servidor GATT
+# Second Vision - Servidor GATT V5
 
 ![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)
 
-Este repositório contém o código-fonte do servidor GATT para o projeto **Second Vision**, um assistente de visão computacional para deficientes visuais. O servidor roda em um Raspberry Pi, realiza processamento de imagem localmente (offline) ou na nuvem (online), e se comunica com um aplicativo cliente via Bluetooth Low Energy (BLE).
+Este repositório contém o código-fonte do servidor GATT V5 para o projeto **Second Vision**, um assistente de visão computacional para deficientes visuais. O servidor roda em um Raspberry Pi, realiza processamento de imagem localmente (offline) ou na nuvem (online), e se comunica com um aplicativo cliente via Bluetooth Low Energy (BLE).
 
 ## 📋 Principais Funcionalidades
 
@@ -13,7 +13,7 @@ Este repositório contém o código-fonte do servidor GATT para o projeto **Seco
 *   **Gerenciamento de Conexão:** O Wi-Fi do dispositivo pode ser totalmente controlado pelo aplicativo cliente, incluindo conexão a novas redes e desconexão.
 *   **Monitoramento de Hardware:** Expõe o status da bateria (porcentagem e tempo restante estimado) via BLE.
 *   **Arquitetura Modular:** O código é estruturado em pacotes com responsabilidades únicas (GATT, serviços de IA, hardware, threads), seguindo boas práticas de engenharia de software.
-*   **Diferenciação de Hardware:** O servidor pode ser configurado para diferentes versões de hardware (ex: Raspberry Pi 5 com modo offline, Raspberry Pi Zero apenas com modo online).
+*   **Diferenciação de Hardware:** O servidor pode ser configurado para diferentes versões de hardware (ex: Raspberry Pi 5 com modo offline e online híbridos, Raspberry Pi Zero apenas com modo online híbrido e offline somente para objetos).
 
 ## 🛠️ Requisitos de Hardware
 
@@ -23,19 +23,26 @@ Este repositório contém o código-fonte do servidor GATT para o projeto **Seco
 
 ## ⚙️ Guia de Instalação Completo (Raspberry Pi)
 
-Siga os passos abaixo para configurar o ambiente do servidor em um sistema operacional baseado em Debian, como o Raspberry Pi OS ou Ubuntu Server.
+Siga os passos abaixo para configurar o ambiente do servidor em um sistema operacional baseado em Debian, como o Ubuntu Server.
+
+*OBS: O Raspberry Pi OS pode não ser uma boa escolha por provável conflito na intalação da dependência Pytorch*
 
 ### 1. Pré-requisitos: Configuração do Sistema, BlueZ e NetworkManager
 
 O sistema operacional já inclui uma versão recente do BlueZ (serviço de Bluetooth). Porém, em alguns casos, pode ser necessário instalar manualmente o pacote completo do **BlueZ** e também o **NetworkManager**, já que o Netplan será configurado para utilizá-lo.
 
-**a. Instalar BlueZ, NetworkManager:**
+**a. Primeiro atualize a lista de repositórios de software, depois faça uma atualização completa.:**
+```bash
+sudo apt update && sudo apt full-upgrade
+```
+
+**b. Instalar BlueZ, NetworkManager:**
 ```bash
 sudo apt-get update
 sudo apt-get install -y bluez bluez-tools bluetooth network-manager
 ```
 
-**b. Habilitar Funcionalidades Experimentais do BlueZ:**
+**c. Habilitar Funcionalidades Experimentais do BlueZ:**
 Abra o arquivo de serviço do Bluetooth para edição.
 
 ```bash
@@ -52,7 +59,7 @@ sudo systemctl daemon-reload
 sudo systemctl restart bluetooth.service
 ```
 
-**b. Instalar Dependências de Sistema:**
+**d. Instalar Dependências de Sistema:**
 Instale os pacotes essenciais para a execução de scripts Python que interagem com o hardware e o sistema.
 
 ```bash
@@ -93,7 +100,7 @@ Este projeto utiliza o ambiente virtual localizado em `/home/second`.
 **a. Crie os diretórios e o ambiente virtual:**
 ```bash
 # Crie o diretório do projeto
-mkdir -p /home/second/GattServer
+mkdir -p /home/second/GattServerV5
 
 # Crie o ambiente virtual no diretório /home/second
 cd /home/second
@@ -102,7 +109,7 @@ python3 -m venv venv
 
 **b. Clone o repositório do projeto:**
 ```bash
-cd /home/second/GattServer
+cd /home/second/GattServerV5
 git clone https://github.com/second-vision/Second-Vision.git . 
 # O ponto '.' no final clona o conteúdo na pasta atual
 ```
@@ -119,7 +126,7 @@ source /home/second/venv/bin/activate
 **b. Navegue para a pasta do projeto e instale as dependências:**
 *(Esta etapa assume que você já está no ambiente virtual ativado)*
 ```bash
-cd /home/second/GattServer
+cd /home/second/GattServerV5
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
@@ -164,7 +171,7 @@ cd /home/second
 source venv/bin/activate
 
 # Navega para o diretório do projeto
-cd GattServer
+cd GattServerV5
 
 # Executa o servidor principal com saída sem buffer para logs em tempo real
 python3 -u main.py
@@ -190,7 +197,7 @@ After=bluetooth.service network.target
 [Service]
 Type=simple
 ExecStart=/home/second/start_gatt_server.sh
-WorkingDirectory=/home/second/GattServer
+WorkingDirectory=/home/second/GattServerV5
 Restart=on-failure
 RestartSec=5
 # O serviço precisa de privilégios de root para gerenciar a rede com nmcli
@@ -232,7 +239,7 @@ O servidor foi projetado para rodar como um serviço de sistema.
 O código-fonte é organizado em pacotes com responsabilidades bem definidas:
 
 ```
-/GattServer
+/GattServerV5
 ├── main.py                 # Ponto de entrada principal da aplicação
 ├── config.py               # Configurações globais, constantes e chaves de API
 ├── requirements.txt        # Dependências do Python
