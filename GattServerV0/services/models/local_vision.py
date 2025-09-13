@@ -82,14 +82,26 @@ class AICameraService:
     
     def _parse_detections(self, metadata):
         """
-        Decodifica os metadados da IA e retorna uma lista de nomes de objetos.
+        Decodifica os metadados da IA, com verificação de segurança antes do pós-processamento.
         """
         np_outputs = self.imx500.get_outputs(metadata, add_batch=True)
         if np_outputs is None:
             return None
-
+    
+        # --- A CORREÇÃO CRUCIAL ESTÁ AQUI ---
+        # A saída da IA é uma tupla de arrays. O primeiro array contém as detecções.
+        # Vamos verificar o 'shape' (formato) do primeiro array.
+        detections_array = np_outputs[0]
+        
+        # O shape é (lote, número_de_detecções, dados_da_detecção).
+        # Se o número_de_detecções (índice 1 do shape) for 0, não há nada para processar.
+        if detections_array.shape[1] == 0:
+            return [] # Retorna uma lista vazia de objetos. Não chama a função que quebra.
+        
+        # Se chegamos aqui, significa que há pelo menos uma detecção para processar.
+        # Agora é seguro chamar a função de pós-processamento.
         boxes, scores, classes = \
-            postprocess_nanodet_detection(outputs=np_outputs[0], conf=self.threshold, iou_thres=0.70)[0]
+            postprocess_nanodet_detection(outputs=detections_array, conf=self.threshold, iou_thres=0.65)[0]
         
         detected_labels = []
         labels = self.intrinsics.labels
