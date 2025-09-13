@@ -2,7 +2,7 @@
   "expo": {
     "name": "Second Vision",
     "slug": "second-vision",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./src/shared/assets/images/logo.png",
     "scheme": "myapp",
@@ -26,7 +26,8 @@
         "android.permission.BLUETOOTH_ADMIN",
         "android.permission.BLUETOOTH_CONNECT"
       ],
-      "package": "com.rotech.ble_connection"
+      "package": "com.rotech.ble_connection",
+      "versionCode": 4
     },
     "web": {
       "bundler": "metro",
@@ -34,18 +35,23 @@
       "favicon": "./src/shared/assets/images/build/ic_launcher_foreground.png"
     },
     "plugins": [
-      [
-        "expo-router"
-      ],
+      ["expo-router"],
       [
         "react-native-ble-plx",
         {
           "isBackgroundEnabled": true,
-          "modes": [
-            "peripheral",
-            "central"
-          ],
+          "modes": ["peripheral", "central"],
           "bluetoothAlwaysPermission": "Allow $(PRODUCT_NAME) to connect to bluetooth devices"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0"
+          }
         }
       ]
     ],
