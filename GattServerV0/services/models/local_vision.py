@@ -82,38 +82,34 @@ class AICameraService:
     
     def _parse_detections(self, metadata):
         """
-        Decodifica os metadados da IA de forma segura, tratando a saída como
-        uma tupla de múltiplos tensores (caixas, pontuações, classes).
+        Decodifica os metadados da IA, tratando a saída como uma ÚNICA
+        detecção de maior confiança.
         """
         np_outputs = self.imx500.get_outputs(metadata)
-        if np_outputs is None or len(np_outputs) < 3: # Garante que temos pelo menos 3 tensores de saída
-            return []
+        if np_outputs is None or len(np_outputs) < 3:
+            return [] # Retorna lista vazia se não houver dados
     
-        # --- ESTRUTURA DE SAÍDA MAIS COMUM ---
-        # np_outputs[0]: Caixas (Boxes) - Não precisamos delas, mas estão lá.
-        # np_outputs[1]: Pontuações de Confiança (Scores)
-        # np_outputs[2]: Índices de Classe (Classes)
+        # --- NOVA LÓGICA: TRATAR COMO VALORES ÚNICOS ---
+        # A saída parece ser a melhor detecção, não uma lista.
+        # Vamos extrair o primeiro (e único) score e classe.
+        # Usamos [0] para remover a dimensão do "lote" (batch).
+        score = np_outputs[1][0]
+        class_index = np_outputs[2][0]
         
-        # Adicionamos [0] no final para remover a dimensão do "lote" (batch)
-        scores = np_outputs[1][0]  # Shape: (N,) onde N é o número de detecções
-        classes = np_outputs[2][0] # Shape: (N,)
-    
-        # --- LÓGICA DE FILTRAGEM SIMPLIFICADA ---
         detected_labels = []
         labels = self.intrinsics.labels
         
-        # Itera sobre os resultados já decodificados pelo hardware/driver
-        for i in range(len(scores)):
-            score = scores[i]
+        # Garante que 'score' é um número antes de comparar
+        if isinstance(score, (float, np.float32)) and score > self.threshold:
             
-            if score > self.threshold:
-                class_index = int(classes[i])
-                
-                # Verificação de segurança para o índice da classe
-                if 0 <= class_index < len(labels):
-                    label = labels[class_index]
-                    if label and label != "-" and label not in detected_labels:
-                        detected_labels.append(label)
+            # Converte o índice para inteiro para usar na lista
+            class_index = int(class_index)
+            
+            # Verificação de segurança para o índice da classe
+            if 0 <= class_index < len(labels):
+                label = labels[class_index]
+                if label and label != "-":
+                    detected_labels.append(label)
     
         return detected_labels
 
