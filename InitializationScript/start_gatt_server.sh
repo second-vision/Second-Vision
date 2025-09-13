@@ -3,6 +3,6 @@ cd /home/second
 
 source venv/bin/activate
 
-cd GattServer
+cd GattServerV5
 
 python3 -u main.py
