@@ -116,42 +116,40 @@ class AICameraService:
     def _processing_loop(self):
         """
         Loop em background que captura frames e metadados.
-        Revisado para maior robustez e melhor logging.
+        Revisado para depurar por que o loop está parando.
         """
         print("[AI Cam Loop] Thread de processamento iniciado.")
         loop_counter = 0
         while self.is_running and self.picam2:
+            loop_counter += 1
+            print(f"[AI Cam Loop] Início da iteração: {loop_counter}")
+    
             try:
-                # Usa capture_request() para obter um objeto que contém ambos
-                # o frame e os metadados de forma sincronizada. É mais robusto.
-                request = self.picam2.capture_request()
+                # --- CAPTURA SEPARADA COM LOGS ---
+                print(f"  [Loop {loop_counter}] Capturando frame...")
+                frame = self.picam2.capture_array("main")
                 
-                # Obtém o frame do request
-                frame = request.make_array("main")
-                # Obtém os metadados do request
-                metadata = request.get_metadata()
-                
-                request.release() # Libera o buffer para a câmera
+                print(f"  [Loop {loop_counter}] Capturando metadados...")
+                metadata = self.picam2.capture_metadata()
+                print(f"  [Loop {loop_counter}] Metadados capturados.")
                 
                 objects = self._parse_detections(metadata)
                 
-                loop_counter += 1
-                with self._lock:
-                    self.latest_frame = frame
-                    if objects is not None:
+                if objects is not None:
+                    with self._lock:
+                        self.latest_frame = frame
                         self.latest_objects = objects
                 
-                # Log a cada 30 iterações para não poluir a tela
+                # Log heartbeat no final da iteração bem-sucedida
                 if loop_counter % 30 == 0:
-                    print(f"[AI Cam Loop] Heartbeat: {loop_counter} frames processados. Objetos atuais: {self.latest_objects}")
-
+                    print(f"  [AI Cam Loop] Heartbeat: {loop_counter} frames processados. Objetos atuais: {self.latest_objects}")
+    
             except Exception as e:
-                # Se ocorrer um erro, registra-o e para o serviço de forma limpa.
                 print(f"[AI Cam Loop] ERRO CRÍTICO NO LOOP, ENCERRANDO THREAD: {e}")
-                self.is_running = False # Sinaliza para o loop parar
-
+                self.is_running = False
+                break # Sai do loop explicitamente
+    
         print("[AI Cam Loop] Thread de processamento finalizado.")
-        # Quando o loop termina (normalmente ou por erro), para a câmera.
         if self.picam2:
             self.picam2.stop()
             print("[AI Cam] Câmera parada devido ao fim do loop.")
