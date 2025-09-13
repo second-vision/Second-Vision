@@ -82,73 +82,68 @@ class AICameraService:
     
     def _parse_detections(self, metadata):
         """
-        Decodifica os metadados da IA, tratando a saída como uma ÚNICA
-        detecção de maior confiança.
+        Decodifica os metadados da IA, com verificação de segurança antes do pós-processamento.
         """
-        np_outputs = self.imx500.get_outputs(metadata)
-        if np_outputs is None or len(np_outputs) < 3:
-            return [] # Retorna lista vazia se não houver dados
-    
-        # --- NOVA LÓGICA: TRATAR COMO VALORES ÚNICOS ---
-        # A saída parece ser a melhor detecção, não uma lista.
-        # Vamos extrair o primeiro (e único) score e classe.
-        # Usamos [0] para remover a dimensão do "lote" (batch).
-        score = np_outputs[1][0]
-        class_index = np_outputs[2][0]
+        np_outputs = self.imx500.get_outputs(metadata, add_batch=True)
+        if np_outputs is None:
+            return [] # Retorna lista vazia se não houver saída
+
+        detections_array = np_outputs[0]
+        
+        # VERIFICAÇÃO DE SEGURANÇA: Se não houver detecções, retorna lista vazia
+        if detections_array.shape[1] == 0:
+            return []
+
+        # Se houver detecções, chama a função de pós-processamento
+        try:
+            boxes, scores, classes = \
+                postprocess_nanodet_detection(outputs=detections_array, conf=self.threshold, iou_thres=0.65)[0]
+        except ValueError as e:
+            # Captura o erro específico de "broadcast" se ele acontecer
+            print(f"[AI Cam Parser] Erro de broadcast no pós-processamento: {e}. Provavelmente não há detecções válidas.")
+            return []
         
         detected_labels = []
         labels = self.intrinsics.labels
-        
-        # Garante que 'score' é um número antes de comparar
-        if isinstance(score, (float, np.float32)) and score > self.threshold:
-            
-            # Converte o índice para inteiro para usar na lista
-            class_index = int(class_index)
-            
-            # Verificação de segurança para o índice da classe
-            if 0 <= class_index < len(labels):
-                label = labels[class_index]
+        for score, class_index in zip(scores, classes):
+            if score > self.threshold:
+                label = labels[int(class_index)]
                 if label and label != "-":
                     detected_labels.append(label)
-    
+        
         return detected_labels
 
     def _processing_loop(self):
         """
-        Loop em background que captura frames e metadados.
-        Revisado para depurar por que o loop está parando.
+        Loop em background que captura usando o método robusto 'capture_request'.
         """
         print("[AI Cam Loop] Thread de processamento iniciado.")
         loop_counter = 0
         while self.is_running and self.picam2:
             loop_counter += 1
-            print(f"[AI Cam Loop] Início da iteração: {loop_counter}")
-    
+            
             try:
-                # --- CAPTURA SEPARADA COM LOGS ---
-                print(f"  [Loop {loop_counter}] Capturando frame...")
-                frame = self.picam2.capture_array("main")
-                
-                print(f"  [Loop {loop_counter}] Capturando metadados...")
-                metadata = self.picam2.capture_metadata()
-                print(f"  [Loop {loop_counter}] Metadados capturados.")
+                # Usa capture_request() para obter frame e metadados de forma sincronizada
+                request = self.picam2.capture_request()
+                frame = request.make_array("main")
+                metadata = request.get_metadata()
+                # Libera o request imediatamente para evitar esgotamento de buffer
+                request.release()
                 
                 objects = self._parse_detections(metadata)
                 
-                if objects is not None:
-                    with self._lock:
-                        self.latest_frame = frame
-                        self.latest_objects = objects
-                
-                # Log heartbeat no final da iteração bem-sucedida
+                with self._lock:
+                    self.latest_frame = frame
+                    self.latest_objects = objects
+
                 if loop_counter % 30 == 0:
-                    print(f"  [AI Cam Loop] Heartbeat: {loop_counter} frames processados. Objetos atuais: {self.latest_objects}")
-    
+                    print(f"[AI Cam Loop] Heartbeat: {loop_counter} frames processados. Objetos atuais: {self.latest_objects}")
+
             except Exception as e:
                 print(f"[AI Cam Loop] ERRO CRÍTICO NO LOOP, ENCERRANDO THREAD: {e}")
                 self.is_running = False
-                break # Sai do loop explicitamente
-    
+                break # Sai explicitamente do loop
+
         print("[AI Cam Loop] Thread de processamento finalizado.")
         if self.picam2:
             self.picam2.stop()
