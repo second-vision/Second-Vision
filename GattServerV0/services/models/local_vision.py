@@ -103,26 +103,46 @@ class AICameraService:
 
     def _processing_loop(self):
         """
-        Loop em background que captura frames de imagem e metadados, 
-        processa os resultados e os armazena de forma segura.
+        Loop em background que captura frames e metadados.
+        Revisado para maior robustez e melhor logging.
         """
+        print("[AI Cam Loop] Thread de processamento iniciado.")
+        loop_counter = 0
         while self.is_running and self.picam2:
             try:
-                # Captura o frame da imagem
-                frame = self.picam2.capture_array("main")
-                # Captura os metadados associados
-                metadata = self.picam2.capture_metadata()
+                # Usa capture_request() para obter um objeto que contém ambos
+                # o frame e os metadados de forma sincronizada. É mais robusto.
+                request = self.picam2.capture_request()
+                
+                # Obtém o frame do request
+                frame = request.make_array("main")
+                # Obtém os metadados do request
+                metadata = request.get_metadata()
+                
+                request.release() # Libera o buffer para a câmera
                 
                 objects = self._parse_detections(metadata)
                 
-                # Armazena ambos (frame e objetos) de forma segura
+                loop_counter += 1
                 with self._lock:
                     self.latest_frame = frame
                     if objects is not None:
                         self.latest_objects = objects
+                
+                # Log a cada 30 iterações para não poluir a tela
+                if loop_counter % 30 == 0:
+                    print(f"[AI Cam Loop] Heartbeat: {loop_counter} frames processados. Objetos atuais: {self.latest_objects}")
+
             except Exception as e:
-                print(f"[AI Cam] Erro no loop de processamento: {e}")
-                time.sleep(1)
+                # Se ocorrer um erro, registra-o e para o serviço de forma limpa.
+                print(f"[AI Cam Loop] ERRO CRÍTICO NO LOOP, ENCERRANDO THREAD: {e}")
+                self.is_running = False # Sinaliza para o loop parar
+
+        print("[AI Cam Loop] Thread de processamento finalizado.")
+        # Quando o loop termina (normalmente ou por erro), para a câmera.
+        if self.picam2:
+            self.picam2.stop()
+            print("[AI Cam] Câmera parada devido ao fim do loop.")
 
     def get_latest_objects(self):
         """Retorna a lista mais recente de objetos detectados (thread-safe)."""
@@ -137,9 +157,6 @@ class AICameraService:
     def stop(self):
         """Para a câmera e o thread."""
         self.is_running = False
-        if self.picam2:
-            self.picam2.stop()
-            print("[AI Cam] Câmera parada.")
 
 # --- Instância Única e Funções Públicas ---
 # Esta instância é criada quando o módulo é importado pela primeira vez.
