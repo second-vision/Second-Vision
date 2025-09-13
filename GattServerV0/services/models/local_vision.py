@@ -3,7 +3,7 @@
 import threading
 import time
 import sys
-
+import numpy as np
 # Tenta importar as bibliotecas essenciais e define uma flag de disponibilidade
 try:
     from picamera2 import Picamera2
@@ -82,35 +82,44 @@ class AICameraService:
     
     def _parse_detections(self, metadata):
         """
-        Decodifica os metadados da IA, com verificação de segurança antes do pós-processamento.
+        Decodifica os metadados da IA de forma manual e segura para extrair os
+        nomes das classes dos objetos detectados.
         """
-        np_outputs = self.imx500.get_outputs(metadata, add_batch=True)
+        np_outputs = self.imx500.get_outputs(metadata)
         if np_outputs is None:
             return None
     
-        # --- A CORREÇÃO CRUCIAL ESTÁ AQUI ---
-        # A saída da IA é uma tupla de arrays. O primeiro array contém as detecções.
-        # Vamos verificar o 'shape' (formato) do primeiro array.
-        detections_array = np_outputs[0]
-        
-        # O shape é (lote, número_de_detecções, dados_da_detecção).
-        # Se o número_de_detecções (índice 1 do shape) for 0, não há nada para processar.
-        if detections_array.shape[1] == 0:
-            return [] # Retorna uma lista vazia de objetos. Não chama a função que quebra.
-        
-        # Se chegamos aqui, significa que há pelo menos uma detecção para processar.
-        # Agora é seguro chamar a função de pós-processamento.
-        boxes, scores, classes = \
-            postprocess_nanodet_detection(outputs=detections_array, conf=self.threshold, iou_thres=0.65)[0]
-        
+        # A saída da maioria dos modelos SSD/NanoDet é uma lista de arrays.
+        # O array principal contém as pontuações de classe para cada "caixa" de predição.
+        # Exemplo de shape: (1, 3598, 80) -> 1 lote, 3598 caixas, 80 classes
+        class_scores = np_outputs[0] 
+    
+        # --- NOVA LÓGICA DE EXTRAÇÃO MANUAL ---
         detected_labels = []
         labels = self.intrinsics.labels
-        for score, category_index in zip(scores, classes):
-            if score > self.threshold:
-                label = labels[int(category_index)]
-                if label and label != "-":
-                    detected_labels.append(label)
         
+        # Verifica se há alguma predição para processar
+        if class_scores.shape[1] > 0:
+            
+            # Encontra o índice da classe com a maior pontuação para cada caixa de predição
+            # axis=2 significa que estamos procurando o máximo ao longo das 80 classes
+            best_class_indices = np.argmax(class_scores[0], axis=1)
+            
+            # Encontra a pontuação de confiança para essas melhores classes
+            best_class_scores = np.max(class_scores[0], axis=1)
+            
+            # Agora, itera apenas sobre as melhores predições
+            for i in range(len(best_class_scores)):
+                score = best_class_scores[i]
+                
+                if score > self.threshold:
+                    class_index = best_class_indices[i]
+                    label = labels[int(class_index)]
+                    
+                    # Adiciona à lista de detecções, mas evita duplicatas
+                    if label and label != "-" and label not in detected_labels:
+                        detected_labels.append(label)
+    
         return detected_labels
 
     def _processing_loop(self):
