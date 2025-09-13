@@ -1,0 +1,4 @@
+requests
+python-dotenv
+opencv-python-headless
+dbus-python

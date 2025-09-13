@@ -29,8 +29,8 @@ def main():
     mainloop = GLib.MainLoop()
     
     if ina219 is None:
-        print("[Main] ERRO CRÍTICO: Sensor INA219 não encontrado. Encerrando.")
-        sys.exit(1)
+        print("[Main]: Sem UPS por enquanto.")
+        #sys.exit(1)
         
     # --- Objetos de Comunicação entre Threads ---
     shared_state = {'internet_connected': False}

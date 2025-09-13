@@ -1,41 +1,52 @@
-# Second Vision - Servidor GATT
+# Second Vision - Servidor GATT V0
 
 ![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)
 
-Este repositório contém o código-fonte do servidor GATT para o projeto **Second Vision**, um assistente de visão computacional para deficientes visuais. O servidor roda em um Raspberry Pi, realiza processamento de imagem localmente (offline) ou na nuvem (online), e se comunica com um aplicativo cliente via Bluetooth Low Energy (BLE).
+Este repositório contém o código-fonte do servidor GATT V0 (Versão Raspberry Pi Zero 2W) para o projeto **Second Vision**, um assistente de visão computacional para deficientes visuais. O servidor roda em um Raspberry Pi Zero 2W, realiza processamento de imagem localmente (offline) ou na nuvem (online), e se comunica com um aplicativo cliente via Bluetooth Low Energy (BLE).
 
 ## 📋 Principais Funcionalidades
 
 *   **Servidor GATT BLE:** Expõe serviços e características Bluetooth para comunicação com o aplicativo cliente.
 *   **Processamento Híbrido de IA:**
-    *   **Modo Offline:** Utiliza modelos locais (YOLO para objetos, PaddleOCR para texto) para funcionar sem conexão com a internet.
+    *   **Modo Offline:** Utiliza Raspberry Pi AI Camera para detecção de objetos localmente sem conexão com a internet; Diferente da versão GATT V5 não é suportado a detecção de textos localmente.
     *   **Modo Online:** Utiliza APIs de nuvem para detecção de objetos e OCR com maior precisão e variedade quando uma conexão de internet está disponível.
 *   **Gerenciamento de Conexão:** O Wi-Fi do dispositivo pode ser totalmente controlado pelo aplicativo cliente, incluindo conexão a novas redes e desconexão.
 *   **Monitoramento de Hardware:** Expõe o status da bateria (porcentagem e tempo restante estimado) via BLE.
 *   **Arquitetura Modular:** O código é estruturado em pacotes com responsabilidades únicas (GATT, serviços de IA, hardware, threads), seguindo boas práticas de engenharia de software.
-*   **Diferenciação de Hardware:** O servidor pode ser configurado para diferentes versões de hardware (ex: Raspberry Pi 5 com modo offline, Raspberry Pi Zero apenas com modo online).
+*   **Diferenciação de Hardware:** O servidor pode ser configurado para diferentes versões de hardware (ex: Raspberry Pi 5 com modo offline e online híbridos, Raspberry Pi Zero apenas com modo online híbrido e offline somente para objetos).
 
 ## 🛠️ Requisitos de Hardware
 
-1.  **Plataforma:** Raspberry Pi (Testado no RPi 5, adaptável para RPi Zero).
-2.  **Câmera:** Módulo de Câmera compatível com o Raspberry Pi.
-3.  **Energia:** UPS HAT (Testado com Waveshare UPS HAT B com sensor INA219) para monitoramento de bateria e operação portátil.
+1.  **Plataforma:** Raspberry Pi (Testado no RPi 5 e RPi Zero).
+2.  **Câmera:** Módulo de Câmera AI para Raspberry Pi.
+3.  **Energia:** UPS HAT para monitoramento de bateria e operação portátil.
 
 ## ⚙️ Guia de Instalação Completo (Raspberry Pi)
 
-Siga os passos abaixo para configurar o ambiente do servidor em um sistema operacional baseado em Debian, como o Raspberry Pi OS ou Ubuntu Server.
+Siga os passos abaixo para configurar o ambiente do servidor em um sistema operacional baseado em Debian, como o Raspberry Pi OS Lite.
 
 ### 1. Pré-requisitos: Configuração do Sistema, BlueZ e NetworkManager
 
 O sistema operacional já inclui uma versão recente do BlueZ (serviço de Bluetooth). Porém, em alguns casos, pode ser necessário instalar manualmente o pacote completo do **BlueZ** e também o **NetworkManager**, já que o Netplan será configurado para utilizá-lo.
 
-**a. Instalar BlueZ, NetworkManager:**
+**a. Primeiro atualize a lista de repositórios de software, depois faça uma atualização completa.:**
+```bash
+sudo apt update && sudo apt full-upgrade
+```
+
+**b. Instale o pacote de software para o Sony IMX500 usado na Câmera AI do Raspberry Pi e o Picamera2.:**
+```bash
+sudo apt install imx500-all
+sudo apt install -y python3-picamera2
+```
+
+**c. Instalar BlueZ, NetworkManager:**
 ```bash
 sudo apt-get update
 sudo apt-get install -y bluez bluez-tools bluetooth network-manager
 ```
 
-**b. Habilitar Funcionalidades Experimentais do BlueZ:**
+**d. Habilitar Funcionalidades Experimentais do BlueZ:**
 Abra o arquivo de serviço do Bluetooth para edição.
 
 ```bash
@@ -67,12 +78,20 @@ sudo apt-get install -y \
 
 Para que o `NetworkManager` controle as interfaces de rede, o Netplan precisa ser configurado para usá-lo como renderizador.
 
-**a. Crie, edite ou cole o arquivo de configuração do Netplan:**
+O Raspberry Pi OS Lite usa dhcpcd por padrão para gerenciamento de rede. No entanto, nosso servidor foi projetado para usar o NetworkManager, que oferece uma API de controle mais robusta através do comando nmcli. Siga os passos abaixo para instalar e habilitar o NetworkManager.
+
+**a. Desabilite o serviço de rede padrão do Raspberry Pi OS (dhcpcd):**
+```bash
+sudo systemctl stop dhcpcd
+sudo systemctl disable dhcpcd
+```
+
+**b. Crie, edite ou cole o arquivo de configuração do Netplan:**
 ```bash
 sudo nano /etc/netplan/01-netcfg.yaml
 ```
 
-**b. Insira o seguinte conteúdo:**
+**c. Insira o seguinte conteúdo:**
 ```yaml
 # /etc/netplan/01-netcfg.yaml
 network:
@@ -80,7 +99,7 @@ network:
   renderer: NetworkManager
 ```
 
-**c. Aplique a nova configuração de rede:**
+**d. Aplique a nova configuração de rede:**
 ```bash
 sudo netplan apply
 ```
@@ -93,7 +112,7 @@ Este projeto utiliza o ambiente virtual localizado em `/home/second`.
 **a. Crie os diretórios e o ambiente virtual:**
 ```bash
 # Crie o diretório do projeto
-mkdir -p /home/second/GattServer
+mkdir -p /home/second/GattServerV0
 
 # Crie o ambiente virtual no diretório /home/second
 cd /home/second
@@ -102,7 +121,7 @@ python3 -m venv venv
 
 **b. Clone o repositório do projeto:**
 ```bash
-cd /home/second/GattServer
+cd /home/second/GattServerV0
 git clone https://github.com/second-vision/Second-Vision.git . 
 # O ponto '.' no final clona o conteúdo na pasta atual
 ```
@@ -119,7 +138,7 @@ source /home/second/venv/bin/activate
 **b. Navegue para a pasta do projeto e instale as dependências:**
 *(Esta etapa assume que você já está no ambiente virtual ativado)*
 ```bash
-cd /home/second/GattServer
+cd /home/second/GattServerV0
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
@@ -164,7 +183,7 @@ cd /home/second
 source venv/bin/activate
 
 # Navega para o diretório do projeto
-cd GattServer
+cd GattServerV0
 
 # Executa o servidor principal com saída sem buffer para logs em tempo real
 python3 -u main.py
@@ -190,7 +209,7 @@ After=bluetooth.service network.target
 [Service]
 Type=simple
 ExecStart=/home/second/start_gatt_server.sh
-WorkingDirectory=/home/second/GattServer
+WorkingDirectory=/home/second/GattServerV0
 Restart=on-failure
 RestartSec=5
 # O serviço precisa de privilégios de root para gerenciar a rede com nmcli
@@ -232,7 +251,7 @@ O servidor foi projetado para rodar como um serviço de sistema.
 O código-fonte é organizado em pacotes com responsabilidades bem definidas:
 
 ```
-/GattServer
+/GattServerV0
 ├── main.py                 # Ponto de entrada principal da aplicação
 ├── config.py               # Configurações globais, constantes e chaves de API
 ├── requirements.txt        # Dependências do Python

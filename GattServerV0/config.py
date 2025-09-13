@@ -2,7 +2,6 @@
 
 import dbus
 import os
-from hardware.ina219 import INA219
 
 # --- Constantes BlueZ/DBus ---
 BLUEZ_SERVICE_NAME = 'org.bluez'
@@ -16,13 +15,8 @@ GATT_CHRC_IFACE = 'org.bluez.GattCharacteristic1'
 GATT_DESC_IFACE = 'org.bluez.GattDescriptor1'
 
 # --- Inicialização de Hardware ---
-# Tenta inicializar o sensor. Se falhar, ina219 será None.
-try:
-    ina219 = INA219(addr=0x42)
-    #print("Sensor INA219 inicializado com sucesso.")
-except Exception as e:
-    print(f"ERRO: Não foi possível inicializar o sensor INA219: {e}")
-    ina219 = None
+# Sem UPS por enquanto
+ina219 = None
 
 # --- Configurações de Visão Computacional ---
 
