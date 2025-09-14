@@ -2,15 +2,14 @@
 
 import time
 
-# --- Importações dos Módulos ---
-# Importa as funções que interagem com o hardware da câmera e os modelos
-from services.models.local_vision import (ai_camera_service, 
-                                          detect_objects_local_ai_cam, 
-                                          detect_text_local)
-# Importa a função que se comunica com a API da nuvem
+# --- Importações dos Módulos Refatorados ---
+# Importa as funções que interagem com o hardware e a API
+from services.models.local_vision import ai_camera_service, detect_objects_local_ai_cam
 from services.api.cloud_vision import process_frame
-# Importa a classe de estabilização de objetos
+# Importa as classes de estabilização
 from services.stabilizers.vision_stabilizers import ObjectTracker, TextStabilizer
+# Importa OpenCV apenas para a codificação de imagem para a API
+import cv2
 
 def camera_capture_loop(characteristic_objects, characteristic_texts, shared_state):
     """
@@ -22,55 +21,40 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
         characteristic_texts: A instância da característica GATT para textos.
         shared_state (dict): Dicionário compartilhado que contém 'internet_connected'.
     """
-    if not ai_camera_service or not ai_camera_service.is_running:
+    if not ai_camera_service or not ai_camera_service.picam2:
         print("[Vision Service] ERRO: Serviço da Câmera com IA não foi inicializado. Encerrando o loop de visão.")
         return
 
     # --- Inicialização dos Componentes ---
-    # O tracker é útil para suavizar as detecções da Câmera AI, que podem variar entre frames.
-    tracker = ObjectTracker(window_size=5, stability_threshold_ratio=0.6)
+    # O TextStabilizer é útil para o texto vindo da API da nuvem.
     text_stabilizer = TextStabilizer(similarity_threshold=85, stability_count=3)
 
     # --- Variáveis de Controle do Loop ---
-    frame_count = 0
-    PROCESS_EVERY_N_FRAMES = 1  # Controla a frequência de processamento geral
     last_sent_objects_str = None
 
     print("[Vision Service] Loop de captura e processamento iniciado.")
     while True:
         try:
-            # Pega o frame mais recente que o AICameraService capturou em background.
-            frame = ai_camera_service.get_latest_frame()
-            if frame is None:
-                print("[Vision Service] Aguardando o primeiro frame da câmera...")
-                time.sleep(1)
-                continue
-
-            frame_count += 1
-            if frame_count % PROCESS_EVERY_N_FRAMES != 0:
-                time.sleep(0.01)
-                continue
-
             is_online = shared_state.get('internet_connected', False)
             
             # --- 1. Processamento de Objetos ---
-            stable_objects_list = []
+            detected_objects = []
 
             if is_online:
-                # MODO ONLINE: Envia o frame para a API da nuvem.
-                api_detections = process_frame(frame, is_object_detection=True) or []
-                # Remove duplicatas para ter uma lista limpa de tipos de objetos.
-                stable_objects_list = list(set(api_detections))
+                # MODO ONLINE: Pega o frame da câmera e envia para a API.
+                frame = ai_camera_service.get_latest_frame()
+                if frame is not None:
+                    api_detections = process_frame(frame, is_object_detection=True) or []
+                    # Remove duplicatas para ter uma lista limpa de tipos de objetos.
+                    detected_objects = list(set(api_detections))
             else:
                 # MODO OFFLINE: Pega os resultados já processados pela Câmera AI.
-                local_detections = detect_objects_local_ai_cam()
-                # Passa as detecções pelo estabilizador para suavizar o resultado.
-                tracker.update(local_detections)
-                stable_objects_list = tracker.get_stable_objects()
+                # A função get_latest_objects já retorna uma lista de objetos únicos.
+                detected_objects = detect_objects_local_ai_cam()
 
             # Lógica de envio da notificação de objetos
-            stable_objects_list.sort()
-            current_objects_str = ", ".join(stable_objects_list) if stable_objects_list else "none"
+            detected_objects.sort()
+            current_objects_str = ", ".join(detected_objects) if detected_objects else "none"
       
             if current_objects_str != last_sent_objects_str:
                 characteristic_objects.send_update(current_objects_str)
@@ -78,26 +62,24 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
                 print(f"[Vision Service] Objetos enviados: {current_objects_str}")
 
             # --- 2. Processamento de Texto (OCR) ---
-            extracted_texts_phrases = []
-
+            # O OCR só funciona no modo online para esta versão do hardware.
             if is_online:
-                # MODO ONLINE: Envia o frame para a API de OCR da nuvem.
-                extracted_texts_phrases = process_frame(frame, is_object_detection=False) or []
+                frame = ai_camera_service.get_latest_frame()
+                if frame is not None:
+                    extracted_texts_phrases = process_frame(frame, is_object_detection=False) or []
+                    current_text = " | ".join(extracted_texts_phrases)
+                    stabilized_text = text_stabilizer.update(current_text)
+                    
+                    if stabilized_text:
+                        characteristic_texts.send_update(stabilized_text)
+                        print(f"[Vision Service] Texto enviado: '{stabilized_text}'")
             else:
-                # MODO OFFLINE: Não há suporte para OCR local nesta versão.
-                # A função detect_text_local() retorna uma lista vazia.
-                extracted_texts_phrases = detect_text_local(frame)
-            
-            # Lógica de estabilização e envio de notificação de texto
-            current_text = " | ".join(extracted_texts_phrases)
-            stabilized_text = text_stabilizer.update(current_text)
-            
-            if stabilized_text:
-                characteristic_texts.send_update(stabilized_text)
-                # print(f"[Vision Service] Texto enviado: '{stabilized_text}'")
+                # No modo offline, garante que o texto seja limpo se estava mostrando algo antes.
+                stabilized_text = text_stabilizer.update("")
 
-            # Pequena pausa para não sobrecarregar a CPU com o loop Python
-            time.sleep(0.1) 
+
+            # Pequena pausa para o loop principal não consumir 100% da CPU
+            time.sleep(0.5)
 
         except Exception as e:
             print(f"[Vision Service] ERRO INESPERADO NO LOOP PRINCIPAL: {e}")
