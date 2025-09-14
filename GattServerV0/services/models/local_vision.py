@@ -77,26 +77,80 @@ class AICameraService:
 
     def _parse_detections(self, metadata):
         """
-        Esta é uma cópia direta e adaptada da função 'parse_detections' do exemplo,
-        modificada para retornar uma lista de nomes de labels.
+        Parse robusto para postprocess_nanodet_detection.
+        Retorna somente nomes de labels com score >= self.intrinsics.threshold.
+        Protege contra shapes estranhos como (1,0,4) e mismatches.
         """
         np_outputs = self.imx500.get_outputs(metadata, add_batch=True)
         if np_outputs is None:
             return []
+    
+        try:
+            # chama o postprocess (mantive iou fixo como antes)
+            res = postprocess_nanodet_detection(
+                outputs=np_outputs[0],
+                conf=self.intrinsics.threshold,
+                iou_thres=0.70
+            )[0]
+        except Exception as e:
+            print(f"[AI Cam] postprocess_nanodet_detection error: {e}")
+            return []
+    
+        # espera (boxes, scores, classes)
+        if not (isinstance(res, (list, tuple)) and len(res) >= 3):
+            print("[AI Cam] Unexpected postprocess return:", type(res))
+            return []
+    
+        boxes, scores, classes = res
+    
+        # normalize para numpy
+        boxes = np.asarray(boxes)
+        scores = np.asarray(scores)
+        classes = np.asarray(classes)
+    
+        # Se houver dimensão de batch (1, ...), "aperta" para ficar sem a batch
+        if boxes.ndim == 3 and boxes.shape[0] == 1:
+            boxes = boxes[0]
+        if scores.ndim >= 2 and scores.shape[0] == 1:
+            scores = scores[0]
+        if classes.ndim >= 2 and classes.shape[0] == 1:
+            classes = classes[0]
+    
+        # Se não há elementos em boxes -> sem detecções
+        if boxes.size == 0 or (boxes.ndim >= 1 and boxes.shape[0] == 0):
+            return []
+    
+        # Flatten scores/classes caso estejam em (N,1) ou similares
+        try:
+            scores = scores.reshape(-1)
+        except Exception:
+            scores = np.ravel(scores)
+    
+        try:
+            classes = classes.reshape(-1)
+        except Exception:
+            classes = np.ravel(classes)
 
-        # Usando 'nanodet' como padrão, pois é o mais provável para o seu modelo
-        boxes, scores, classes = \
-            postprocess_nanodet_detection(outputs=np_outputs[0], conf=self.intrinsics.threshold, iou_thres=0.70)[0]
-        
+
+        print("[AI Cam DEBUG] boxes.shape:", boxes.shape, "boxes.size:", boxes.size)
+        print("[AI Cam DEBUG] scores.shape:", scores.shape)
+        print("[AI Cam DEBUG] classes.shape:", classes.shape)
+        # Proteção extra: use apenas o número mínimo consistente entre arrays
+        n = min(len(boxes), len(scores), len(classes))
+        if n == 0:
+            return []
+    
         detected_labels = []
         all_labels = self.intrinsics.labels
-        for score, category_index in zip(scores, classes):
-            # A verificação de score já é feita, mas uma segunda não faz mal
-            if score > self.intrinsics.threshold:
-                label = all_labels[int(category_index)]
-                if label and label != "-":
-                    detected_labels.append(label)
-        
+        for i in range(n):
+            score = float(scores[i])
+            cat_idx = int(classes[i])
+            if score >= getattr(self.intrinsics, "threshold", self.threshold):
+                if 0 <= cat_idx < len(all_labels):
+                    label = all_labels[cat_idx]
+                    if label and label != "-":
+                        detected_labels.append(label)
+    
         return detected_labels
 
     def _processing_loop(self):
