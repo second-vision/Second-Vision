@@ -31,6 +31,7 @@ class AICameraService:
         self.latest_objects = []
         self._lock = threading.Lock()
         self.is_running = False
+        self.latest_frame = None
         self.threshold = threshold
         self.picam2 = None
         self.imx500 = None
@@ -105,12 +106,14 @@ class AICameraService:
         print("[AI Cam Loop] Thread de processamento iniciado.")
         while self.is_running and self.picam2:
             try:
+                frame = self.picam2.capture_array("main")
                 metadata = self.picam2.capture_metadata()
                 
                 # Chama a nossa função de parse adaptada
                 objects = self._parse_detections(metadata)
                 
                 with self._lock:
+                    self.latest_frame = frame
                     self.latest_objects = objects
             except Exception as e:
                 print(f"[AI Cam] Erro no loop de processamento: {e}")
@@ -120,6 +123,11 @@ class AICameraService:
         # Retorna a lista de objetos únicos para consistência com o modo online
         with self._lock:
             return list(set(self.latest_objects))
+
+    def get_latest_frame(self):
+        """Retorna o frame de imagem mais recente capturado (thread-safe)."""
+        with self._lock:
+            return self.latest_frame
     
     def stop(self):
         """Para a câmera e o thread."""
