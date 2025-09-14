@@ -80,54 +80,42 @@ class AICameraService:
             if self.picam2: self.picam2.stop()
             self.picam2 = None
 
-    def parse_detections(self, metadata: dict):
-        """
-        Versão adaptada do parse_detections oficial.
-        Retorna apenas os nomes dos objetos detectados.
-        """
+    def _parse_detections(self, metadata: dict):
         global last_detections
-        bbox_normalization = self.intrinsics.bbox_normalization
-        bbox_order = self.intrinsics.bbox_order
-        threshold = getattr(self.intrinsics, "threshold", self.threshold)
-        iou = 0.70
-        max_detections = 100  # pode ajustar se quiser
     
         np_outputs = self.imx500.get_outputs(metadata, add_batch=True)
-        input_w, input_h = self.imx500.get_input_size()
+        if np_outputs is None or len(np_outputs) == 0:
+            return []  # sempre retorna lista vazia, não last_detections
     
-        if np_outputs is None:
-            return [det.category for det in last_detections]
+        try:
+            if self.intrinsics.postprocess == "nanodet":
+                boxes, scores, classes = postprocess_nanodet_detection(
+                    outputs=np_outputs[0],
+                    conf=self.threshold,
+                    iou_thres=0.70,
+                    max_out_dets=100
+                )[0]
+                boxes = scale_boxes(boxes, 1, 1, *self.imx500.get_input_size()[::-1], False, False)
+            else:
+                boxes, scores, classes = np_outputs[0][0], np_outputs[1][0], np_outputs[2][0]
     
-        if self.intrinsics.postprocess == "nanodet":
-            boxes, scores, classes = postprocess_nanodet_detection(
-                outputs=np_outputs[0],
-                conf=threshold,
-                iou_thres=iou,
-                max_out_dets=max_detections
-            )[0]
+        except Exception as e:
+            print(f"[AI Cam] postprocess_nanodet_detection error: {e}")
+            return []
     
-            boxes = scale_boxes(boxes, 1, 1, input_h, input_w, False, False)
+        # Garante que scores e classes são 1D
+        scores = np.ravel(scores)
+        classes = np.ravel(classes)
     
-        else:
-            boxes, scores, classes = np_outputs[0][0], np_outputs[1][0], np_outputs[2][0]
-    
-            if bbox_normalization:
-                boxes = boxes / input_h
-    
-            if bbox_order == "xy":
-                boxes = boxes[:, [1, 0, 3, 2]]
-    
-            boxes = np.array_split(boxes, 4, axis=1)
-            boxes = zip(*boxes)
-    
+        # Cria as detecções válidas
         last_detections = [
             Detection(box, self.intrinsics.labels[int(category)], float(score), metadata)
             for box, score, category in zip(boxes, scores, classes)
-            if score > threshold and 0 <= int(category) < len(self.intrinsics.labels)
+            if score >= self.threshold and 0 <= int(category) < len(self.intrinsics.labels)
         ]
     
-        # Agora retorna só os nomes
-        return [det.category for det in last_detections if det.category != "-"]
+        # Retorna apenas nomes válidos
+        return [det.category for det in last_detections if det.category and det.category != "-"]
 
     def _processing_loop(self):
         """
