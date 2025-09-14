@@ -129,7 +129,12 @@ class AICameraService:
             for box, score, category in zip(boxes, scores, classes)
             if score >= threshold and 0 <= int(category) < len(self.intrinsics.labels)
         ]
-        return [det.category for det in last_detections if det.category != "-"]
+        detected_labels = [det.category for det in last_detections if det.category != "-"]
+        print("[AI Cam Debug] Detected labels:", detected_labels)
+        return detected_labels
+
+
+
 
     def _processing_loop(self):
         """Mantém o último frame disponível (opcional)."""

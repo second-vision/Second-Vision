@@ -21,7 +21,7 @@ class DeviceInfoCharacteristic(Characteristic):
         """
         Monta o JSON com as informações do dispositivo.
         """
-        device_version = os.getenv('DEVICE_VERSION', 'V5')
+        device_version = os.getenv('DEVICE_VERSION', 'V0')
         
         info = {}
         if device_version == 'V5':
@@ -34,7 +34,7 @@ class DeviceInfoCharacteristic(Characteristic):
             info = {
                 "model": "RPi-0",
                 "version_code": 0.2,
-                "features": ["cloud_yolo", "cloud_ocr"]
+                "features": ["local_yolo", "cloud_yolo", "cloud_ocr"]
             }
         
         return json.dumps(info)
