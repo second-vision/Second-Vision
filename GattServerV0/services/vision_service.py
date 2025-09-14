@@ -41,6 +41,7 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
 
     # --- Inicialização dos Componentes ---
     # O TextStabilizer é útil para o texto vindo da API da nuvem.
+    tracker = ObjectTracker(window_size=5, stability_threshold_ratio=0.6)
     text_stabilizer = TextStabilizer(similarity_threshold=85, stability_count=3)
 
     # --- Variáveis de Controle do Loop ---
@@ -51,7 +52,7 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
             is_online = shared_state.get('internet_connected', False)
             
             # --- 1. Processamento de Objetos ---
-            translated_objects = []
+            stable_objects_list = []
 
             if is_online:
                 # MODO ONLINE: Pega o frame da câmera e envia para a API.
@@ -59,7 +60,7 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
                 if frame is not None:
                     api_detections = process_frame(frame, is_object_detection=True) or []
                     # Remove duplicatas para ter uma lista limpa de tipos de objetos.
-                    translated_objects = list(set(api_detections))
+                    stable_objects_list = list(set(api_detections))
             else:
                 # MODO OFFLINE: Pega os resultados já processados pela Câmera AI.
                 detected_objects = detect_objects_local_ai_cam()
@@ -70,10 +71,12 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
                 ]
                 # Remove valores None caso o label não esteja no dicionário
                 translated_objects = [obj for obj in translated_objects if obj is not None]
+                tracker.update(translated_objects)
+                stable_objects_list = tracker.get_stable_objects()
 
             # Lógica de envio da notificação de objetos
-            translated_objects.sort()
-            current_objects_str = ", ".join(translated_objects) if translated_objects else "none"
+            stable_objects_list.sort()
+            current_objects_str = ", ".join(stable_objects_list) if stable_objects_list else "none"
       
             if current_objects_str != last_sent_objects_str:
                 characteristic_objects.send_update(current_objects_str)
