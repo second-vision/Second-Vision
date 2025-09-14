@@ -11,6 +11,20 @@ from services.stabilizers.vision_stabilizers import ObjectTracker, TextStabilize
 # Importa OpenCV apenas para a codificação de imagem para a API
 import cv2
 
+# Mapeamento de labels detectados para os textos desejados
+OFFLINE_LABEL_TRANSLATIONS = {
+    "person": "Pessoa",
+    "bicycle": "Bicicleta",
+    "car": "Carro",
+    "motorcycle": "Moto",
+    "bus": "Ônibus",
+    "train": "Trem",
+    "truck": "Caminhão",
+    "traffic light": "Semáforo",
+    "stop sign": "Placa de Pare",
+    "fire hydrant": "Hidrante",
+}
+
 def camera_capture_loop(characteristic_objects, characteristic_texts, shared_state):
     """
     Loop principal que orquestra o processamento de imagem para a versão Pi Zero 2W.
@@ -32,13 +46,12 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
     # --- Variáveis de Controle do Loop ---
     last_sent_objects_str = None
 
-    print("[Vision Service] Loop de captura e processamento iniciado.")
     while True:
         try:
             is_online = shared_state.get('internet_connected', False)
             
             # --- 1. Processamento de Objetos ---
-            detected_objects = []
+            translated_objects = []
 
             if is_online:
                 # MODO ONLINE: Pega o frame da câmera e envia para a API.
@@ -46,20 +59,26 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
                 if frame is not None:
                     api_detections = process_frame(frame, is_object_detection=True) or []
                     # Remove duplicatas para ter uma lista limpa de tipos de objetos.
-                    detected_objects = list(set(api_detections))
+                    translated_objects = list(set(api_detections))
             else:
                 # MODO OFFLINE: Pega os resultados já processados pela Câmera AI.
-                # A função get_latest_objects já retorna uma lista de objetos únicos.
                 detected_objects = detect_objects_local_ai_cam()
+                # Traduz os labels detectados para o português
+                translated_objects = [
+                    OFFLINE_LABEL_TRANSLATIONS.get(label, None)
+                    for label in detected_objects
+                ]
+                # Remove valores None caso o label não esteja no dicionário
+                translated_objects = [obj for obj in translated_objects if obj is not None]
 
             # Lógica de envio da notificação de objetos
-            detected_objects.sort()
-            current_objects_str = ", ".join(detected_objects) if detected_objects else "none"
+            translated_objects.sort()
+            current_objects_str = ", ".join(translated_objects) if translated_objects else "none"
       
             if current_objects_str != last_sent_objects_str:
                 characteristic_objects.send_update(current_objects_str)
                 last_sent_objects_str = current_objects_str
-                print(f"[Vision Service] Objetos enviados: {current_objects_str}")
+                #print(f"[Vision Service] Objetos enviados: {current_objects_str}")
 
             # --- 2. Processamento de Texto (OCR) ---
             # O OCR só funciona no modo online para esta versão do hardware.
@@ -72,7 +91,7 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
                     
                     if stabilized_text:
                         characteristic_texts.send_update(stabilized_text)
-                        print(f"[Vision Service] Texto enviado: '{stabilized_text}'")
+                        #print(f"[Vision Service] Texto enviado: '{stabilized_text}'")
             else:
                 # No modo offline, garante que o texto seja limpo se estava mostrando algo antes.
                 stabilized_text = text_stabilizer.update("")
@@ -85,5 +104,4 @@ def camera_capture_loop(characteristic_objects, characteristic_texts, shared_sta
             print(f"[Vision Service] ERRO INESPERADO NO LOOP PRINCIPAL: {e}")
             time.sleep(5)
 
-    print("[Vision Service] Encerrando o loop de captura.")
     ai_camera_service.stop()

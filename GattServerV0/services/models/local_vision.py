@@ -24,8 +24,7 @@ last_detections = []
 
 class AICameraService:
     """
-    Gerencia a Câmera com IA (IMX500) adaptando o código de exemplo oficial
-    para rodar em um thread e fornecer uma lista de detecções.
+    Gerencia a Câmera com IA (IMX500) rodando em um thread e fornecendo uma lista de detecções.
     """
     def __init__(self, 
                  model_path="/usr/share/imx500-models/imx500_network_ssd_mobilenetv2_fpnlite_320x320_pp.rpk",
@@ -46,7 +45,6 @@ class AICameraService:
 
         try:
             # --- 1. Inicialização do IMX500 e Intrinsics ---
-            print("[AI Cam] Inicializando dispositivo IMX500...")
             self.imx500 = IMX500(model_path)
             self.intrinsics = self.imx500.network_intrinsics
             if not self.intrinsics: 
@@ -58,7 +56,6 @@ class AICameraService:
                 self.intrinsics.labels = f.read().splitlines()
             self.intrinsics.update_with_defaults()
             self.intrinsics.threshold = self.threshold
-            print("[AI Cam] Modelo e labels carregados.")
 
             # --- 2. Inicialização da Picamera2 ---
             self.picam2 = Picamera2(self.imx500.camera_num)
@@ -73,9 +70,8 @@ class AICameraService:
 
             self.imx500.show_network_fw_progress_bar()
             self.picam2.start()
-            print("[AI Cam] Câmera iniciada.")
 
-            # --- 3. Inicia thread de processamento (opcional, só mantém frame) ---
+            # --- 3. Inicia thread de processamento ---
             self.is_running = True
             self.thread = threading.Thread(target=self._processing_loop, daemon=True)
             self.thread.start()
@@ -101,7 +97,7 @@ class AICameraService:
             print(f"[AI Cam] Erro no pre_callback: {e}")
 
     def parse_detections(self, metadata):
-        """Parse adaptado do exemplo oficial, retornando apenas nomes de objetos com score >= threshold."""
+        """Parse retornando apenas nomes de objetos com score >= threshold."""
         global last_detections
         threshold = getattr(self.intrinsics, "threshold", self.threshold)
         max_detections = 100
@@ -130,15 +126,10 @@ class AICameraService:
             if score >= threshold and 0 <= int(category) < len(self.intrinsics.labels)
         ]
         detected_labels = [det.category for det in last_detections if det.category != "-"]
-        print("[AI Cam Debug] Detected labels:", detected_labels)
         return detected_labels
 
-
-
-
     def _processing_loop(self):
-        """Mantém o último frame disponível (opcional)."""
-        print("[AI Cam Loop] Thread de processamento iniciado.")
+        """Mantém o último frame disponível ."""
         while self.is_running and self.picam2:
             try:
                 time.sleep(0.03)  # apenas mantém thread viva
@@ -157,7 +148,6 @@ class AICameraService:
         self.is_running = False
         if self.picam2:
             self.picam2.stop()
-            print("[AI Cam] Câmera parada.")
 
 # --- Instância única ---
 ai_camera_service = AICameraService(threshold=0.70)

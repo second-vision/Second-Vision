@@ -122,7 +122,7 @@ python3 -m venv venv --system-site-packages
 **b. Clone o repositório do projeto:**
 ```bash
 cd /home/second/GattServerV0
-git clone https://github.com/second-vision/Second-Vision.git . 
+git clone --branch GattServerV0 --single-branch https://github.com/second-vision/Second-Vision.git . 
 # O ponto '.' no final clona o conteúdo na pasta atual
 ```
 
