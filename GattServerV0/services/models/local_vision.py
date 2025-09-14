@@ -7,10 +7,9 @@ import sys
 # Tenta importar as bibliotecas essenciais
 try:
     import numpy as np
-    from picamera2 import Picamera2
+    from picamera2 import Picamera2, MappedArray
     from picamera2.devices import IMX500
-    from picamera2.devices.imx500 import (NetworkIntrinsics, 
-                                          postprocess_nanodet_detection)
+    from picamera2.devices.imx500 import NetworkIntrinsics, postprocess_nanodet_detection
     from picamera2.devices.imx500.postprocess import scale_boxes
     PICAMERA2_AVAILABLE = True
 except ImportError as e:
@@ -46,31 +45,37 @@ class AICameraService:
             return
 
         try:
-            # --- 1. Inicialização do IMX500 e Intrinsics (do exemplo) ---
+            # --- 1. Inicialização do IMX500 e Intrinsics ---
             print("[AI Cam] Inicializando dispositivo IMX500...")
             self.imx500 = IMX500(model_path)
             self.intrinsics = self.imx500.network_intrinsics
-            if not self.intrinsics: self.intrinsics = NetworkIntrinsics()
+            if not self.intrinsics: 
+                self.intrinsics = NetworkIntrinsics()
             if self.intrinsics.task != "object detection":
                 raise RuntimeError("O modelo carregado não é de detecção de objetos.")
             
             with open(labels_path, "r") as f:
                 self.intrinsics.labels = f.read().splitlines()
             self.intrinsics.update_with_defaults()
-            # Adiciona o threshold aos intrinsics para que 'parse_detections' possa usá-lo
             self.intrinsics.threshold = self.threshold
             print("[AI Cam] Modelo e labels carregados.")
 
             # --- 2. Inicialização da Picamera2 ---
             self.picam2 = Picamera2(self.imx500.camera_num)
-            config = self.picam2.create_preview_configuration(controls={"FrameRate": self.intrinsics.inference_rate})
+            config = self.picam2.create_preview_configuration(
+                controls={"FrameRate": self.intrinsics.inference_rate},
+                buffer_count=12
+            )
             self.picam2.configure(config)
-            
+
+            # Configura callback para capturar metadados com inferência
+            self.picam2.pre_callback = self._pre_callback
+
             self.imx500.show_network_fw_progress_bar()
             self.picam2.start()
             print("[AI Cam] Câmera iniciada.")
-            
-            # --- 3. Inicia nosso thread de processamento ---
+
+            # --- 3. Inicia thread de processamento (opcional, só mantém frame) ---
             self.is_running = True
             self.thread = threading.Thread(target=self._processing_loop, daemon=True)
             self.thread.start()
@@ -80,81 +85,76 @@ class AICameraService:
             if self.picam2: self.picam2.stop()
             self.picam2 = None
 
-    def _parse_detections(self, metadata: dict):
-        global last_detections
-    
-        np_outputs = self.imx500.get_outputs(metadata, add_batch=True)
-        if np_outputs is None or len(np_outputs) == 0:
-            return []  # sempre retorna lista vazia, não last_detections
-    
+    def _pre_callback(self, request):
+        """Callback chamado antes do frame ser processado pela ISP, mantém a inferência."""
         try:
-            if self.intrinsics.postprocess == "nanodet":
-                boxes, scores, classes = postprocess_nanodet_detection(
-                    outputs=np_outputs[0],
-                    conf=self.threshold,
-                    iou_thres=0.70,
-                    max_out_dets=100
-                )[0]
-                boxes = scale_boxes(boxes, 1, 1, *self.imx500.get_input_size()[::-1], False, False)
-            else:
-                boxes, scores, classes = np_outputs[0][0], np_outputs[1][0], np_outputs[2][0]
-    
+            with MappedArray(request, "main") as m:
+                self.latest_frame = m.array.copy()
+            
+            metadata = request.get_metadata()
+            detected_labels = self.parse_detections(metadata)
+            
+            with self._lock:
+                self.latest_objects = detected_labels
+
         except Exception as e:
-            print(f"[AI Cam] postprocess_nanodet_detection error: {e}")
-            return []
-    
-        # Garante que scores e classes são 1D
-        scores = np.ravel(scores)
-        classes = np.ravel(classes)
-    
-        # Cria as detecções válidas
+            print(f"[AI Cam] Erro no pre_callback: {e}")
+
+    def parse_detections(self, metadata):
+        """Parse adaptado do exemplo oficial, retornando apenas nomes de objetos com score >= threshold."""
+        global last_detections
+        threshold = getattr(self.intrinsics, "threshold", self.threshold)
+        max_detections = 100
+        iou = 0.70
+
+        np_outputs = self.imx500.get_outputs(metadata, add_batch=True)
+        if np_outputs is None:
+            return [det.category for det in last_detections]
+
+        input_w, input_h = self.imx500.get_input_size()
+
+        if self.intrinsics.postprocess == "nanodet":
+            boxes, scores, classes = postprocess_nanodet_detection(
+                outputs=np_outputs[0],
+                conf=threshold,
+                iou_thres=iou,
+                max_out_dets=max_detections
+            )[0]
+            boxes = scale_boxes(boxes, 1, 1, input_h, input_w, False, False)
+        else:
+            boxes, scores, classes = np_outputs[0][0], np_outputs[1][0], np_outputs[2][0]
+
         last_detections = [
             Detection(box, self.intrinsics.labels[int(category)], float(score), metadata)
             for box, score, category in zip(boxes, scores, classes)
-            if score >= self.threshold and 0 <= int(category) < len(self.intrinsics.labels)
+            if score >= threshold and 0 <= int(category) < len(self.intrinsics.labels)
         ]
-    
-        # Retorna apenas nomes válidos
-        return [det.category for det in last_detections if det.category and det.category != "-"]
+        return [det.category for det in last_detections if det.category != "-"]
 
     def _processing_loop(self):
-        """
-        Loop em background que captura metadados e os processa usando a lógica do exemplo.
-        """
+        """Mantém o último frame disponível (opcional)."""
         print("[AI Cam Loop] Thread de processamento iniciado.")
         while self.is_running and self.picam2:
             try:
-                frame = self.picam2.capture_array("main")
-                metadata = self.picam2.capture_metadata()
-                
-                # Chama a nossa função de parse adaptada
-                objects = self._parse_detections(metadata)
-                
-                with self._lock:
-                    self.latest_frame = frame
-                    self.latest_objects = objects
+                time.sleep(0.03)  # apenas mantém thread viva
             except Exception as e:
-                print(f"[AI Cam] Erro no loop de processamento: {e}")
-                time.sleep(1)
+                print(f"[AI Cam Loop] erro: {e}")
 
     def get_latest_objects(self):
-        # Retorna a lista de objetos únicos para consistência com o modo online
         with self._lock:
             return list(set(self.latest_objects))
 
     def get_latest_frame(self):
-        """Retorna o frame de imagem mais recente capturado (thread-safe)."""
         with self._lock:
             return self.latest_frame
     
     def stop(self):
-        """Para a câmera e o thread."""
         self.is_running = False
         if self.picam2:
             self.picam2.stop()
             print("[AI Cam] Câmera parada.")
 
-# --- Instância Única e Funções Públicas ---
+# --- Instância única ---
 ai_camera_service = AICameraService(threshold=0.70)
 
 def detect_objects_local_ai_cam():
