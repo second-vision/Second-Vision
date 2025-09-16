@@ -23,7 +23,7 @@ Este repositório contém o código-fonte do servidor GATT V0 (Versão Raspberry
 
 ## ⚙️ Guia de Instalação Completo (Raspberry Pi)
 
-Siga os passos abaixo para configurar o ambiente do servidor em um sistema operacional baseado em Debian, como o Raspberry Pi OS Lite.
+Siga os passos abaixo para configurar o ambiente do servidor em um sistema operacional baseado em Debian, como o Ubuntu Server.
 
 ### 1. Pré-requisitos: Configuração do Sistema, BlueZ e NetworkManager
 
@@ -78,20 +78,12 @@ sudo apt-get install -y \
 
 Para que o `NetworkManager` controle as interfaces de rede, o Netplan precisa ser configurado para usá-lo como renderizador.
 
-O Raspberry Pi OS Lite usa dhcpcd por padrão para gerenciamento de rede. No entanto, nosso servidor foi projetado para usar o NetworkManager, que oferece uma API de controle mais robusta através do comando nmcli. Siga os passos abaixo para instalar e habilitar o NetworkManager.
-
-**a. Desabilite o serviço de rede padrão do Raspberry Pi OS (dhcpcd):**
-```bash
-sudo systemctl stop dhcpcd
-sudo systemctl disable dhcpcd
-```
-
-**b. Crie, edite ou cole o arquivo de configuração do Netplan:**
+**a. Crie, edite ou cole o arquivo de configuração do Netplan:**
 ```bash
 sudo nano /etc/netplan/01-netcfg.yaml
 ```
 
-**c. Insira o seguinte conteúdo:**
+**b. Insira o seguinte conteúdo:**
 ```yaml
 # /etc/netplan/01-netcfg.yaml
 network:
@@ -99,7 +91,7 @@ network:
   renderer: NetworkManager
 ```
 
-**d. Aplique a nova configuração de rede:**
+**c. Aplique a nova configuração de rede:**
 ```bash
 sudo netplan apply
 ```
