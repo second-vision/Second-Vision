@@ -23,7 +23,7 @@ Este repositório contém o código-fonte do servidor GATT V0 (Versão Raspberry
 
 ## ⚙️ Guia de Instalação Completo (Raspberry Pi)
 
-Siga os passos abaixo para configurar o ambiente do servidor em um sistema operacional baseado em Debian, como o Ubuntu Server.
+Siga os passos abaixo para configurar o ambiente do servidor em um sistema operacional baseado em Debian, como o Rasp OS Lite.
 
 ### 1. Pré-requisitos: Configuração do Sistema, BlueZ e NetworkManager
 
@@ -62,8 +62,26 @@ Se você precisar adicioná-la, salve o arquivo e recarregue os serviços:
 sudo systemctl daemon-reload
 sudo systemctl restart bluetooth.service
 ```
+**e. Configurar bluetooth desativando EATT:**
+Abra o arquivo de configuração do bluetooth.
+```bash
+sudo nano /etc/bluetooth/main.conf
+```
 
-**b. Instalar Dependências de Sistema:**
+Desça até a seção *[GATT]* no fim do arquivo e localize a linha *Channels = 3*, então basta descomentar essa linha e alterar o valor para 1
+```ini
+# /etc/bluetooth/main.conf
+
+[GATT]
+# ... (outras opções como Cache, KeySize, ExchangeMTU)
+
+# Number of ATT channels
+# Possible values: 1-5 (1 disables EATT)
+# Default to 3
+Channels = 1
+```
+
+**f. Instalar Dependências de Sistema:**
 Instale os pacotes essenciais para a execução de scripts Python que interagem com o hardware e o sistema.
 
 ```bash
@@ -73,31 +91,7 @@ sudo apt-get install -y \
   libdbus-1-dev libdbus-glib-1-dev python3-dev build-essential \
   libgirepository1.0-dev gir1.2-glib-2.0
 ```
-
-### 2. Configuração de Rede (Netplan)
-
-Para que o `NetworkManager` controle as interfaces de rede, o Netplan precisa ser configurado para usá-lo como renderizador.
-
-**a. Crie, edite ou cole o arquivo de configuração do Netplan:**
-```bash
-sudo nano /etc/netplan/01-netcfg.yaml
-```
-
-**b. Insira o seguinte conteúdo:**
-```yaml
-# /etc/netplan/01-netcfg.yaml
-network:
-  version: 2
-  renderer: NetworkManager
-```
-
-**c. Aplique a nova configuração de rede:**
-```bash
-sudo netplan apply
-```
-*OBS: Caso a internet pare de funcionar após esse processo, reinicie o sistema operacional.*
-
-### 3. Estrutura de Diretórios e Ambiente Virtual
+### 2. Estrutura de Diretórios e Ambiente Virtual
 
 Este projeto utiliza o ambiente virtual localizado em `/home/second`.
 
@@ -118,7 +112,7 @@ git clone --branch GattServerV0 --single-branch https://github.com/second-vision
 # O ponto '.' no final clona o conteúdo na pasta atual
 ```
 
-### 4. Dependências do Python
+### 3. Dependências do Python
 
 Instale todas as bibliotecas Python necessárias usando o arquivo `requirements.txt`.
 
@@ -135,7 +129,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 5. Variáveis de Ambiente
+### 4. Variáveis de Ambiente
 
 As chaves de API e a versão do dispositivo são gerenciadas por um arquivo `.env`.
 
@@ -157,7 +151,7 @@ OCR_SUBSCRIPTION_KEY=SUA_CHAVE_SECRETA_DE_TEXTO
 
 ```
 
-### 6. Configuração do Serviço (Systemd)
+### 5. Configuração do Serviço (Systemd)
 
 O serviço `systemd` gerencia a execução do servidor, garantindo que ele inicie com o sistema e seja reiniciado em caso de falha.
 
@@ -247,7 +241,7 @@ O código-fonte é organizado em pacotes com responsabilidades bem definidas:
 ├── main.py                 # Ponto de entrada principal da aplicação
 ├── config.py               # Configurações globais, constantes e chaves de API
 ├── requirements.txt        # Dependências do Python
-|
+|── /assets/                # Arquivo de definição dos objetos detectáveis pela Rasp AI Cam
 ├── /bluez/                 # Módulos de baixo nível para interagir com BlueZ
 ├── /config/                # Arquivos de configuração como .env
 ├── /gatt/                  # Estrutura do servidor GATT (Aplicação, Serviço, Características)
