@@ -57,11 +57,6 @@ Localize a linha que começa com `ExecStart=` e certifique-se de que a flag `--e
 *Linha de Exemplo:*
 `ExecStart=/usr/lib/bluetooth/bluetoothd --experimental`
 
-Se você precisar adicioná-la, salve o arquivo e recarregue os serviços:
-```bash
-sudo systemctl daemon-reload
-sudo systemctl restart bluetooth.service
-```
 **e. Configurar bluetooth desativando EATT:**
 Abra o arquivo de configuração do bluetooth.
 ```bash
@@ -79,6 +74,11 @@ Desça até a seção *[GATT]* no fim do arquivo e localize a linha *Channels = 
 # Possible values: 1-5 (1 disables EATT)
 # Default to 3
 Channels = 1
+```
+Após isso é importante recarregar os serviços:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart bluetooth.service
 ```
 
 **f. Instalar Dependências de Sistema:**
