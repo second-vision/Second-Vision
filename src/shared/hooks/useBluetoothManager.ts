@@ -7,6 +7,12 @@ import { NavigationProp } from "@/app/types/types";
 import * as Speech from "expo-speech";
 const bleManager = new BleManager();
 
+import { Alert } from "react-native";
+import {
+  CHARACTERISTIC_UUID_DEVICE_INFO,
+  DATA_SERVICE_UUID,
+} from "../constants";
+
 export function useBluetoothManager() {
   const [isScanning, setIsScanning] = useState(false);
   const [isScanningM, setIsScanningM] = useState(true);
@@ -38,7 +44,8 @@ export function useBluetoothManager() {
   const startScan = () => {
     setIsScanning(true);
     setIsScanningM(true);
-    const targetDeviceName = "Second Vision";
+    const targetDeviceNameV0 = "Second Vision V0";
+    const targetDeviceNameV5 = "Second Vision V5";
 
     // Inicia o escaneamento
     bleManager.startDeviceScan(null, null, (error, device) => {
@@ -48,7 +55,11 @@ export function useBluetoothManager() {
       }
 
       // Verifica se o dispositivo tem o nome desejado
-      if (device && device.name === targetDeviceName) {
+      if (
+        device &&
+        (device.name === targetDeviceNameV0 ||
+          device.name === targetDeviceNameV5)
+      ) {
         setAllDevices((prevState: Device[]) => {
           if (!isDuplicteDevice(prevState, device)) {
             return [...prevState, device];
@@ -70,17 +81,24 @@ export function useBluetoothManager() {
 
   const connectToDevice = async (device: Device) => {
     try {
-      const deviceConnection = await bleManager.connectToDevice(device.id);
-      setConnectedDevice(deviceConnection);
-      await deviceConnection.discoverAllServicesAndCharacteristics();
+      // Conecta e descobre serviços/características
+      const connectedDevice = await device.connect();
+      await connectedDevice.discoverAllServicesAndCharacteristics();
       bleManager.stopDeviceScan();
 
-      setConnectedDevices((prev) => new Set(prev).add(device.id));
-      setDeviceConnection(device);
+      if (!(await connectedDevice.isConnected())) {
+        throw new Error("Falha ao manter a conexão após o pareamento.");
+      }
+
+      setDeviceConnection(connectedDevice);
       Speech.stop();
       navigation.replace("HomeStack");
     } catch (e) {
-      console.error("FAILED TO CONNECT", e);
+      console.error("FALHA GERAL NA CONEXÃO/PAREAMENTO", e);
+      Alert.alert(
+        "Falha na Conexão",
+        `Não foi possível estabelecer uma conexão segura. Tente novamente.`
+      );
     }
   };
 
