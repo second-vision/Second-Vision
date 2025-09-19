@@ -1800,7 +1800,7 @@
     "@react-navigation/elements" "^2.6.4"
     warn-once "^0.1.1"
 
-"@react-navigation/native@^7.1.8":
+"@react-navigation/native@^7.1.17", "@react-navigation/native@^7.1.8":
   version "7.1.17"
   resolved "https://registry.yarnpkg.com/@react-navigation/native/-/native-7.1.17.tgz#88d557c0f5000aa2741e4368c59719526f1394c4"
   integrity sha512-uEcYWi1NV+2Qe1oELfp9b5hTYekqWATv2cuwcOAg5EvsIsUPtzFrKIasgUXLBRGb9P7yR5ifoJ+ug4u6jdqSTQ==
@@ -3224,7 +3224,7 @@ expo-modules-core@3.0.17:
   dependencies:
     invariant "^2.2.4"
 
-expo-router@~6.0.7:
+expo-router@^6.0.7:
   version "6.0.7"
   resolved "https://registry.yarnpkg.com/expo-router/-/expo-router-6.0.7.tgz#9bba7e6528887126714ff942a466f483b47d529b"
   integrity sha512-dP/35aQadCuplEP99CZ0sLrVpnCFCQGnCBtFlI0Tph75PbepdWhI7XC0Vzt7MoNBLF9NW80q5CeZdXTvybc+4w==

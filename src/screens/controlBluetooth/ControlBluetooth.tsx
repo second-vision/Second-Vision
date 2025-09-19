@@ -1,13 +1,12 @@
 import { useEffect } from "react";
 import { View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { BackHandler } from "react-native";
 
-import { NavigationProp } from "@/src/shared/types/types";
 import { useBluetoothManager, useTermsManager } from "@/src/shared/hooks";
 
 export const ControlBluetooth = () => {
-  const navigation = useNavigation<NavigationProp>();
+  const router = useRouter();
 
   const { checkBluetoothState, handleBluetoothState, bluetoothState } =
     useBluetoothManager();
@@ -33,6 +32,6 @@ export const ControlBluetooth = () => {
 
   useEffect(() => {
     checkTermsAcceptance(handleBluetoothState);
-  }, [bluetoothState, navigation]);
+  }, [bluetoothState, router]);
   return <View></View>;
 };

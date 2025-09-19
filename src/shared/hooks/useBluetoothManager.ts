@@ -2,8 +2,7 @@ import { useState } from "react";
 import { BleManager, State, Device } from "react-native-ble-plx";
 import BluetoothStateManager from "react-native-bluetooth-state-manager";
 import { useDeviceContext } from "../context";
-import { useNavigation } from "@react-navigation/native";
-import { NavigationProp } from "@/src/shared/types/types";
+
 import * as Speech from "expo-speech";
 const bleManager = new BleManager();
 
@@ -12,6 +11,7 @@ import {
   CHARACTERISTIC_UUID_DEVICE_INFO,
   DATA_SERVICE_UUID,
 } from "../constants";
+import { useRouter } from "expo-router";
 
 export function useBluetoothManager() {
   const [isScanning, setIsScanning] = useState(false);
@@ -22,7 +22,7 @@ export function useBluetoothManager() {
     new Set()
   );
   const { setDeviceConnection } = useDeviceContext();
-  const navigation = useNavigation<NavigationProp>();
+  const router = useRouter();
   const [bluetoothState, setBluetoothState] = useState<State | string>("");
 
   const checkBluetoothState = async () => {
@@ -92,7 +92,7 @@ export function useBluetoothManager() {
 
       setDeviceConnection(connectedDevice);
       Speech.stop();
-      navigation.replace("HomeStack");
+      router.replace("/home-stack");
     } catch (e) {
       console.error("FALHA GERAL NA CONEXÃO/PAREAMENTO", e);
       Alert.alert(
@@ -117,10 +117,10 @@ export function useBluetoothManager() {
 
     if (bluetoothState === "PoweredOn") {
       Speech.stop();
-      navigation.replace("BluetoothOnStack");
+      router.replace("/bluetooth-on-stack");
     } else if (bluetoothState === "PoweredOff") {
       Speech.stop();
-      navigation.replace("BluetoothOffStack");
+      router.replace("/bluetooth-off-stack");
     }
   };
 

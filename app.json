@@ -36,7 +36,6 @@
       "favicon": "./src/shared/assets/images/build/ic_launcher_foreground.png"
     },
     "plugins": [
-      ["expo-router"],
       [
         "react-native-ble-plx",
         {

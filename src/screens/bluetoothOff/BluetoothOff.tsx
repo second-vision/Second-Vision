@@ -1,20 +1,19 @@
 import { useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
 import { BleManager, State } from "react-native-ble-plx";
 import { View, Image, Pressable, BackHandler } from "react-native";
 import * as Speech from "expo-speech";
-import { NavigationProp } from "@/src/shared/types/types";
 import { styles } from "./styles";
 import { requestPermissions, useSpeech } from "@/src/shared/hooks";
 import { useBluetoothManager } from "@/src/shared/hooks/useBluetoothManager";
 import { useSettings } from "@/src/shared/context";
 import { AppText } from "@/src/shared/components";
 import { FontSizes } from "@/src/shared/constants/fontSizes";
+import { useRouter } from "expo-router";
 
 const bleManager = new BleManager();
 
 export const BluetoothOff = () => {
-  const navigation = useNavigation<NavigationProp>();
+  const router = useRouter();
   const [bluetoothState, setBluetoothState] = useState<State | string>("");
   const { speakEnabled } = useSettings();
   const { speak } = useSpeech(0);
@@ -53,9 +52,9 @@ export const BluetoothOff = () => {
   useEffect(() => {
     if (bluetoothState === "PoweredOn") {
       Speech.stop();
-      navigation.replace("BluetoothOnStack");
+      router.replace("/bluetooth-on-stack");
     }
-  }, [bluetoothState, navigation]);
+  }, [bluetoothState, router]);
 
   return (
     <View style={styles.container}>

@@ -1,5 +1,5 @@
 import { Splash } from "@/src/screens";
 
-export default function SplashStack() {
+export default function Index() {
   return <Splash />;
 }

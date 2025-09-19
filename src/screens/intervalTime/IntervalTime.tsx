@@ -8,7 +8,6 @@ import {
   Alert,
   AccessibilityInfo,
 } from "react-native";
-import { useNavigation } from "expo-router";
 
 import {
   About,
@@ -19,12 +18,13 @@ import {
 } from "../../shared/components";
 import { styles } from "./styles";
 import { useHomePropsContext, useMenu } from "@/src/shared/context";
-import { NavigationProp } from "@/src/shared/types/types";
+
 import { FontSizes } from "@/src/shared/constants/fontSizes";
+import { useRouter } from "expo-router";
 const MAX_INTERVAL_SECONDS = 30;
 
 export const IntervalTime = () => {
-  const navigation = useNavigation<NavigationProp>();
+  const router = useRouter();
   const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
   const inputRef = useRef<TextInput>(null);
 
@@ -66,7 +66,7 @@ export const IntervalTime = () => {
     const intervalInSeconds = parseInt(inputValueInt, 10) || 0;
     setIntervalValue(intervalInSeconds);
     AccessibilityInfo.announceForAccessibility(`Intervalo salvo com sucesso.`);
-    navigation.navigate("HomeStack");
+    router.navigate("/home-stack");
   };
 
   return (

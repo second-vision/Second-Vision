@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 import Video from "react-native-video";
-import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 
-import { NavigationProp } from "@/src/shared/types/types";
 import { styles } from "./styles";
 
 export const Splash = () => {
-  const navigation = useNavigation<NavigationProp>();
+  const router = useRouter();
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoaded(true);
-      navigation.replace("ControlBluetoothStack");
+      router.replace("/control-bluetooth-stack");
     }, 3000);
 
     return () => clearTimeout(timer);

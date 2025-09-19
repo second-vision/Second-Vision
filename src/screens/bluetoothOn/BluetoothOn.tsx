@@ -8,12 +8,10 @@ import {
   Pressable,
   FlatList,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { BleManager, Device } from "react-native-ble-plx";
 import * as Speech from "expo-speech";
 import { About, AppText, Devices, Header } from "../../shared/components";
-import { NavigationProp } from "@/src/shared/types/types";
 import { useMenu, useSettings } from "../../shared/context";
 import { styles } from "./styles";
 import {
@@ -24,10 +22,11 @@ import {
 } from "@/src/shared/hooks";
 import { FontSizes } from "@/src/shared/constants/fontSizes";
 import { theme } from "../../shared/styles";
+import { useRouter } from "expo-router";
 const bleManager = new BleManager();
 
 export const BluetoothOn = () => {
-  const navigation = useNavigation<NavigationProp>();
+  const router = useRouter();
   const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
   const { speakEnabled } = useSettings();
   const { speak } = useSpeech(0);
@@ -90,7 +89,7 @@ export const BluetoothOn = () => {
   useEffect(() => {
     if (bluetoothState === "PoweredOff") {
       Speech.stop();
-      navigation.replace("BluetoothOffStack");
+      router.replace("/bluetooth-off-stack");
     }
   }, [bluetoothState]);
 

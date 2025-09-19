@@ -1,4 +1,3 @@
-import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView, View, ScrollView, TouchableOpacity } from "react-native";
 import {
   About,
@@ -12,11 +11,12 @@ import { MODES, HOSTSPOT_MODES } from "@/src/shared/constants/modes";
 import { FontSizes } from "@/src/shared/constants/fontSizes";
 import { styles } from "./styles";
 import { useHomePropsContext, useMenu } from "@/src/shared/context";
-import { NavigationProp } from "@/src/shared/types/types";
+
 import { useEffect } from "react";
+import { useRouter } from "expo-router";
 
 export const OperationMode = () => {
-  const navigation = useNavigation<NavigationProp>();
+  const router = useRouter();
   const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
   const {
     interval,
@@ -36,13 +36,13 @@ export const OperationMode = () => {
 
   const handleSelectMode = (mode: any) => {
     setModeValue(mode);
-    navigation.navigate("HomeStack");
+    router.navigate("/home-stack");
   };
 
   const handleSelectHotspot = async (hotspot: any) => {
     if (hotspot == hostspotUI) return;
     setHotspotValue(hotspot);
-    navigation.navigate("HomeStack");
+    router.navigate("/home-stack");
   };
 
   const sendShutdownCommand = () => {};
