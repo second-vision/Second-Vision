@@ -3,7 +3,7 @@ import { View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { BackHandler } from "react-native";
 
-import { NavigationProp } from "@/app/types/types";
+import { NavigationProp } from "@/src/shared/types/types";
 import { useBluetoothManager, useTermsManager } from "@/src/shared/hooks";
 
 export const ControlBluetooth = () => {

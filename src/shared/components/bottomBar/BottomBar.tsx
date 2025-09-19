@@ -6,7 +6,7 @@ import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { theme } from "../../styles";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { NavigationProp } from "@/app/types/types";
+import { NavigationProp } from "@/src/shared/types/types";
 
 interface IBottomBarProps {
   interval: number | null;

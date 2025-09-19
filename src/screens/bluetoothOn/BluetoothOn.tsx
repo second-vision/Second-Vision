@@ -13,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { BleManager, Device } from "react-native-ble-plx";
 import * as Speech from "expo-speech";
 import { About, AppText, Devices, Header } from "../../shared/components";
-import { NavigationProp } from "@/app/types/types";
+import { NavigationProp } from "@/src/shared/types/types";
 import { useMenu, useSettings } from "../../shared/context";
 import { styles } from "./styles";
 import {
@@ -98,7 +98,9 @@ export const BluetoothOn = () => {
 
   const renderItem = ({ item }: { item: Device }) => {
     const isConnected = connectedDevices.has(item.id);
-    const backgroundColor = isConnected ? theme.colors.secundary : theme.colors.backgroundVariant;
+    const backgroundColor = isConnected
+      ? theme.colors.secundary
+      : theme.colors.backgroundVariant;
 
     return (
       <TouchableHighlight
@@ -116,7 +118,9 @@ export const BluetoothOn = () => {
             color={theme.colors.primary}
             accessible={false}
           />
-          <AppText baseSize={FontSizes.Normal} style={styles.peripheralName}>{item.name || "Sem nome"}</AppText>
+          <AppText baseSize={FontSizes.Normal} style={styles.peripheralName}>
+            {item.name || "Sem nome"}
+          </AppText>
         </View>
       </TouchableHighlight>
     );
@@ -153,7 +157,11 @@ export const BluetoothOn = () => {
 
         {searchPerformed && allDevices.length === 0 && (
           <View style={styles.row}>
-            <AppText baseSize={FontSizes.Small} style={styles.noPeripherals} accessibilityRole="alert">
+            <AppText
+              baseSize={FontSizes.Small}
+              style={styles.noPeripherals}
+              accessibilityRole="alert"
+            >
               Nenhum dispositivo encontrado. Toque no botão Escanear ou abra o
               menu no canto superior esquerdo para ver o tutorial.
             </AppText>

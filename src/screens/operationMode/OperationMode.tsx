@@ -12,7 +12,7 @@ import { MODES, HOSTSPOT_MODES } from "@/src/shared/constants/modes";
 import { FontSizes } from "@/src/shared/constants/fontSizes";
 import { styles } from "./styles";
 import { useHomePropsContext, useMenu } from "@/src/shared/context";
-import { NavigationProp } from "@/app/types/types";
+import { NavigationProp } from "@/src/shared/types/types";
 import { useEffect } from "react";
 
 export const OperationMode = () => {

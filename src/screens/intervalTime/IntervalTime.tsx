@@ -19,7 +19,7 @@ import {
 } from "../../shared/components";
 import { styles } from "./styles";
 import { useHomePropsContext, useMenu } from "@/src/shared/context";
-import { NavigationProp } from "@/app/types/types";
+import { NavigationProp } from "@/src/shared/types/types";
 import { FontSizes } from "@/src/shared/constants/fontSizes";
 const MAX_INTERVAL_SECONDS = 30;
 

@@ -3,7 +3,7 @@ import { BleManager, State, Device } from "react-native-ble-plx";
 import BluetoothStateManager from "react-native-bluetooth-state-manager";
 import { useDeviceContext } from "../context";
 import { useNavigation } from "@react-navigation/native";
-import { NavigationProp } from "@/app/types/types";
+import { NavigationProp } from "@/src/shared/types/types";
 import * as Speech from "expo-speech";
 const bleManager = new BleManager();
 

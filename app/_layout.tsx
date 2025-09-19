@@ -7,7 +7,7 @@ import {
   OperationMode,
   Splash,
   TermsOfUse,
-  Settings
+  Settings,
 } from "@/src/screens";
 import {
   DeviceProvider,
@@ -25,7 +25,7 @@ export default function RootLayout() {
       <ModeProvider>
         <DeviceProvider>
           <MenuProvider>
-            <Stack.Navigator>
+            <Stack.Navigator initialRouteName="SplashStack">
               <Stack.Screen
                 name="SplashStack"
                 component={Splash}

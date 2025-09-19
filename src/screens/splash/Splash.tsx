@@ -3,7 +3,7 @@ import { View } from "react-native";
 import Video from "react-native-video";
 import { useNavigation } from "@react-navigation/native";
 
-import { NavigationProp } from "@/app/types/types";
+import { NavigationProp } from "@/src/shared/types/types";
 import { styles } from "./styles";
 
 export const Splash = () => {

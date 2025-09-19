@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import { NavigationProp } from "@/app/types/types";
+import { NavigationProp } from "@/src/shared/types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
 import ExitApp from "react-native-exit-app";

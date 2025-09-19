@@ -22,7 +22,7 @@ import { Alert } from "react-native";
 import * as Speech from "expo-speech";
 
 import { useNavigation } from "expo-router";
-import { NavigationProp } from "@/app/types/types";
+import { NavigationProp } from "@/src/shared/types/types";
 import { useSpeech } from "./useSpeech";
 
 const bleManager = new BleManager();
@@ -34,7 +34,8 @@ export function useDeviceConnection(
     device: Device
   ) => Promise<{ connected: boolean; ssid: string | null }>
 ) {
-  const { deviceInfo, setDeviceInfo, setModeValue, hostspotUI } = useHomePropsContext();
+  const { deviceInfo, setDeviceInfo, setModeValue, hostspotUI } =
+    useHomePropsContext();
   const [isOn, setIsOn] = useState(true);
   const [objectData, setObjectData] = useState<string | null>(null);
   const [ocrData, setOcrData] = useState<string | null>(null);
