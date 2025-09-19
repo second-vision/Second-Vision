@@ -1,6 +1,6 @@
 import { View, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRoute } from "@react-navigation/native";
+import { usePathname } from "expo-router";
 import { Device } from "react-native-ble-plx";
 import { styles } from "./styles";
 import { AppText } from "../appText/AppText";
@@ -19,15 +19,14 @@ export const Header: React.FC<HeaderProps> = ({
   sendShutdownCommand,
   device,
 }) => {
-  const route = useRoute();
-
+  const pathname = usePathname();
   const handleShutdownCommand = async () => {
     if (device) {
       await sendShutdownCommand(device);
     }
   };
 
-  if (route.name !== "HomeStack") {
+  if (pathname !== "/home-stack") {
     return (
       <View style={[styles.headerOptions]}>
         <Pressable
@@ -43,7 +42,9 @@ export const Header: React.FC<HeaderProps> = ({
             style={[styles.information2]}
           />
         </Pressable>
-        <AppText baseSize={FontSizes.Large} style={[styles.textFont]}>{props}</AppText>
+        <AppText baseSize={FontSizes.Large} style={[styles.textFont]}>
+          {props}
+        </AppText>
         <AppText style={[styles.information]}></AppText>
       </View>
     );
@@ -63,7 +64,9 @@ export const Header: React.FC<HeaderProps> = ({
             style={[styles.information2]}
           />
         </Pressable>
-        <AppText baseSize={FontSizes.Large} style={[styles.textFont]}>{props}</AppText>
+        <AppText baseSize={FontSizes.Large} style={[styles.textFont]}>
+          {props}
+        </AppText>
         <Pressable
           style={[styles.information3]}
           onPress={handleShutdownCommand}

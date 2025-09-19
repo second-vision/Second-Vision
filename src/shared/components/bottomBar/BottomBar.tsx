@@ -5,8 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { theme } from "../../styles";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { NavigationProp } from "@/src/shared/types/types";
+import { usePathname, useRouter } from "expo-router";
 
 interface IBottomBarProps {
   interval: number | null;
@@ -16,10 +15,9 @@ interface IBottomBarProps {
 }
 
 export const BottomBar: React.FC<IBottomBarProps> = () => {
-  const navigation = useNavigation<NavigationProp>();
-  const route = useRoute();
-
-  const isActive = (screenName: string) => route.name === screenName;
+  const router = useRouter();
+  const pathname = usePathname();
+  const isActive = (screenName: string) => pathname === screenName;
 
   return (
     <View style={styles.bottomNav}>
@@ -27,17 +25,17 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
       <TouchableOpacity
         style={[
           styles.navItem,
-          isActive("HomeStack") && {
+          isActive("/home-stack") && {
             backgroundColor: theme.colors.primary,
             borderRadius: 30,
           },
         ]}
-        onPress={() => navigation.navigate("HomeStack")}
+        onPress={() => router.navigate("/home-stack")}
         accessibilityLabel="Página inicial"
         accessibilityHint="Navega para a tela principal"
       >
         <Ionicons
-          name={isActive("HomeStack") ? "home" : "home-outline"}
+          name={isActive("/home-stack") ? "home" : "home-outline"}
           color={
             isActive("HomeStack")
               ? theme.colors.background
@@ -51,19 +49,19 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
       <TouchableOpacity
         style={[
           styles.navItem,
-          isActive("IntervalTimeStack") && {
+          isActive("Iinterval-time-stack") && {
             backgroundColor: theme.colors.primary,
             borderRadius: 30,
           },
         ]}
-        onPress={() => navigation.navigate("IntervalTimeStack")}
+        onPress={() => router.navigate("/interval-time-stack")}
         accessibilityLabel="Intervalo de fala"
         accessibilityHint="Navega para a tela de definição de intervalo"
       >
         <Ionicons
-          name={isActive("IntervalTimeStack") ? "timer" : "timer-outline"}
+          name={isActive("interval-time-stack") ? "timer" : "timer-outline"}
           color={
-            isActive("IntervalTimeStack")
+            isActive("interval-time-stack")
               ? theme.colors.background
               : theme.colors.primary
           }
@@ -75,16 +73,16 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
       <TouchableOpacity
         style={[
           styles.navItem,
-          isActive("OperationModeStack") && {
+          isActive("operation-mode-stack") && {
             backgroundColor: theme.colors.primary,
             borderRadius: 30,
           },
         ]}
-        onPress={() => navigation.navigate("OperationModeStack")}
+        onPress={() => router.navigate("/operation-mode-stack")}
         accessibilityLabel="Modo de operação"
         accessibilityHint="Navega para a tela de modos de operação"
       >
-        {isActive("OperationModeStack") ? (
+        {isActive("operation-mode-stack") ? (
           <MaterialCommunityIcons
             name="pencil"
             size={30}
@@ -103,17 +101,17 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
       <TouchableOpacity
         style={[
           styles.navItem,
-          isActive("SettingsStack") && {
+          isActive("settings-stack") && {
             backgroundColor: theme.colors.primary,
             borderRadius: 30,
           },
         ]}
-        onPress={() => navigation.navigate("SettingsStack")}
+        onPress={() => router.navigate("/settings-stack")}
         accessibilityLabel="Configurações"
         accessibilityHint="Navega para a tela de configurações"
       >
         <Ionicons
-          name={isActive("SettingsStack") ? "settings" : "settings-outline"}
+          name={isActive("settings-stack") ? "settings" : "settings-outline"}
           color={
             isActive("SettingsStack")
               ? theme.colors.background

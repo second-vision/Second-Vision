@@ -21,9 +21,8 @@ import {
 import { Alert } from "react-native";
 import * as Speech from "expo-speech";
 
-import { useNavigation } from "expo-router";
-import { NavigationProp } from "@/src/shared/types/types";
 import { useSpeech } from "./useSpeech";
+import { useRouter } from "expo-router";
 
 const bleManager = new BleManager();
 
@@ -41,7 +40,7 @@ export function useDeviceConnection(
   const [ocrData, setOcrData] = useState<string | null>(null);
   const [battery, setBattery] = useState<string | null>(null);
   const [batteryDuration, setBatteryDuration] = useState<string | null>(null);
-  const navigation = useNavigation<NavigationProp>();
+  const router = useRouter();
   const { speakEnabled } = useSettings();
 
   const { speak } = useSpeech(0);
@@ -100,7 +99,7 @@ export function useDeviceConnection(
   useEffect(() => {
     if (bluetoothState === "PoweredOff") {
       Speech.stop();
-      navigation.replace("ControlBluetoothStack");
+      router.replace("/control-bluetooth-stack");
     }
   }, [bluetoothState]);
 
@@ -259,7 +258,7 @@ export function useDeviceConnection(
                 await Promise.race([writeWithTimeout(device), timeout]);
 
                 Speech.stop();
-                navigation.replace("ControlBluetoothStack");
+                router.replace("/control-bluetooth-stack");
               }
             } catch (error) {
               console.error("Erro ao enviar comando:", error);

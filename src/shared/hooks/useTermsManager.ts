@@ -1,18 +1,17 @@
-import { useNavigation } from "@react-navigation/native";
-import { NavigationProp } from "@/src/shared/types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
 import ExitApp from "react-native-exit-app";
 import * as Speech from "expo-speech";
+import { useRouter } from "expo-router";
 
 export function useTermsManager() {
-  const navigation = useNavigation<NavigationProp>();
+  const router = useRouter();
 
   const checkTermsAcceptance = async (handleBluetoothState: () => void) => {
     const accepted = await AsyncStorage.getItem("hasAcceptedTerms");
     if (accepted !== "true") {
       Speech.stop();
-      navigation.replace("TermsOfUseStack");
+      router.replace("/terms-of-use-stack");
     } else {
       handleBluetoothState();
     }
@@ -21,7 +20,7 @@ export function useTermsManager() {
   const acceptTerms = async () => {
     await AsyncStorage.setItem("hasAcceptedTerms", "true");
     Speech.stop();
-    navigation.replace("ControlBluetoothStack");
+    router.replace("/control-bluetooth-stack");
   };
 
   const rejectTerms = () => {
