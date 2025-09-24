@@ -11,7 +11,7 @@
 <p align="center">
   <a href="#-sobre-o-projeto">Sobre</a> •
   <a href="#-principais-funcionalidades">Funcionalidades</a> •
-  <a href="#-tecnologias">Tecnologias</a> •
+  <a href="#-tecnologias-utilizadas">Tecnologias</a> •
   <a href="#-instalação-do-servidor">Instalação</a> •
   <a href="#-jornada-e-reconhecimento">Jornada</a> •
   <a href="#-desenvolvedores">Equipe</a>
