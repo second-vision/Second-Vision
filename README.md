@@ -19,7 +19,7 @@
 
 <p align="center">
   <img alt="Linguagem Principal" src="https://img.shields.io/github/languages/top/second-vision/second-vision?color=blue&logo=python">
-  <img alt="Status" src="https://img.shields.io/badge/status-em%20desenvolvimento-yellow">
+  <img alt="Status" src="https://img.shields.io/badge/status-finalizado-green">
   <a href="#"><img alt="Artigo Científico" src="https://img.shields.io/badge/artigo-em%20publica%C3%A7%C3%A3o-brightgreen"></a>
 </p>
 
