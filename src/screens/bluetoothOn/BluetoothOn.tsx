@@ -141,7 +141,7 @@ export const BluetoothOn = () => {
         <View style={styles.buttonGroup}>
           <Pressable
             style={styles.scanButton}
-            onPress={() => router.navigate("/home-stack")}
+            onPress={startScan}
             accessibilityRole="button"
             accessibilityLabel={
               isScanning ? "Parar escaneamento" : "Iniciar escaneamento"

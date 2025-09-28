@@ -29,7 +29,7 @@ import { FontSizes } from "@/src/shared/constants/fontSizes";
 
 export const Settings = () => {
   const { interval, mode, hostspot, deviceInfo } = useHomePropsContext();
-  const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
+  const { isMenuOpen, toggleMenu } = useMenu();
   const { speakEnabled, fontSize, setFontSize, loading, toggleSpeak } =
     useSettings();
   const { resetSettings, handleFontSizeChange, handleSpeakToggle } =
@@ -152,7 +152,11 @@ export const Settings = () => {
               }}
               value={speakEnabled}
               onValueChange={handleSpeakToggle}
-              thumbColor={speakEnabled ? theme.colors.primary : theme.colors.backgroundVariant}
+              thumbColor={
+                speakEnabled
+                  ? theme.colors.primary
+                  : theme.colors.backgroundVariant
+              }
               trackColor={{ false: theme.colors.line, true: theme.colors.line }}
               accessibilityRole="switch"
               accessibilityLabel="Guiamento sonoro"
@@ -168,14 +172,18 @@ export const Settings = () => {
             accessibilityLabel="Redefinir configurações"
             accessibilityHint="Reinicia tamanho da fonte e guiamento sonoro"
           >
-            <Ionicons name="refresh" size={20} color={theme.colors.background} />
+            <Ionicons
+              name="refresh"
+              size={20}
+              color={theme.colors.background}
+            />
             <AppText baseSize={FontSizes.Normal} style={styles.resetText}>
               Redefinir configurações
             </AppText>
           </TouchableOpacity>
         </View>
 
-        <About visible={isMenuOpen} onClose={closeMenu} />
+        <About visible={isMenuOpen} onClose={toggleMenu} />
       </ScrollView>
 
       <BottomBar

@@ -25,7 +25,7 @@ const MAX_INTERVAL_SECONDS = 30;
 
 export const IntervalTime = () => {
   const router = useRouter();
-  const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
+  const { isMenuOpen, toggleMenu } = useMenu();
   const inputRef = useRef<TextInput>(null);
 
   const { interval, mode, setIntervalValue, hostspot, deviceInfo } =
@@ -122,7 +122,7 @@ export const IntervalTime = () => {
           </Pressable>
         </View>
 
-        <About visible={isMenuOpen} onClose={closeMenu} />
+        <About visible={isMenuOpen} onClose={toggleMenu} />
       </ScrollView>
 
       <BottomBar

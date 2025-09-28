@@ -17,7 +17,7 @@ import { useRouter } from "expo-router";
 
 export const OperationMode = () => {
   const router = useRouter();
-  const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
+  const { isMenuOpen, toggleMenu } = useMenu();
   const {
     interval,
     mode,
@@ -164,7 +164,7 @@ export const OperationMode = () => {
           )}
         </View>
 
-        <About visible={isMenuOpen} onClose={closeMenu} />
+        <About visible={isMenuOpen} onClose={toggleMenu} />
       </ScrollView>
 
       <BottomBar
