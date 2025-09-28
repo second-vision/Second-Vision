@@ -11,6 +11,7 @@ export const styles = StyleSheet.create({
     marginLeft: 10,
   },
   modalContainer: {
+    paddingTop: 8,
     flex: 1,
     backgroundColor: theme.colors.modal,
     marginTop: 0,

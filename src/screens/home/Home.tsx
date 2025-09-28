@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SafeAreaView, ScrollView } from "react-native";
+import { SafeAreaView, ScrollView, View } from "react-native";
 import {
   About,
   BottomBar,
@@ -23,7 +23,7 @@ import { Device } from "react-native-ble-plx";
 export const Home = () => {
   //Variaveis uteis
   const { deviceConnection } = useDeviceContext();
-  const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
+  const { isMenuOpen, toggleMenu } = useMenu();
   const [isScanningM] = useState(true);
   const [allDevices] = useState<Device[]>([]);
 
@@ -76,7 +76,7 @@ export const Home = () => {
     isScanningM,
     allDevices,
     hostspotUI,
-    deviceInfo
+    deviceInfo,
   });
 
   // Variaveis para UI
@@ -92,52 +92,54 @@ export const Home = () => {
   const batteryLevelForDashboard = isNaN(batteryNumber) ? 0 : batteryNumber;
 
   return (
-    <SafeAreaView style={styles.container} accessible>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Loading
-          LoadingVisible={isConnecting}
-          accessibilityLabel="Carregando"
-          accessibilityRole="progressbar"
-        />
-        <Header
-          toggleMenu={toggleMenu}
-          props="Second Vision"
-          sendShutdownCommand={sendShutdownCommand}
-          device={deviceConnection}
-        />
-        <Devices />
-        <Dashboard
-          isOn={isOn}
-          intervalDash={interval * 1000}
-          batteryLevel={batteryLevelForDashboard}
-          currentModeIndex={mode}
-          currentMode={currentMode}
-          currentHostspot={currentHostspot}
-        />
-        <ModalWifi
-          handleSelectHotspot={handleSelectHotspot}
-          openHotspotSettings={openHotspotSettings}
-          handleSubmitCredentials={handleSubmitCredentials}
-          modalVisible={modalVisible}
-          ssid={ssid}
-          setSsid={setSsid}
-          password={password}
-          setPassword={setPassword}
-          SendWifiSubmit={handleWifiSubmit}
-          device={deviceConnection}
-          onClose={() => {
-            setModalVisible(false);
-            setHotspotValue(2);
-          }}
-        />
-        <About visible={isMenuOpen} onClose={closeMenu} />
-      </ScrollView>
+    <View style={{ height: "100%" }}>
+      <View style={styles.container} accessible>
+        <View style={styles.scrollContent}>
+          <Loading
+            LoadingVisible={isConnecting}
+            accessibilityLabel="Carregando"
+            accessibilityRole="progressbar"
+          />
+          <Header
+            toggleMenu={toggleMenu}
+            props="Second Vision"
+            sendShutdownCommand={sendShutdownCommand}
+            device={deviceConnection}
+          />
+          <Devices />
+          <Dashboard
+            isOn={isOn}
+            intervalDash={interval * 1000}
+            batteryLevel={batteryLevelForDashboard}
+            currentModeIndex={mode}
+            currentMode={currentMode}
+            currentHostspot={currentHostspot}
+          />
+          <ModalWifi
+            handleSelectHotspot={handleSelectHotspot}
+            openHotspotSettings={openHotspotSettings}
+            handleSubmitCredentials={handleSubmitCredentials}
+            modalVisible={modalVisible}
+            ssid={ssid}
+            setSsid={setSsid}
+            password={password}
+            setPassword={setPassword}
+            SendWifiSubmit={handleWifiSubmit}
+            device={deviceConnection}
+            onClose={() => {
+              setModalVisible(false);
+              setHotspotValue(2);
+            }}
+          />
+          <About visible={isMenuOpen} onClose={toggleMenu} />
+        </View>
+      </View>
       <BottomBar
         mode={mode}
         hostspot={hostspot}
         interval={interval}
         deviceInfo={deviceInfo?.model!}
       />
-    </SafeAreaView>
+    </View>
   );
 };

@@ -27,7 +27,7 @@ const bleManager = new BleManager();
 
 export const BluetoothOn = () => {
   const router = useRouter();
-  const { isMenuOpen, toggleMenu, closeMenu } = useMenu();
+  const { isMenuOpen, toggleMenu } = useMenu();
   const { speakEnabled } = useSettings();
   const { speak } = useSpeech(0);
   const [bluetoothState, setBluetoothState] = useState("PoweredOn");
@@ -141,7 +141,7 @@ export const BluetoothOn = () => {
         <View style={styles.buttonGroup}>
           <Pressable
             style={styles.scanButton}
-            onPress={startScan}
+            onPress={() => router.navigate("/home-stack")}
             accessibilityRole="button"
             accessibilityLabel={
               isScanning ? "Parar escaneamento" : "Iniciar escaneamento"
@@ -175,7 +175,7 @@ export const BluetoothOn = () => {
         />
       </SafeAreaView>
 
-      <About visible={isMenuOpen} onClose={closeMenu} />
+      <About visible={isMenuOpen} onClose={toggleMenu} />
     </View>
   );
 };

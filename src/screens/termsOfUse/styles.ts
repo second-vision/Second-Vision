@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-around",
     marginTop: 20,
-    marginBottom: 30,
+    marginBottom: 60,
   },
   Button: {
     backgroundColor: theme.colors.primary,

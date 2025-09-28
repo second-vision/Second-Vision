@@ -6,6 +6,7 @@ import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { theme } from "../../styles";
 import { usePathname, useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface IBottomBarProps {
   interval: number | null;
@@ -37,7 +38,7 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
         <Ionicons
           name={isActive("/home-stack") ? "home" : "home-outline"}
           color={
-            isActive("HomeStack")
+            isActive("/home-stack")
               ? theme.colors.background
               : theme.colors.primary
           }
@@ -49,7 +50,7 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
       <TouchableOpacity
         style={[
           styles.navItem,
-          isActive("Iinterval-time-stack") && {
+          isActive("/interval-time-stack") && {
             backgroundColor: theme.colors.primary,
             borderRadius: 30,
           },
@@ -59,9 +60,9 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
         accessibilityHint="Navega para a tela de definição de intervalo"
       >
         <Ionicons
-          name={isActive("interval-time-stack") ? "timer" : "timer-outline"}
+          name={isActive("/interval-time-stack") ? "timer" : "timer-outline"}
           color={
-            isActive("interval-time-stack")
+            isActive("/interval-time-stack")
               ? theme.colors.background
               : theme.colors.primary
           }
@@ -73,7 +74,7 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
       <TouchableOpacity
         style={[
           styles.navItem,
-          isActive("operation-mode-stack") && {
+          isActive("/operation-mode-stack") && {
             backgroundColor: theme.colors.primary,
             borderRadius: 30,
           },
@@ -82,7 +83,7 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
         accessibilityLabel="Modo de operação"
         accessibilityHint="Navega para a tela de modos de operação"
       >
-        {isActive("operation-mode-stack") ? (
+        {isActive("/operation-mode-stack") ? (
           <MaterialCommunityIcons
             name="pencil"
             size={30}
@@ -101,7 +102,7 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
       <TouchableOpacity
         style={[
           styles.navItem,
-          isActive("settings-stack") && {
+          isActive("/settings-stack") && {
             backgroundColor: theme.colors.primary,
             borderRadius: 30,
           },
@@ -111,9 +112,9 @@ export const BottomBar: React.FC<IBottomBarProps> = () => {
         accessibilityHint="Navega para a tela de configurações"
       >
         <Ionicons
-          name={isActive("settings-stack") ? "settings" : "settings-outline"}
+          name={isActive("/settings-stack") ? "settings" : "settings-outline"}
           color={
-            isActive("SettingsStack")
+            isActive("/settings-stack")
               ? theme.colors.background
               : theme.colors.primary
           }

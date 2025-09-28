@@ -1,24 +1,29 @@
 {
   "expo": {
+    "owner": "secondvision",
     "name": "Second Vision",
-    "slug": "second-vision",
+    "slug": "secondvision",
     "sdkVersion": "54.0.0",
-    "version": "1.0.4",
-    "versionCode": "5",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./src/shared/assets/images/logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./src/shared/assets/images/build/splashscreen_image.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+    "cli": {
+      "appVersionSource": "remote"
+    },
+    "build": {
+      "production": {
+        "releaseChannel": "production",
+        "distribution": "store"
+      }
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.rotech.second_vision"
+      "bundleIdentifier": "com.rotech.ble_connection"
     },
     "android": {
+      "versionCode": 5,
       "adaptiveIcon": {
         "foregroundImage": "./src/shared/assets/images/build/ic_launcher_foreground.png",
         "backgroundColor": "#ffffff"
@@ -28,7 +33,7 @@
         "android.permission.BLUETOOTH_ADMIN",
         "android.permission.BLUETOOTH_CONNECT"
       ],
-      "package": "com.rotech.second_vision"
+      "package": "com.rotech.ble_connection"
     },
     "web": {
       "bundler": "metro",
@@ -52,10 +57,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "cbd938e0-ff98-4f6c-9294-a0a74d834fbd"
-      },
-      "router": {
-        "origin": false
+        "projectId": "4ea6acdf-bbea-486d-b12d-bac3d85a5134"
       }
     }
   }

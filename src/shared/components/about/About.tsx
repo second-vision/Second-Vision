@@ -69,7 +69,7 @@ export const About: React.FC<AboutProps> = ({ visible, onClose }) => {
     >
       <View style={styles.modalContainer}>
         <TouchableOpacity
-          style={{ position: "absolute", top: 32, left: 20 }}
+          style={{ position: "absolute", top: 43, left: 20 }}
           onPress={onClose}
           accessibilityLabel="Fechar"
           accessibilityHint="Fecha o modal sobre informações"
