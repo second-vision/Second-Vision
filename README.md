@@ -78,7 +78,7 @@ O Second Vision é um projeto com uma trajetória de crescimento e validação c
 -   **Origem:** Nascido como um TCC na **Etec Zona Leste**.
 -   **Mentoria:** Recebeu mentoria e apoio da **IBM** e da **Fundação IOCHPE**, que ajudaram a moldar a visão técnica e de produto.
 -   **Evolução Acadêmica:** Atualmente em desenvolvimento na **Fatec Zona Leste**, com a publicação de um **artigo científico** em andamento.
--   **Expositor na FETEPS:** Selecionado como projeto expositor na **16ª FETEPS (Feira Tecnológica do Centro Paula Souza)**, um reconhecimento da sua inovação e impacto.
+-   **Expositor na FETEPS:** Selecionado como projeto expositor na **16ª FETEPS (Feira Tecnológica do Centro Paula Souza)**, conquistou a segunda colocação no ranking geral, um reconhecimento da sua inovação e impacto.
 -   **Interesse Institucional:** O projeto despertou o interesse do **SUS** e do **Ministério da Saúde** como uma potencial ferramenta de tecnologia assistiva, com discussões em andamento para apoio e desenvolvimento da ideia.
 
 ## 👨‍💻 Desenvolvedores
