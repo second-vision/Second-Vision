@@ -206,6 +206,33 @@ Group=root
 WantedBy=multi-user.target
 ```
 
+### ⚠️ Observação Importante: Bloqueio de Bluetooth (rfkill)
+
+Em alguns casos, especialmente após reinicializações ou instalações limpas do sistema, o **Bluetooth pode iniciar bloqueado via `rfkill`**, o que impede o registro de anúncios BLE e faz o servidor GATT falhar silenciosamente ou apresentar erros como:
+
+org.bluez.Error.Failed: Failed to register advertisement
+
+Para verificar o estado do Bluetooth, utilize:
+rfkill list
+
+Se o dispositivo Bluetooth (`hci0`) aparecer como **Soft blocked: yes**, é necessário desbloqueá-lo manualmente:
+
+```bash
+sudo rfkill unblock bluetooth
+sudo systemctl restart bluetooth
+```
+
+Após isso, confirme que o Bluetooth está ativo:
+bluetoothctl
+power on
+
+IMPORTANTE:
+Caso o Bluetooth esteja bloqueado no momento da inicialização, o serviço gatt_server.service não conseguirá anunciar o dispositivo, mesmo que o serviço esteja em execução.
+
+(Opcional) Garantir desbloqueio automático no boot
+
+Para garantir que o Bluetooth nunca inicie bloqueado, recomenda-se criar um serviço simples para executar o desbloqueio no boot ou adicionar o comando rfkill unblock bluetooth a um script de inicialização anterior ao serviço GATT.
+
 **d. Habilite e inicie o serviço:**
 ```bash
 sudo systemctl daemon-reload
