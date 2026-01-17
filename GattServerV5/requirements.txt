@@ -1,5 +1,6 @@
 ultralytics
 paddleocr
+paddlepaddle
 pyspellchecker
 fuzzywuzzy
 python-Levenshtein
